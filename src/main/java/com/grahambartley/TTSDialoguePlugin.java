@@ -1,10 +1,12 @@
 package com.grahambartley;
 
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -13,6 +15,7 @@ import javax.inject.Inject;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.InputStream;
@@ -33,6 +36,9 @@ public class TTSDialoguePlugin extends Plugin
 {
 	@Inject
 	private Client client;
+
+	@Inject
+	private TTSDialogueConfig config;
 
 	private String lastSpoken = "";
 
@@ -94,6 +100,17 @@ public class TTSDialoguePlugin extends Plugin
 	        Clip clip = AudioSystem.getClip();
 	        clip.open(audioStream);
 	        currentClip = clip;
+				float volume = Math.max(0, Math.min(100, config.volume()));
+				FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+				if (volume == 0)
+				{
+					gainControl.setValue(gainControl.getMinimum());
+				}
+				else
+				{
+					float gain = (float) (20f * Math.log10(volume / 100.0));
+					gainControl.setValue(gain);
+				}
 	        clip.start();
 	    }
 	    catch (Exception e)
@@ -141,6 +158,13 @@ public class TTSDialoguePlugin extends Plugin
 		        currentClip.stop();
 		        currentClip.close();
 		    }
+		    lastSpoken = "";
 		}
+	}
+
+	@Provides
+	TTSDialogueConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(TTSDialogueConfig.class);
 	}
 }
