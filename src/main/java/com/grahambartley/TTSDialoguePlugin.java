@@ -31,14 +31,12 @@ import java.nio.file.StandardCopyOption;
 )
 public class TTSDialoguePlugin extends Plugin
 {
-	private final Client client;
+	@Inject
+	private Client client;
 
 	private String lastSpoken = "";
 
-	@Inject
-  public TTSDialoguePlugin(final Client client) {
-    this.client = client;
-  }
+	private Clip currentClip;
 
   @Override
 	protected void startUp()
@@ -52,11 +50,12 @@ public class TTSDialoguePlugin extends Plugin
 		log.info("TTS Plugin stopped");
 	}
 
-	private void speakWithTTS(String text)
+	private void speakWithTTS(String text, String speaker)
 	{
 		try
 		{
-			URL url = new URL("http://localhost:59125/");
+			String port = speaker.equalsIgnoreCase("player") ? "59126" : "59125";
+			URL url = new URL("http://localhost:" + port + "/");
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "text/plain");
@@ -84,16 +83,23 @@ public class TTSDialoguePlugin extends Plugin
 
 	private void playAudio(String filepath)
 	{
-		try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(filepath)))
-		{
-			Clip clip = AudioSystem.getClip();
-			clip.open(audioStream);
-			clip.start();
-		}
-		catch (Exception e)
-		{
-			log.warn("Audio playback failed: " + e.getMessage());
-		}
+	    try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(filepath)))
+	    {
+	        if (currentClip != null && currentClip.isRunning())
+	        {
+	            currentClip.stop();
+	            currentClip.close();
+	        }
+
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(audioStream);
+	        currentClip = clip;
+	        clip.start();
+	    }
+	    catch (Exception e)
+	    {
+	        log.warn("Audio playback failed: " + e.getMessage());
+	    }
 	}
 
 	private String cleanDialogueText(String raw)
@@ -112,8 +118,29 @@ public class TTSDialoguePlugin extends Plugin
 			{
 				lastSpoken = text;
 				String cleaned = cleanDialogueText(text);
-				speakWithTTS(cleaned);
+				speakWithTTS(cleaned, "npc");
 			}
+		}
+
+		Widget playerDialogue = client.getWidget(WidgetInfo.DIALOG_PLAYER_TEXT);
+		if (playerDialogue != null && !playerDialogue.isHidden())
+		{
+			String text = playerDialogue.getText();
+			if (text != null && !text.isEmpty() && !text.equals(lastSpoken))
+			{
+				lastSpoken = text;
+				String cleaned = cleanDialogueText(text);
+				speakWithTTS(cleaned, "player");
+			}
+		}
+
+		if ((npcDialogue == null || npcDialogue.isHidden()) && (playerDialogue == null || playerDialogue.isHidden()))
+		{
+		    if (currentClip != null && currentClip.isRunning())
+		    {
+		        currentClip.stop();
+		        currentClip.close();
+		    }
 		}
 	}
 }
