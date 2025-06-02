@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'com.diffplug.spotless' version '6.25.0'
 }
 
 repositories {
@@ -64,4 +65,21 @@ tasks.withType(JavaExec).configureEach {
 	jvmArgs += [
 			"--add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED"
 	]
+}
+
+spotless {
+	java {
+		googleJavaFormat('1.17.0')
+		target 'src/**/*.java'
+	}
+}
+
+tasks.register('installGitHook', Copy) {
+	from("$rootDir/scripts/pre-commit")
+	into("$rootDir/.git/hooks")
+	fileMode = 0755
+}
+
+tasks.named('build') {
+	dependsOn 'spotlessCheck'
 }

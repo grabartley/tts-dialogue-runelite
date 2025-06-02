@@ -1,0 +1,7 @@
+#!/bin/sh
+./gradlew spotlessCheck
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+  echo "Code formatting violations found. Commit aborted."
+  exit 1
+fi
