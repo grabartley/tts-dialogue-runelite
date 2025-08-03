@@ -38,9 +38,17 @@ public class TTSDialoguePlugin extends Plugin {
 
   private Clip currentClip;
 
+  private VoiceManager voiceManager;
+
   @Override
   protected void startUp() {
-    log.info("TTSDialogue started!");
+    voiceManager = new VoiceManager(config, client);
+    log.info("TTSDialogue started");
+
+    // Show server health status if configured
+    if (config.showServerStatus()) {
+      logServerHealthStatus();
+    }
   }
 
   @Override
@@ -48,9 +56,16 @@ public class TTSDialoguePlugin extends Plugin {
     log.info("TTS Plugin stopped");
   }
 
-  private void speakWithTTS(String text, String speaker) {
+  private void speakWithTTS(String text, String speaker, String npcName) {
     try {
-      String port = speaker.equalsIgnoreCase("player") ? "59126" : "59125";
+      String port;
+      if (config.enableRaceBasedVoices() && voiceManager != null) {
+        port = voiceManager.getPortForSpeaker(speaker, npcName);
+      } else {
+        // Fallback to original behavior
+        port = speaker.equalsIgnoreCase("player") ? "59126" : "59125";
+      }
+
       URL url = new URL("http://localhost:" + port + "/");
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       con.setRequestMethod("POST");
@@ -70,6 +85,10 @@ public class TTSDialoguePlugin extends Plugin {
 
       playAudio(tempPath.toString());
       con.disconnect();
+
+      if (config.enableRaceBasedVoices() && !"player".equalsIgnoreCase(speaker)) {
+        log.debug("Used voice for NPC '{}': port {}", npcName, port);
+      }
     } catch (Exception e) {
       log.warn("TTS failed: " + e.getMessage());
     }
@@ -103,6 +122,29 @@ public class TTSDialoguePlugin extends Plugin {
     return raw.replaceAll("<[^>]+>", "").trim();
   }
 
+  /** Extracts NPC name from dialogue widget or uses current interacting NPC */
+  private String getCurrentNPCName() {
+    // Try to get NPC name from dialogue name widget
+    Widget npcNameWidget = client.getWidget(WidgetInfo.DIALOG_NPC_NAME);
+    if (npcNameWidget != null && !npcNameWidget.isHidden()) {
+      String npcName = npcNameWidget.getText();
+      if (npcName != null && !npcName.isEmpty()) {
+        return npcName.trim();
+      }
+    }
+
+    // Fallback: try to get from interacting NPC
+    if (client.getLocalPlayer() != null && client.getLocalPlayer().getInteracting() != null) {
+      String interactingName = client.getLocalPlayer().getInteracting().getName();
+      if (interactingName != null && !interactingName.isEmpty()) {
+        return interactingName.trim();
+      }
+    }
+
+    // Last resort: return "Unknown NPC"
+    return "Unknown NPC";
+  }
+
   @Subscribe
   public void onGameTick(final GameTick tick) {
     Widget npcDialogue = client.getWidget(WidgetInfo.DIALOG_NPC_TEXT);
@@ -111,7 +153,8 @@ public class TTSDialoguePlugin extends Plugin {
       if (text != null && !text.isEmpty() && !text.equals(lastSpoken)) {
         lastSpoken = text;
         String cleaned = cleanDialogueText(text);
-        speakWithTTS(cleaned, "npc");
+        String npcName = getCurrentNPCName();
+        speakWithTTS(cleaned, "npc", npcName);
       }
     }
 
@@ -121,7 +164,7 @@ public class TTSDialoguePlugin extends Plugin {
       if (text != null && !text.isEmpty() && !text.equals(lastSpoken)) {
         lastSpoken = text;
         String cleaned = cleanDialogueText(text);
-        speakWithTTS(cleaned, "player");
+        speakWithTTS(cleaned, "player", null); // No NPC name needed for player
       }
     }
 
@@ -132,6 +175,49 @@ public class TTSDialoguePlugin extends Plugin {
         currentClip.close();
       }
       lastSpoken = "";
+    }
+  }
+
+  /** Log the health status of all TTS voice servers */
+  private void logServerHealthStatus() {
+    if (voiceManager == null) {
+      return;
+    }
+
+    log.info("🎭 TTS Voice Server Health Status:");
+    log.info("====================================");
+
+    var healthStatus = voiceManager.getServerHealthStatus();
+    int healthyCount = 0;
+    int totalCount = healthStatus.size();
+
+    for (var entry : healthStatus.entrySet()) {
+      VoiceManager.VoiceProfile voice = entry.getKey();
+      boolean isHealthy = entry.getValue();
+
+      String status = isHealthy ? "✅ HEALTHY" : "❌ UNAVAILABLE";
+      log.info("  {} (port {}): {}", voice.getDisplayName(), voice.getPort(), status);
+
+      if (isHealthy) {
+        healthyCount++;
+      }
+    }
+
+    log.info("====================================");
+    log.info("📊 Summary: {}/{} voice servers are healthy", healthyCount, totalCount);
+
+    if (healthyCount == 0) {
+      log.warn(
+          "⚠️  No TTS servers are running! Please start voice servers using './setup-voices.sh start'");
+    } else if (healthyCount < totalCount) {
+      log.warn("⚠️  Some TTS servers are unavailable. Fallback voices will be used when needed.");
+      if (config.enableFallbacks()) {
+        log.info("💡 Voice fallbacks are enabled - missing voices will use alternatives");
+      } else {
+        log.warn("⚠️  Voice fallbacks are disabled - some dialogue may fail");
+      }
+    } else {
+      log.info("🎉 All voice servers are healthy!");
     }
   }
 
