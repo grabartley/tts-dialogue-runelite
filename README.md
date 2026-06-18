@@ -3,11 +3,25 @@
 Bring your RuneScape adventures to **life** with full voice acting!  
 This plugin reads **in-game dialogue out loud** using different AI voices for NPCs and the player character. Experience immersive conversations with unique voices for every race and gender! 🎧🧙‍♂️
 
-> Powered by 🧠 [Piper](https://github.com/rhasspy/piper) + 🎮 RuneLite
+> Powered by 🧠 [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) via [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) + 🎮 RuneLite
+
+---
+
+## 🧩 TTS Engine
+
+By default the plugin synthesizes dialogue **in-process** with the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model running on CPU through [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). There is no Docker, no local HTTP server, and no network call at synthesis time. On first use the plugin downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it; every line after that is generated locally.
+
+Model load and synthesis run on a dedicated background thread, so the game never stalls on the first line or on repeated dialogue. On Apple Silicon a typical line synthesizes in roughly 1.3–1.8 s of CPU time.
+
+The legacy Docker voice-server path described below remains available behind the **In-Process TTS (Kokoro)** config toggle. Turn it off to fall back to the HTTP voice servers; leave it on (default) for the embedded engine.
+
+> The native sherpa-onnx library ships per-platform. `build.gradle` bundles the macOS Apple Silicon native jar by default; swap the `sherpa-onnx-native-lib-*` line for your platform when building elsewhere.
 
 ---
 
 ## ✨ Features
+
+- 🧠 **In-process Kokoro TTS** - offline, on-device synthesis with no server or per-line network call
 
 - 🔊 **Text-to-Speech for all dialogue** (NPC & Player)
 - 🎭 **16-Voice Matrix System** - 8 races × 2 genders each with unique voices:

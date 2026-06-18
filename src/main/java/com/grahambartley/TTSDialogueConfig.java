@@ -30,6 +30,18 @@ public interface TTSDialogueConfig extends Config {
   }
 
   @ConfigItem(
+      keyName = "useInProcessTts",
+      name = "In-Process TTS (Kokoro)",
+      description =
+          "Synthesize dialogue in-process with the embedded Kokoro model instead of the local HTTP"
+              + " voice servers. The model downloads once on first use.",
+      position = 5,
+      section = generalSection)
+  default boolean useInProcessTts() {
+    return true;
+  }
+
+  @ConfigItem(
       keyName = "enableRaceBasedVoices",
       name = "Enable Automatic NPC Voices",
       description = "Automatically select voices based on NPC race and gender detection",

@@ -1,8 +1,9 @@
 package com.grahambartley;
 
 import com.google.inject.Provides;
+import com.grahambartley.tts.KokoroAudio;
+import com.grahambartley.tts.KokoroTtsEngine;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -22,6 +23,7 @@ import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.RuneLite;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -34,15 +36,31 @@ public class TTSDialoguePlugin extends Plugin {
 
   @Inject private TTSDialogueConfig config;
 
+  // Speaker ids into the Kokoro voice bank. Race/gender mapping is a separate issue, so for now the
+  // player and NPCs just get two distinct built-in voices.
+  private static final int NPC_SPEAKER_ID = 0;
+  private static final int PLAYER_SPEAKER_ID = 1;
+
   private String lastSpoken = "";
 
   private Clip currentClip;
+  private final Object audioLock = new Object();
 
   private VoiceManager voiceManager;
+
+  private KokoroTtsEngine ttsEngine;
 
   @Override
   protected void startUp() {
     voiceManager = new VoiceManager(config, client);
+
+    Path ttsDir = RuneLite.RUNELITE_DIR.toPath().resolve("tts-dialogue");
+    ttsEngine = new KokoroTtsEngine(ttsDir);
+    if (config.useInProcessTts()) {
+      // Warm the model on a background thread so the first line is not the one that pays the load.
+      ttsEngine.prewarm();
+    }
+
     log.info("TTSDialogue started");
 
     // Show server health status if configured
@@ -53,10 +71,44 @@ public class TTSDialoguePlugin extends Plugin {
 
   @Override
   protected void shutDown() {
+    if (ttsEngine != null) {
+      ttsEngine.close();
+      ttsEngine = null;
+    }
     log.info("TTS Plugin stopped");
   }
 
   private void speakWithTTS(String text, String speaker, String npcName) {
+    if (config.useInProcessTts()) {
+      speakInProcess(text, speaker);
+      return;
+    }
+    speakWithHttpServer(text, speaker, npcName);
+  }
+
+  /** Synthesizes the line in-process with Kokoro, off the game thread, then plays it back. */
+  private void speakInProcess(String text, String speaker) {
+    if (ttsEngine == null || ttsEngine.isFailed()) {
+      return;
+    }
+    int speakerId = "player".equalsIgnoreCase(speaker) ? PLAYER_SPEAKER_ID : NPC_SPEAKER_ID;
+    long requestedAtNanos = System.nanoTime();
+    ttsEngine.speak(
+        text,
+        speakerId,
+        pcm -> {
+          long latencyMs = (System.nanoTime() - requestedAtNanos) / 1_000_000L;
+          log.info(
+              "In-process TTS end-to-end latency: {} ms for \"{}\"", latencyMs, abbreviate(text));
+          playAudio(KokoroAudio.toAudioInputStream(pcm.getSamples(), pcm.getSampleRate()));
+        });
+  }
+
+  private static String abbreviate(String text) {
+    return text.length() <= 40 ? text : text.substring(0, 40) + "...";
+  }
+
+  private void speakWithHttpServer(String text, String speaker, String npcName) {
     try {
       String port;
       if (config.enableRaceBasedVoices() && voiceManager != null) {
@@ -83,7 +135,7 @@ public class TTSDialoguePlugin extends Plugin {
       Path tempPath = Files.createTempFile("npc_voice", ".wav");
       Files.copy(is, tempPath, StandardCopyOption.REPLACE_EXISTING);
 
-      playAudio(tempPath.toString());
+      playAudio(AudioSystem.getAudioInputStream(tempPath.toFile()));
       con.disconnect();
 
       if (config.enableRaceBasedVoices() && !"player".equalsIgnoreCase(speaker)) {
@@ -94,27 +146,38 @@ public class TTSDialoguePlugin extends Plugin {
     }
   }
 
-  private void playAudio(String filepath) {
-    try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(filepath))) {
-      if (currentClip != null && currentClip.isRunning()) {
-        currentClip.stop();
-        currentClip.close();
-      }
+  private void playAudio(AudioInputStream audioStream) {
+    // Playback can be triggered from the game thread (HTTP path) or the TTS background thread
+    // (in-process path), and onGameTick stops the clip on skipped dialogue, so guard the shared
+    // clip.
+    synchronized (audioLock) {
+      try {
+        if (currentClip != null && currentClip.isRunning()) {
+          currentClip.stop();
+          currentClip.close();
+        }
 
-      Clip clip = AudioSystem.getClip();
-      clip.open(audioStream);
-      currentClip = clip;
-      float volume = Math.max(0, Math.min(100, config.volume()));
-      FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-      if (volume == 0) {
-        gainControl.setValue(gainControl.getMinimum());
-      } else {
-        float gain = (float) (20f * Math.log10(volume / 100.0));
-        gainControl.setValue(gain);
+        Clip clip = AudioSystem.getClip();
+        clip.open(audioStream);
+        currentClip = clip;
+        float volume = Math.max(0, Math.min(100, config.volume()));
+        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        if (volume == 0) {
+          gainControl.setValue(gainControl.getMinimum());
+        } else {
+          float gain = (float) (20f * Math.log10(volume / 100.0));
+          gainControl.setValue(gain);
+        }
+        clip.start();
+      } catch (Exception e) {
+        log.warn("Audio playback failed: " + e.getMessage());
+      } finally {
+        try {
+          audioStream.close();
+        } catch (Exception ignored) {
+          // nothing to do on close failure
+        }
       }
-      clip.start();
-    } catch (Exception e) {
-      log.warn("Audio playback failed: " + e.getMessage());
     }
   }
 
@@ -170,9 +233,14 @@ public class TTSDialoguePlugin extends Plugin {
 
     if ((npcDialogue == null || npcDialogue.isHidden())
         && (playerDialogue == null || playerDialogue.isHidden())) {
-      if (currentClip != null && currentClip.isRunning()) {
-        currentClip.stop();
-        currentClip.close();
+      if (ttsEngine != null) {
+        ttsEngine.interrupt();
+      }
+      synchronized (audioLock) {
+        if (currentClip != null && currentClip.isRunning()) {
+          currentClip.stop();
+          currentClip.close();
+        }
       }
       lastSpoken = "";
     }

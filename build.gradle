@@ -12,15 +12,44 @@ repositories {
 		}
 	}
 	mavenCentral()
+
+	// sherpa-onnx is not published to Maven Central. Resolve its prebuilt
+	// jars straight from the k2-fsa GitHub release assets via an ivy layout.
+	// Asset layout: <tag>/<artifact>-<tag>.jar, e.g. v1.13.3/sherpa-onnx-v1.13.3.jar
+	ivy {
+		url = 'https://github.com/k2-fsa/sherpa-onnx/releases/download'
+		patternLayout {
+			artifact '[revision]/[artifact]-[revision].jar'
+		}
+		metadataSources { artifact() }
+		content { includeGroup 'com.k2fsa' }
+	}
 }
 
 def runeLiteVersion = 'latest.release'
+def sherpaOnnxVersion = 'v1.13.3'
 
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
 	compileOnly 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+	// In-process Kokoro TTS via sherpa-onnx (k2-fsa). The pure-Java API jar is
+	// needed at compile time; the JNI native lib jar is runtime only and is
+	// auto-extracted from the classpath by sherpa-onnx's library loader.
+	implementation "com.k2fsa:sherpa-onnx:${sherpaOnnxVersion}"
+	// Bundle the native lib for the host platform. Swap/add the line below for
+	// other platforms when distributing:
+	//   sherpa-onnx-native-lib-osx-aarch64   (macOS Apple Silicon)
+	//   sherpa-onnx-native-lib-osx-x64       (macOS Intel)
+	//   sherpa-onnx-native-lib-linux-x64     (Linux x64)
+	//   sherpa-onnx-native-lib-linux-aarch64 (Linux arm64)
+	//   sherpa-onnx-native-lib-win-x64       (Windows x64)
+	runtimeOnly "com.k2fsa:sherpa-onnx-native-lib-osx-aarch64:${sherpaOnnxVersion}"
+
+	// Extracts the Kokoro model bundle (tar.bz2) on first run.
+	implementation 'org.apache.commons:commons-compress:1.26.2'
 
 	testImplementation 'junit:junit:4.12'
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
