@@ -1,5 +1,5 @@
 .gradle
-build
+/build
 .idea/
 .project
 .settings/
@@ -8,3 +8,6 @@ nbactions.xml
 nb-configuration.xml
 nbproject/
 .DS_Store
+.claude/worktrees/
+.claude/tmp/
+.claude/settings.local.json
