@@ -9,7 +9,7 @@
 
 **Gielinor, out loud.** This plugin voices in-game dialogue in real time, giving NPCs and your own character distinct AI voices so every conversation actually speaks to you.
 
-It runs entirely on your machine. No accounts, no cloud calls, no per-line API bills. The first time you talk to someone the plugin pulls down the voice model, and after that every line is synthesized locally, on-device.
+By default it runs entirely on your machine. No accounts, no cloud calls, no per-line API bills. The first time you talk to someone the plugin pulls down the voice model, and after that every line is synthesized locally, on-device. An optional **Cloud (Azure)** backend is available for stronger, emotional delivery; it is off by default and only used when you explicitly select it and supply your own Azure key.
 
 > Powered by [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) via [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx), running inside RuneLite.
 
@@ -165,6 +165,24 @@ Windows SmartScreen may warn on an unsigned bundle; choose **More info -> Run an
 - **Player Voice** chooses which Kokoro voice the player character uses.
 - **Enable Voice Fallbacks** falls back to a gender-appropriate human voice when an NPC is missing from the table. When off, those NPCs use the single default voice.
 - **Debug Mode** logs detailed NPC race/gender resolution.
+- **Voice Backend** selects the synthesis engine. `Local` is the offline, in-process Kokoro voice (default). `Cloud` routes synthesis through Microsoft Azure Neural TTS for emotional delivery.
+- **Azure Subscription Key** / **Azure Region** configure the Cloud backend (for example `eastus`). These are required only when **Voice Backend** is `Cloud`; the key is stored locally and never bundled with the plugin.
+
+### Cloud (Azure) backend
+
+When **Voice Backend** is `Cloud` and a key and region are set, dialogue is synthesized by Azure Neural TTS over HTTPS using the injected RuneLite OkHttp client. This is the strongest-emotion path and renders detected emotion as Azure SSML styles. Each race/gender resolves to a distinct `en-US`/`en-GB` neural voice, mirroring the spirit of the local Kokoro matrix, with a default voice for any unmapped speaker. Emotion maps to an Azure SSML `mstts:express-as` style:
+
+| Emotion | Azure style |
+|---------|-------------|
+| Neutral | plain (no style) |
+| Happy   | `cheerful` |
+| Sad     | `sad` |
+| Angry   | `angry` |
+| Scared  | `terrified` |
+
+If the resolved voice does not support a requested style, delivery degrades to plain. A missing/invalid key, an API error, or a network problem fails that line gracefully and falls back to the local voice with a one-time notice; nothing crashes and the game thread is never blocked.
+
+> With the Cloud backend active, dialogue text and your configured region leave your machine and are sent to Microsoft Azure. The local backend stays fully offline.
 
 ## Troubleshooting
 

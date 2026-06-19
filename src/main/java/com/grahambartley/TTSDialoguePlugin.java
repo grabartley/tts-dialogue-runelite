@@ -2,6 +2,7 @@ package com.grahambartley;
 
 import com.google.gson.Gson;
 import com.google.inject.Provides;
+import com.grahambartley.synthesis.AzureTtsBackend;
 import com.grahambartley.synthesis.BackendProvider;
 import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.LocalKokoroBackend;
@@ -67,7 +68,15 @@ public class TTSDialoguePlugin extends Plugin {
     EngineInstaller installer = new EngineInstaller(okHttpClient, gson, ttsDir.resolve("engines"));
     LocalKokoroBackend localKokoro =
         new LocalKokoroBackend(installer, launcher -> new ExternalEngineClient(launcher, gson));
-    backendProvider = new BackendProvider(config, localKokoro);
+    // The cloud Azure backend is registered alongside the local Kokoro fallback and selected when
+    // Voice Backend is Cloud and a key/region are set. It uses the injected OkHttpClient (Hub
+    // rule).
+    // The provider routes every line, applies the emotion-downgrade rule, and falls back to local
+    // Kokoro (with a one-time notice) when the selected backend is unavailable.
+    AzureTtsBackend azureBackend = new AzureTtsBackend(okHttpClient, config);
+    azureBackend.setNotice(this::notifyBackend);
+    backendProvider = new BackendProvider(config, localKokoro, azureBackend);
+    backendProvider.setAvailabilityNotice(this::notifyBackend);
     // Persistent on-disk cache lives under the same RuneLite dir as the engine; on by default so
     // repeated lines survive restarts and cloud backends are not re-billed. It sits in front of the
     // backend provider's synthesis regardless of which backend (local or cloud) runs. Opt-out via
@@ -100,6 +109,15 @@ public class TTSDialoguePlugin extends Plugin {
       backendProvider = null;
     }
     log.info("TTS Plugin stopped");
+  }
+
+  /**
+   * Surfaces a one-time backend notice (fallback or cloud failure) to the player. Logged at warn so
+   * it appears in the client log without a chat dependency; the message text is already
+   * user-facing.
+   */
+  private void notifyBackend(String message) {
+    log.warn(message);
   }
 
   /** Hands the line to the off-thread synth + playback pipeline; never blocks the game thread. */

@@ -24,6 +24,14 @@ public interface TTSDialogueConfig extends Config {
       position = 2)
   String synthesisSection = "synthesis";
 
+  @ConfigSection(
+      name = "Cloud (Azure)",
+      description =
+          "Microsoft Azure Neural TTS settings. Used only when Voice Backend is Cloud. Dialogue text"
+              + " and your region leave your machine when this backend is active.",
+      position = 3)
+  String cloudAzureSection = "cloudAzure";
+
   /**
    * Which synthesis backend dialogue routes through. {@code LOCAL} is the offline, in-process
    * Kokoro engine (default); {@code LOCAL_GPU} and {@code CLOUD} are reserved for the emotional
@@ -57,6 +65,31 @@ public interface TTSDialogueConfig extends Config {
       section = synthesisSection)
   default boolean enableEmotion() {
     return true;
+  }
+
+  @ConfigItem(
+      keyName = "azureKey",
+      name = "Azure Subscription Key",
+      description =
+          "Your Microsoft Azure Speech resource key. Required for the Cloud voice backend. Stored"
+              + " locally and never bundled with the plugin.",
+      position = 0,
+      secret = true,
+      section = cloudAzureSection)
+  default String azureKey() {
+    return "";
+  }
+
+  @ConfigItem(
+      keyName = "azureRegion",
+      name = "Azure Region",
+      description =
+          "The region of your Azure Speech resource, e.g. eastus. Required for the Cloud voice"
+              + " backend.",
+      position = 1,
+      section = cloudAzureSection)
+  default String azureRegion() {
+    return "";
   }
 
   @ConfigItem(
