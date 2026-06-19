@@ -24,10 +24,10 @@ Every voice is a real, distinct Kokoro speaker. The audio you hear is the clean 
 - 🧠 **In-process Kokoro TTS** - offline, on-device synthesis with no server or per-line network call
 - 🔊 **Text-to-Speech for all dialogue** (NPC & Player)
 - 🎭 **Race/Gender Voice Matrix** - 8 races × 2 genders plus player voices, each mapped to a distinct Kokoro speaker
-- 🤖 **Automatic NPC Detection** - Intelligently detects race and gender from NPC names, IDs, and context
+- 🤖 **Static NPC Voice Table** - Race and gender resolve from a precomputed `npcId → {race, gender}` table baked into the plugin: one in-memory lookup, no network calls or downloads
 - ⏩ **Smart Playback** - Cancels audio on skipped dialogue
-- 🔄 **Sensible Fallbacks** - Undetected NPCs fall back to a gender-appropriate human voice
-- 🐛 **Debug Mode** - Detailed NPC detection logging for troubleshooting
+- 🔄 **Sensible Fallbacks** - NPCs missing from the table fall back to a gender-appropriate human voice
+- 🐛 **Debug Mode** - Detailed NPC voice resolution logging for troubleshooting
 
 ### 🎙️ Voice Matrix
 
@@ -45,7 +45,22 @@ Voices are drawn from the English speakers of the `kokoro-multi-lang-v1_0` bank 
 | 😈 **Demon** | `bm_daniel` (24) | `af_river` (8) |
 | 🧙 **Wizard** | `bm_fable` (25) | `af_alloy` (0) |
 
-The **Human** voices double as the fallback for any NPC whose race can't be detected, and as the default for every NPC when **Automatic NPC Voices** is turned off.
+The **Human** voices double as the fallback for any NPC missing from the table, and as the default for every NPC when **Automatic NPC Voices** is turned off.
+
+### 🗂️ NPC Voice Table
+
+Each NPC's race and gender come from a static, precomputed table bundled at `src/main/resources/npc-voices.json` (a flat `npcId → {race, gender}` map). At runtime, choosing a voice is a single in-memory lookup keyed by NPC id, so there are **no network requests and no large downloads** in the hot path. Ids not in the table fall back deterministically to Human/Male (or a gender-appropriate human voice when fallbacks are on).
+
+The table is generated **offline** and can be regenerated and expanded over time:
+
+```bash
+# Regenerate src/main/resources/npc-voices.json from the OSRSBox monster dump
+# plus the curated overrides in tools/overrides.json
+python3 tools/generate_npc_voices.py
+```
+
+- `tools/generate_npc_voices.py` - the offline generator (not part of the plugin runtime). It classifies race/gender from a static OSRSBox monster dump with a deterministic, conservative keyword classifier, then merges authoritative overrides on top.
+- `tools/overrides.json` - hand-curated, authoritative `npcId → {race, gender}` entries that always win. **Fix mistakes and add important peaceful NPCs here**, then regenerate. See `tools/README.md` for details.
 
 ---
 
@@ -88,10 +103,10 @@ Drop the built `.jar` into your RuneLite `plugins` folder or use RuneLite's Exte
 ## ⚙️ Configuration
 
 - **Dialogue Volume** - Volume of the spoken dialogue (0–100)
-- **Enable Automatic NPC Voices** - Pick a Kokoro voice per NPC from race/gender detection. When off, every NPC uses the default Human voice.
+- **Enable Automatic NPC Voices** - Pick a Kokoro voice per NPC from the static race/gender table. When off, every NPC uses the default Human voice.
 - **Player Voice** - Which Kokoro voice the player character uses
-- **Enable Voice Fallbacks** - When an NPC's race can't be detected, fall back to a gender-appropriate human voice. When off, undetected NPCs use the single default voice.
-- **Debug Mode** - Detailed NPC race/gender detection logging
+- **Enable Voice Fallbacks** - When an NPC is missing from the table, fall back to a gender-appropriate human voice. When off, those NPCs use the single default voice.
+- **Debug Mode** - Detailed NPC race/gender resolution logging
 
 ---
 

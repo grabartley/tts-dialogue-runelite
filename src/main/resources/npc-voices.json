@@ -1,0 +1,5444 @@
+{
+  "_meta": {
+    "description": "Static precomputed npcId -> {race, gender} lookup baked into the plugin. Generated offline by tools/generate_npc_voices.py. Do not hand-edit; edit tools/overrides.json and regenerate instead.",
+    "schema": "npcs[id] = { race, gender }",
+    "count": 1355,
+    "overrides_applied": 20,
+    "race_counts": {
+      "Demon": 221,
+      "Dwarf": 20,
+      "Elf": 6,
+      "Goblin": 131,
+      "Human": 210,
+      "Troll": 261,
+      "Undead": 464,
+      "Wizard": 42
+    },
+    "gender_counts": {
+      "Female": 143,
+      "Male": 1212
+    }
+  },
+  "npcs": {
+    "1": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "2": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "3": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "5": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "11": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "26": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "27": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "28": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "29": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "30": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "31": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "32": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "33": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "34": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "35": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "36": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "37": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "38": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "39": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "40": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "41": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "42": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "43": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "44": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "45": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "46": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "47": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "48": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "49": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "50": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "51": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "52": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "53": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "54": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "55": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "56": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "57": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "58": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "59": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "60": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "61": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "62": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "63": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "64": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "65": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "66": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "67": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "68": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "69": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "70": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "71": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "72": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "73": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "74": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "75": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "76": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "77": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "78": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "79": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "80": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "81": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "82": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "83": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "84": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "85": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "86": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "87": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "88": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "89": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "90": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "91": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "92": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "93": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "94": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "95": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "96": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "97": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "98": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "99": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "101": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "104": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "105": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "106": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "130": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "132": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "133": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "135": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "136": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "137": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "138": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "139": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "142": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "216": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "224": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "231": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "239": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "240": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "241": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "242": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "243": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "244": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "245": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "246": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "247": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "248": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "249": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "250": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "251": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "252": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "253": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "254": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "255": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "256": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "257": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "258": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "259": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "260": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "261": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "262": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "263": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "264": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "265": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "266": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "267": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "268": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "269": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "270": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "271": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "272": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "273": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "274": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "275": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "289": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "290": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "291": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "292": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "294": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "295": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "296": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "300": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "378": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "379": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "414": {
+      "race": "Undead",
+      "gender": "Female"
+    },
+    "415": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "416": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "419": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "423": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "433": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "434": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "435": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "436": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "443": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "444": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "445": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "446": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "447": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "465": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "466": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "467": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "468": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "472": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "473": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "474": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "477": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "498": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "499": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "505": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "506": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "507": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "510": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "511": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "512": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "514": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "515": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "527": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "528": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "529": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "563": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "564": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "565": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "566": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "567": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "568": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "569": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "570": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "571": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "572": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "573": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "574": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "575": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "576": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "577": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "578": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "579": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "580": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "581": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "582": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "583": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "584": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "585": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "586": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "587": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "588": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "589": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "590": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "591": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "592": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "593": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "594": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "595": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "596": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "597": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "598": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "599": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "613": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "614": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "615": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "616": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "617": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "618": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "619": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "620": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "621": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "622": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "623": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "624": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "639": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "645": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "646": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "647": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "648": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "649": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "650": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "651": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "652": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "653": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "654": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "655": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "656": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "657": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "658": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "659": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "660": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "661": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "662": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "663": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "664": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "665": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "666": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "667": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "668": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "674": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "677": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "678": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "680": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "681": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "699": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "700": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "701": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "702": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "703": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "704": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "705": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "710": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "711": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "712": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "713": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "714": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "715": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "717": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "720": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "721": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "722": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "723": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "724": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "725": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "726": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "727": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "728": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "763": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "794": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "797": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "799": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "866": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "867": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "868": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "869": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "870": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "871": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "872": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "873": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "874": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "875": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "876": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "877": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "878": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "879": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "880": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "924": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "931": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "932": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "933": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "934": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "935": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "936": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "937": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "938": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "939": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "940": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "941": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "942": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "949": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "950": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "951": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "952": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "953": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "955": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "956": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "957": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "958": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "959": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "960": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "961": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "962": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "963": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "965": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "983": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "984": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "985": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "986": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "987": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "988": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "991": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "992": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "993": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "994": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "1025": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "1041": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1062": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1065": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "1101": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1107": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1118": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "1119": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "1127": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1130": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "1131": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "1139": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "1140": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "1141": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "1142": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "1153": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1225": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1273": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1274": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1275": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1277": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1280": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1282": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1284": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1286": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1354": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1355": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1356": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1377": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "1378": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "1401": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1402": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1403": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1404": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1405": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1406": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1407": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1408": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "1432": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "1443": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "1537": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1538": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1539": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1540": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1541": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1556": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "1557": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "1558": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "1559": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "1610": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "1611": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "1612": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "1680": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1681": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1682": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1684": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1685": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1686": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1687": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1688": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "1777": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1778": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1871": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "1872": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "1874": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1875": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1876": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "1877": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2005": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2006": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2007": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2008": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2018": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2025": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2026": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2027": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2028": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2029": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2030": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2031": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2032": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2048": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2049": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2050": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2051": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2052": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2056": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "2057": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "2058": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "2059": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "2067": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2068": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2075": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2076": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2077": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2078": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2079": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2080": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2081": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2082": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2083": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2084": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2085": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2086": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2087": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2088": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2089": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2090": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2091": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2092": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2093": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2094": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2095": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2096": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2097": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2098": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2099": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2100": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2101": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2102": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2103": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2137": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2138": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2139": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2140": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2141": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2142": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2145": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2209": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "2212": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "2233": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2234": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2235": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2236": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2241": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2244": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "2245": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2246": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2247": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2248": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2249": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2261": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2265": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "2266": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "2292": {
+      "race": "Elf",
+      "gender": "Male"
+    },
+    "2293": {
+      "race": "Elf",
+      "gender": "Female"
+    },
+    "2463": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2464": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "2465": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2466": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "2467": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2468": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "2477": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2484": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2485": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2486": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2487": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2488": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2489": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "2490": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "2491": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "2501": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2502": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2503": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2504": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2505": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2506": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2507": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2508": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2509": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2510": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2511": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2512": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2514": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2515": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2516": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2517": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2518": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2519": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2520": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2521": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2522": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2523": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2524": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2525": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2526": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2527": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2528": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2529": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2530": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2531": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2532": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2533": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2534": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2579": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "2584": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2585": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2586": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2592": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2613": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "2621": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "2627": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "2629": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "2834": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2836": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2856": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2857": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2858": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2859": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2860": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2861": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2862": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2863": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2864": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "2918": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2919": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "2954": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "2955": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "2992": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2993": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "2994": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3014": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3015": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "3017": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3018": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3027": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3028": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3029": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3030": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3031": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3032": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3033": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3034": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3035": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3036": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3037": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3038": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3039": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3040": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3041": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3042": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3043": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3044": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3045": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3046": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3047": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3048": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3049": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3050": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3051": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3052": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3053": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3054": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3073": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3074": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3075": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3076": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3106": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3107": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3108": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3109": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3110": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3111": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "3112": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "3113": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "3133": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "3134": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "3137": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3139": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "3161": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "3168": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "3234": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3237": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3239": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3257": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "3260": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "3261": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3263": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3264": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3265": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3268": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "3286": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3287": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3288": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3289": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3298": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3299": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "3313": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3314": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3315": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3329": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3330": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3353": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3354": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "3355": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "3356": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3357": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "3358": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3359": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3433": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3434": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3484": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3485": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3486": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3527": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3565": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3625": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3652": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3692": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3693": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3694": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3695": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3696": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3697": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3698": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3699": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3707": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3708": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3851": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3852": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "3912": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3963": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "3969": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3970": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3971": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3972": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3973": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3974": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3975": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3976": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3977": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3978": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3979": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3980": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3981": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "3982": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "3996": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "3997": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "3998": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "3999": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "4068": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4104": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4120": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4121": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4122": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4123": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4124": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4125": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4126": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4127": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4128": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4129": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4135": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4136": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4137": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4138": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4139": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4143": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4163": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4196": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4198": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4246": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4266": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "4267": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "4303": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "4304": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "4308": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4309": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4310": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4311": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4315": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "4319": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4354": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4355": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4356": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4357": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4358": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4359": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4360": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4361": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4362": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4382": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4383": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4387": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4389": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4391": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4393": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4395": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4406": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4427": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4428": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4429": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4430": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4431": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4432": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4436": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4437": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4438": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4439": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4442": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4443": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4486": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4487": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4491": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4492": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4493": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4494": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4495": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4496": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4497": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4498": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4499": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "4504": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4534": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4535": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4571": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4655": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4682": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4689": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4690": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4691": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "4742": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4743": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4744": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "4797": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4805": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "4878": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "4884": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4885": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4886": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4887": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4888": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4889": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4922": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "4973": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "4974": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5007": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5054": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5086": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "5087": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "5088": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "5089": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "5126": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5142": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "5143": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "5144": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "5145": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "5146": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "5158": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "5192": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5193": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5194": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5195": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5196": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5197": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5198": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5199": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5200": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5201": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5202": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5203": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5204": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5205": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5206": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5207": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5208": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5237": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5258": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "5281": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5282": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5283": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5293": {
+      "race": "Elf",
+      "gender": "Male"
+    },
+    "5294": {
+      "race": "Elf",
+      "gender": "Male"
+    },
+    "5295": {
+      "race": "Elf",
+      "gender": "Male"
+    },
+    "5296": {
+      "race": "Elf",
+      "gender": "Male"
+    },
+    "5330": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5331": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5332": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5333": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5334": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5335": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5336": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5337": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5338": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5339": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5342": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5343": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5344": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5345": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5346": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5347": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5348": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5349": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5350": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5351": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5369": {
+      "race": "Goblin",
+      "gender": "Female"
+    },
+    "5370": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5628": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5629": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5630": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5633": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5634": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5635": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5636": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5637": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5638": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5639": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5640": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5641": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5642": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5647": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5648": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5649": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5650": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5651": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5652": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5653": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5654": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5655": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5656": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5657": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5658": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5659": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5660": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5661": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5662": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5663": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5665": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5666": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5667": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5668": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5669": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5670": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5671": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5672": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5673": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5674": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5675": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5676": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5677": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5678": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5679": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5680": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5681": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5682": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5683": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5684": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5685": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5686": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5687": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5688": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5689": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5690": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5691": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5692": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5693": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5694": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5695": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5696": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5697": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5698": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5699": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5700": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5701": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5702": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5703": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5704": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5705": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5706": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5707": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5708": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5709": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5710": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5711": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5712": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5713": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5714": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5715": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5716": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5717": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5718": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5719": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5720": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "5775": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "5776": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "5779": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5822": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5823": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5824": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5825": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5826": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5828": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5829": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5830": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5831": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5872": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5873": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5874": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5875": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5876": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5877": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5878": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "5879": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "5880": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "5881": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "5882": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "5886": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5887": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5888": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5890": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5891": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5908": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "5940": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "5966": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5967": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5968": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5969": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5970": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5971": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5972": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "5973": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6077": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6078": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6079": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6081": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6082": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6086": {
+      "race": "Goblin",
+      "gender": "Female"
+    },
+    "6087": {
+      "race": "Goblin",
+      "gender": "Female"
+    },
+    "6094": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6095": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6096": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6097": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6098": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6099": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6294": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6295": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6300": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6301": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6302": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6303": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6304": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6305": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6307": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6312": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6313": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6314": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6315": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6316": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6317": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6321": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6322": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6323": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6326": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6333": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "6334": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "6335": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "6336": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "6343": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6356": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6357": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6361": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6362": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6363": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6364": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6365": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6366": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6368": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6373": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6374": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6375": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6376": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6377": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6378": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6382": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6383": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6384": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6387": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6389": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6394": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "6395": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "6396": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "6397": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "6434": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6435": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6436": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6437": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6440": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6441": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6442": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6443": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6444": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6445": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6446": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6447": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6448": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6449": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6450": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6451": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6452": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6453": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6454": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6455": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6456": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6457": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6458": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6459": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6460": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6461": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6462": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6463": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6464": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6465": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6466": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6467": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6468": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6496": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6497": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6499": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6500": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "6501": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "6502": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6574": {
+      "race": "Goblin",
+      "gender": "Male"
+    },
+    "6593": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6594": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6596": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6597": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6598": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6600": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6608": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6611": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6612": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6613": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6614": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "6615": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6617": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6698": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6725": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6726": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6727": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6728": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6729": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6730": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6732": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6733": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6734": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6735": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6736": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6737": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6740": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6741": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "6815": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6818": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6824": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "6956": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6987": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6988": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6989": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "6990": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6991": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "6992": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "7018": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7019": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7020": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7021": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7022": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7023": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7024": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7025": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7026": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7027": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7028": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7029": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7030": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7031": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7032": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7033": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7034": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7035": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7036": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7037": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7038": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7039": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7144": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7145": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7146": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7147": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7148": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7149": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7234": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7241": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7242": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7243": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7244": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7245": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7246": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7247": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7248": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7249": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7251": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7252": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7253": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7254": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7255": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7256": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7257": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7258": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7261": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7262": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7263": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7264": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7265": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7266": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "7270": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "7271": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7272": {
+      "race": "Undead",
+      "gender": "Female"
+    },
+    "7273": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7274": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7275": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7278": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7279": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7287": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7296": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7307": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7308": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7309": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7310": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "7312": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7390": {
+      "race": "Undead",
+      "gender": "Female"
+    },
+    "7391": {
+      "race": "Undead",
+      "gender": "Female"
+    },
+    "7392": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7396": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7402": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7403": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7404": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7405": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "7406": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7410": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7422": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "7423": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "7485": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7486": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7487": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7488": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7530": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "7531": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "7532": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "7538": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "7539": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "7560": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "7584": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7585": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7656": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7657": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7658": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7659": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7660": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7661": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7662": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7664": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7792": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7793": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7794": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7795": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7797": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7861": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7862": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7863": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7864": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7865": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7866": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7867": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7868": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7869": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7870": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7871": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7872": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7873": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7874": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7875": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7876": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7877": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7878": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7879": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7880": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7881": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7931": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7932": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7933": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7934": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7935": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7936": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7937": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7938": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7939": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "7940": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7955": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "7989": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "7990": {
+      "race": "Troll",
+      "gender": "Female"
+    },
+    "7991": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "7992": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "8027": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8030": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8031": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8062": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8063": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8067": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8068": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8069": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8070": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8071": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8072": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "8079": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8080": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8081": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8082": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8083": {
+      "race": "Demon",
+      "gender": "Female"
+    },
+    "8085": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8086": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8087": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8089": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8090": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8091": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8340": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "8359": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "8360": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8361": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8362": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8363": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8364": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8365": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8400": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "8401": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "8428": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8429": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8430": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8496": {
+      "race": "Dwarf",
+      "gender": "Male"
+    },
+    "8610": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8611": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8612": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "8637": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "8698": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "8700": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "8714": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8715": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "8736": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "8917": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "8918": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "8950": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "8987": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "8988": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "8989": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "9031": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "9033": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "9045": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "9047": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "9051": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "9249": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "9291": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "9483": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "9614": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9615": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9616": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9617": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9727": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9728": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9729": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9730": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9731": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9732": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9733": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "9734": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10374": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10375": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10376": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10398": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "10399": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "10400": {
+      "race": "Demon",
+      "gender": "Male"
+    },
+    "10522": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "10533": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "10589": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10591": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10592": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10654": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10689": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10691": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10693": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10695": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10717": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10718": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10719": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10720": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10721": {
+      "race": "Undead",
+      "gender": "Male"
+    },
+    "10728": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10768": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "10772": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "10812": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10813": {
+      "race": "Troll",
+      "gender": "Male"
+    },
+    "10814": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10815": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10816": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10817": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10818": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10819": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10822": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10823": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10824": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10825": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10826": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "10827": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "11053": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "11054": {
+      "race": "Human",
+      "gender": "Female"
+    },
+    "11057": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "11058": {
+      "race": "Human",
+      "gender": "Male"
+    },
+    "11088": {
+      "race": "Wizard",
+      "gender": "Male"
+    },
+    "11199": {
+      "race": "Goblin",
+      "gender": "Male"
+    }
+  }
+}

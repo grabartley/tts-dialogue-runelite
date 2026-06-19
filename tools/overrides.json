@@ -1,0 +1,25 @@
+{
+  "_comment": "Authoritative, hand-curated npcId -> {race, gender} entries. These take precedence over anything the generator infers from the OSRSBox dump. Add corrections and important peaceful NPCs (shopkeepers, quest givers) here, since the monster dump only covers attackable NPCs. Race must be one of: Human, Elf, Dwarf, Goblin, Troll, Undead, Demon, Wizard. Gender must be Male or Female.",
+  "npcs": {
+    "1": { "name": "Man", "race": "Human", "gender": "Male" },
+    "2": { "name": "Woman", "race": "Human", "gender": "Female" },
+    "3": { "name": "Boy", "race": "Human", "gender": "Male" },
+    "4": { "name": "Girl", "race": "Human", "gender": "Female" },
+    "26": { "name": "Zombie", "race": "Undead", "gender": "Male" },
+    "70": { "name": "Skeleton", "race": "Undead", "gender": "Male" },
+    "85": { "name": "Ghost", "race": "Undead", "gender": "Male" },
+    "101": { "name": "Goblin", "race": "Goblin", "gender": "Male" },
+    "142": { "name": "Demon", "race": "Demon", "gender": "Male" },
+    "216": { "name": "Thurgo", "race": "Dwarf", "gender": "Male" },
+    "224": { "name": "Doric", "race": "Dwarf", "gender": "Male" },
+    "300": { "name": "Sedridor", "race": "Wizard", "gender": "Male" },
+    "378": { "name": "King Roald", "race": "Human", "gender": "Male" },
+    "379": { "name": "Queen Ellamaria", "race": "Human", "gender": "Female" },
+    "419": { "name": "Wise Old Man", "race": "Wizard", "gender": "Male" },
+    "1107": { "name": "Mountain Troll", "race": "Troll", "gender": "Male" },
+    "2292": { "name": "Elrond", "race": "Elf", "gender": "Male" },
+    "2293": { "name": "Arwen", "race": "Elf", "gender": "Female" },
+    "4266": { "name": "General Bentnoze", "race": "Goblin", "gender": "Male" },
+    "4267": { "name": "General Wartface", "race": "Goblin", "gender": "Male" }
+  }
+}
