@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,10 +18,26 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AudioPlayer implements AudioOutput {
 
+  /**
+   * Supplies an unopened {@link SourceDataLine} for a format; a seam so tests can mock the line.
+   */
+  public interface LineFactory {
+    SourceDataLine getLine(AudioFormat format) throws LineUnavailableException;
+  }
+
   private static final int CHUNK_BYTES = 4096;
 
+  private final LineFactory lineFactory;
   private final AtomicLong generation = new AtomicLong();
   private volatile SourceDataLine line;
+
+  public AudioPlayer() {
+    this(AudioSystem::getSourceDataLine);
+  }
+
+  AudioPlayer(LineFactory lineFactory) {
+    this.lineFactory = lineFactory;
+  }
 
   @Override
   public void stream(float[] samples, int sampleRate, int volumePercent) {
@@ -32,7 +49,7 @@ public class AudioPlayer implements AudioOutput {
     AudioFormat format = KokoroAudio.format(sampleRate);
     SourceDataLine open = null;
     try {
-      open = AudioSystem.getSourceDataLine(format);
+      open = lineFactory.getLine(format);
       open.open(format);
       applyVolume(open, volumePercent);
       open.start();
