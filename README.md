@@ -9,11 +9,11 @@ This plugin reads **in-game dialogue out loud** using different AI voices for NP
 
 ## 🧩 TTS Engine
 
-The plugin synthesizes dialogue **in-process** with the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model running on CPU through [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). There is no Docker, no local HTTP server, and no network call at synthesis time. On first use the plugin downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it; every line after that is generated locally.
+The plugin synthesizes dialogue **in-process** with the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model running on CPU through [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). On first use the plugin downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it; every line after that is generated locally on-device.
 
-Model load, synthesis, and playback all run off the game thread on a single background pipeline fed by a small bounded queue, so the game never stalls even under rapid dialogue advancement. Audio is streamed through a `SourceDataLine` straight from memory (no temp WAV files ever hit disk), and a small LRU cache keyed on `(text, voice)` replays repeated NPC lines instantly without re-synthesizing. On Apple Silicon a typical line synthesizes in roughly 1.3–1.8 s of CPU time; cached lines are immediate.
+Model load, synthesis, and playback all run off the game thread on a single background pipeline fed by a small bounded queue, so the game stays responsive even under rapid dialogue advancement. Audio is streamed through a `SourceDataLine` straight from memory, and a small LRU cache keyed on `(text, voice)` replays repeated NPC lines instantly from the cached audio. On Apple Silicon a typical line synthesizes in roughly 1.3–1.8 s of CPU time; cached lines are immediate.
 
-Every voice is a real, distinct Kokoro speaker. The audio you hear is the clean neural output as-is: no resampling pitch shift, no reverb, and no distortion. Character differences between races come from picking genuinely different speakers (accent, timbre, pitch), never from post-processing.
+Every voice is a real, distinct Kokoro speaker, and the audio you hear is the clean neural output as-is. Character differences between races come from picking genuinely different speakers (accent, timbre, pitch).
 
 > The native sherpa-onnx library ships per-platform. `build.gradle` bundles the macOS Apple Silicon native jar by default; swap the `sherpa-onnx-native-lib-*` line for your platform when building elsewhere.
 
@@ -21,17 +21,17 @@ Every voice is a real, distinct Kokoro speaker. The audio you hear is the clean 
 
 ## ✨ Features
 
-- 🧠 **In-process Kokoro TTS** - offline, on-device synthesis with no server or per-line network call
+- 🧠 **In-process Kokoro TTS** - offline, on-device synthesis
 - 🔊 **Text-to-Speech for all dialogue** (NPC & Player)
 - 🎭 **Race/Gender Voice Matrix** - 8 races × 2 genders plus player voices, each mapped to a distinct Kokoro speaker
-- 🤖 **Static NPC Voice Table** - Race and gender resolve from a precomputed `npcId → {race, gender}` table baked into the plugin: one in-memory lookup, no network calls or downloads
+- 🤖 **Static NPC Voice Table** - Race and gender resolve from a precomputed `npcId → {race, gender}` table baked into the plugin via a single in-memory lookup
 - ⏩ **Smart Playback** - Off-thread streaming playback that cancels instantly on skipped dialogue, with an LRU cache for instant replay of repeated lines
 - 🔄 **Sensible Fallbacks** - NPCs missing from the table fall back to a gender-appropriate human voice
 - 🐛 **Debug Mode** - Detailed NPC voice resolution logging for troubleshooting
 
 ### 🎙️ Voice Matrix
 
-Voices are drawn from the English speakers of the `kokoro-multi-lang-v1_0` bank (American `af_/am_`, British `bf_/bm_`). Each category maps to a unique speaker id, so no two categories sound alike.
+Voices are drawn from the English speakers of the `kokoro-multi-lang-v1_0` bank (American `af_/am_`, British `bf_/bm_`). Each category maps to a unique speaker id, so every category sounds distinct.
 
 | Category | Male | Female |
 |----------|------|--------|
@@ -49,7 +49,7 @@ The **Human** voices double as the fallback for any NPC missing from the table, 
 
 ### 🗂️ NPC Voice Table
 
-Each NPC's race and gender come from a static, precomputed table bundled at `src/main/resources/npc-voices.json` (a flat `npcId → {race, gender}` map). At runtime, choosing a voice is a single in-memory lookup keyed by NPC id, so there are **no network requests and no large downloads** in the hot path. Ids not in the table fall back deterministically to Human/Male (or a gender-appropriate human voice when fallbacks are on).
+Each NPC's race and gender come from a static, precomputed table bundled at `src/main/resources/npc-voices.json` (a flat `npcId → {race, gender}` map). At runtime, choosing a voice is a **single in-memory lookup keyed by NPC id**, kept entirely local to the hot path. Ids not in the table fall back deterministically to Human/Male (or a gender-appropriate human voice when fallbacks are on).
 
 The table is generated **offline** and can be regenerated and expanded over time:
 
@@ -59,7 +59,7 @@ The table is generated **offline** and can be regenerated and expanded over time
 python3 tools/generate_npc_voices.py
 ```
 
-- `tools/generate_npc_voices.py` - the offline generator (not part of the plugin runtime). It classifies race/gender from a static OSRSBox monster dump with a deterministic, conservative keyword classifier, then merges authoritative overrides on top.
+- `tools/generate_npc_voices.py` - the offline generator that builds the bundled table ahead of time. It classifies race/gender from a static OSRSBox monster dump with a deterministic, conservative keyword classifier, then merges authoritative overrides on top.
 - `tools/overrides.json` - hand-curated, authoritative `npcId → {race, gender}` entries that always win. **Fix mistakes and add important peaceful NPCs here**, then regenerate. See `tools/README.md` for details.
 
 ---
@@ -78,7 +78,7 @@ git clone https://github.com/grabartley/tts-dialogue-runelite.git
 cd tts-dialogue-runelite
 ```
 
-There is nothing else to install: no Docker, no voice servers, no model files to fetch by hand. The Kokoro bundle downloads itself on first run.
+The Kokoro bundle downloads itself on first run, so cloning the repo is the only setup step.
 
 ### Build the plugin
 

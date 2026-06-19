@@ -38,7 +38,7 @@ The plugin synthesizes dialogue in-process with the embedded Kokoro model via `s
 
 On first launch the plugin downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it; the model loads on a background thread, so dialogue may stay silent only until the load finishes (watch the logs for `Kokoro model loaded`). Every later line is generated locally with no network call.
 
-The legacy HTTP voice servers remain available behind the **In-Process TTS (Kokoro)** config toggle. Only when that toggle is off does the plugin POST to a `localhost` server, which must then be running for audio.
+There is no external voice server to start: synthesis is always in-process, so there is no Docker container or `localhost` port to manage for audio.
 
 ## Testing Flow
 
