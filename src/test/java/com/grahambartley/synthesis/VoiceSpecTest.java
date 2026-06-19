@@ -25,8 +25,8 @@ public class VoiceSpecTest {
 
   @Test
   public void playerSpecIsFlaggedAsPlayer() {
-    assertTrue(VoiceSpec.player(NPCGender.MALE).isPlayer());
-    assertFalse(VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE).isPlayer());
+    assertTrue(VoiceSpec.player(NPCGender.MALE).player());
+    assertFalse(VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE).player());
   }
 
   @Test

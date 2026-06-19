@@ -154,15 +154,21 @@ public class VoiceManager {
    * matrix.
    */
   public int kokoroSpeakerId(VoiceSpec voice) {
-    if (voice.isPlayer()) {
-      return config.playerVoice().getSpeakerId();
+    if (voice.player()) {
+      // Derive the player speaker id from the spec's gender, not by re-reading config. The spec was
+      // stamped from config when the line was resolved, so this keeps the cache key and the audio
+      // in
+      // agreement even if the player voice is switched between resolution and synthesis.
+      return voice.gender() == NPCGender.FEMALE
+          ? VoiceProfile.PLAYER_FEMALE.getSpeakerId()
+          : VoiceProfile.PLAYER_MALE.getSpeakerId();
     }
-    return getVoiceForRaceAndGender(voice.getRace(), voice.getGender()).getSpeakerId();
+    return getVoiceForRaceAndGender(voice.race(), voice.gender()).getSpeakerId();
   }
 
   /** Gender implied by the configured player voice profile. */
   private NPCGender playerGender() {
-    return config.playerVoice() == VoiceProfile.PLAYER_FEMALE ? NPCGender.FEMALE : NPCGender.MALE;
+    return config.playerVoice().getGender();
   }
 
   /** Turns a resolved NPC {@link VoiceProfile} back into its race/gender {@link VoiceSpec}. */

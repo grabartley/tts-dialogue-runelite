@@ -55,7 +55,7 @@ public class BackendProviderTest {
     @Override
     public Pcm synthesize(SynthesisRequest request) {
       synthCalls++;
-      lastEmotion = request.getEmotion();
+      lastEmotion = request.emotion();
       return new Pcm(new float[] {0f}, 24_000);
     }
   }
@@ -152,6 +152,47 @@ public class BackendProviderTest {
     provider.active();
 
     assertEquals("fallback notice should fire once per unavailable backend", 1, notices[0]);
+  }
+
+  @Test
+  public void availabilityNoticeFiresOncePerBackendWhenCyclingUnavailableBackends() {
+    TestConfig config = new TestConfig();
+    StubBackend kokoro =
+        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
+    StubBackend azure = new StubBackend("cloud-azure", false, EnumSet.allOf(Emotion.class));
+    StubBackend zonos = new StubBackend("local-zonos", false, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, azure, zonos);
+
+    int[] notices = {0};
+    provider.setAvailabilityNotice(msg -> notices[0]++);
+
+    // Cycle CLOUD -> LOCAL_GPU -> CLOUD. Each distinct unavailable backend should warn exactly
+    // once,
+    // and returning to a previously warned backend must not re-fire.
+    config.backend = VoiceBackend.CLOUD;
+    provider.active();
+    config.backend = VoiceBackend.LOCAL_GPU;
+    provider.active();
+    config.backend = VoiceBackend.CLOUD;
+    provider.active();
+
+    assertEquals("each unavailable backend warns at most once per session", 2, notices[0]);
+  }
+
+  @Test
+  public void selectedAndFallbackBothUnavailableStillReturnsKokoroWithoutThrowing() {
+    TestConfig config = new TestConfig();
+    config.backend = VoiceBackend.CLOUD;
+    // The bundled fallback itself failed to load.
+    StubBackend kokoro =
+        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, false, EnumSet.of(Emotion.NEUTRAL));
+    StubBackend azure = new StubBackend("cloud-azure", false, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, azure);
+
+    // active() must not throw and must return the local fallback even though it is unavailable; the
+    // one-time silent-failure warning is logged as a side effect. Calling twice proves idempotence.
+    assertEquals(BackendProvider.LOCAL_KOKORO_ID, provider.active().id());
+    assertEquals(BackendProvider.LOCAL_KOKORO_ID, provider.active().id());
   }
 
   @Test

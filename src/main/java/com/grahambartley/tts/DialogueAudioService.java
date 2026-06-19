@@ -75,7 +75,7 @@ public final class DialogueAudioService {
    * advancement replaces the previous line rather than overlapping it.
    */
   public void speak(SynthesisRequest request) {
-    if (request == null || request.getText() == null || request.getText().isEmpty()) {
+    if (request == null || request.text() == null || request.text().isEmpty()) {
       return;
     }
     long mine = epoch.incrementAndGet();
@@ -85,8 +85,7 @@ public final class DialogueAudioService {
     SynthesisBackend backend = backends.active();
     SynthesisRequest effective = BackendProvider.downgradeFor(backend, request);
     CacheKey key =
-        new CacheKey(
-            backend.id(), effective.getVoice().key(), effective.getEmotion(), effective.getText());
+        new CacheKey(backend.id(), effective.voice().key(), effective.emotion(), effective.text());
     submit(() -> run(mine, backend, effective, key));
   }
 

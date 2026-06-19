@@ -3,8 +3,10 @@ package com.grahambartley.synthesis;
 import com.grahambartley.TTSDialogueConfig;
 import com.grahambartley.TTSDialogueConfig.VoiceBackend;
 import com.grahambartley.tts.Pcm;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,9 +38,17 @@ public final class BackendProvider {
   private Consumer<String> availabilityNotice = msg -> {};
 
   /**
-   * Tracks which configured backends we have already warned about so the notice fires once each.
+   * Ids of configured backends we have already warned about, so each unavailable backend surfaces a
+   * fallback notice at most once per session even when the user cycles through several of them.
    */
-  private String lastFallbackFrom;
+  private final Set<String> warnedFallbacks = new HashSet<>();
+
+  /**
+   * One-time guard for the scenario where the selected backend is unavailable <em>and</em> the
+   * local Kokoro fallback is itself unavailable, so {@link #active()} returns a failed engine that
+   * produces no audio. Logged once so the silence is explained.
+   */
+  private boolean warnedKokoroAlsoUnavailable;
 
   /**
    * @param config the live plugin config, read on every resolution so runtime switches apply
@@ -87,15 +97,22 @@ public final class BackendProvider {
     String wantedId = backendIdFor(config.voiceBackend());
     SynthesisBackend wanted = backends.get(wantedId);
     if (wanted != null && wanted.isAvailable()) {
-      lastFallbackFrom = null;
       return wanted;
     }
-    if (!LOCAL_KOKORO_ID.equals(wantedId) && !wantedId.equals(lastFallbackFrom)) {
-      lastFallbackFrom = wantedId;
+    if (!LOCAL_KOKORO_ID.equals(wantedId) && warnedFallbacks.add(wantedId)) {
       String msg =
           "Voice backend '" + wantedId + "' is not available; using the local voice instead.";
       log.info(msg);
       availabilityNotice.accept(msg);
+    }
+    // If the bundled engine also failed, the fallback we are about to return cannot produce audio
+    // either, so lines will be silent. Explain that once instead of failing silently.
+    if (!localKokoro.isAvailable() && !warnedKokoroAlsoUnavailable) {
+      warnedKokoroAlsoUnavailable = true;
+      log.warn(
+          "Backend '{}' is unavailable and the local Kokoro fallback also failed to load; dialogue"
+              + " lines will produce no audio until a working backend is available.",
+          wantedId);
     }
     return localKokoro;
   }
@@ -106,15 +123,18 @@ public final class BackendProvider {
    * the rule, shared by {@link #synthesize} and the pipeline's cache-key computation.
    */
   public static SynthesisRequest downgradeFor(SynthesisBackend backend, SynthesisRequest request) {
-    if (backend.supportedEmotions().contains(request.getEmotion())) {
+    if (backend.supportedEmotions().contains(request.emotion())) {
       return request;
     }
     return request.withEmotion(Emotion.NEUTRAL);
   }
 
   /**
-   * Synthesizes the request through the active backend, applying the emotion-downgrade rule first
-   * so the backend only ever receives an emotion it supports. Returns {@code null} on failure.
+   * Convenience entry that resolves {@link #active()} and synthesizes in one call, applying the
+   * emotion-downgrade rule first so the backend only ever receives an emotion it supports. Returns
+   * {@code null} on failure. Use this only when cache-key parity does not matter (e.g. tests); the
+   * pipeline instead resolves {@link #active()} itself and calls {@link #synthesizeWith} so the
+   * backend reflected in the cache key is the one that actually runs.
    */
   public Pcm synthesize(SynthesisRequest request) {
     SynthesisBackend backend = active();

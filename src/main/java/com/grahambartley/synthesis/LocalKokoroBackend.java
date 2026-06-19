@@ -42,8 +42,8 @@ public final class LocalKokoroBackend implements SynthesisBackend {
 
   @Override
   public Pcm synthesize(SynthesisRequest request) {
-    int speakerId = voiceManager.kokoroSpeakerId(request.getVoice());
-    return engine.synthesize(request.getText(), speakerId);
+    int speakerId = voiceManager.kokoroSpeakerId(request.voice());
+    return engine.synthesize(request.text(), speakerId);
   }
 
   @Override

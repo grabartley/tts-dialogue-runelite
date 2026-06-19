@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.grahambartley.TTSDialogueConfig;
+import com.grahambartley.TTSDialogueConfig.VoiceBackend;
 import com.grahambartley.VoiceManager.NPCGender;
 import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.synthesis.BackendProvider;
@@ -22,16 +23,22 @@ public class DialogueAudioServiceTest {
   /** Records synth requests and hands back canned PCM so cache behavior is observable. */
   private static final class FakeBackend implements SynthesisBackend {
     final List<String> requests = new ArrayList<>();
+    private final String id;
     private final EnumSet<Emotion> supported;
 
     FakeBackend(EnumSet<Emotion> supported) {
+      // Use the fallback id so a default-LOCAL config resolves straight to this backend.
+      this(BackendProvider.LOCAL_KOKORO_ID, supported);
+    }
+
+    FakeBackend(String id, EnumSet<Emotion> supported) {
+      this.id = id;
       this.supported = supported;
     }
 
     @Override
     public String id() {
-      // Use the fallback id so a default-LOCAL config resolves straight to this backend.
-      return BackendProvider.LOCAL_KOKORO_ID;
+      return id;
     }
 
     @Override
@@ -46,7 +53,7 @@ public class DialogueAudioServiceTest {
 
     @Override
     public Pcm synthesize(SynthesisRequest request) {
-      requests.add(request.getVoice().key() + "|" + request.getEmotion() + "|" + request.getText());
+      requests.add(request.voice().key() + "|" + request.emotion() + "|" + request.text());
       return new Pcm(new float[] {0.1f, -0.1f}, 24_000);
     }
   }
@@ -94,7 +101,14 @@ public class DialogueAudioServiceTest {
   /**
    * Config whose only meaningful answer is the backend selection; everything else uses defaults.
    */
-  private static final class TestConfig implements TTSDialogueConfig {}
+  private static final class TestConfig implements TTSDialogueConfig {
+    private VoiceBackend backend = VoiceBackend.LOCAL;
+
+    @Override
+    public VoiceBackend voiceBackend() {
+      return backend;
+    }
+  }
 
   private static BackendProvider provider(SynthesisBackend backend) {
     return new BackendProvider(new TestConfig(), backend);
@@ -269,6 +283,37 @@ public class DialogueAudioServiceTest {
     executor.runAll();
 
     assertEquals(42, output.lastVolume);
+  }
+
+  @Test
+  public void switchingBackendInvalidatesCacheAndResynthesizesOnTheNewBackend() {
+    // Two backends, both available: the local fallback and a cloud backend. The backend id is part
+    // of the cache key, so speaking the same line after switching the config backend must re-synth
+    // on the new backend rather than replaying the cached local PCM.
+    FakeBackend local = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    FakeBackend cloud = new FakeBackend("cloud-azure", EnumSet.allOf(Emotion.class));
+    TestConfig config = new TestConfig();
+    BackendProvider provider = new BackendProvider(config, local, cloud);
+    FakeOutput output = new FakeOutput();
+    DeferredExecutor executor = new DeferredExecutor();
+    DialogueAudioService svc = service(provider, output, executor, 8, 100);
+
+    SynthesisRequest line = req("Well met", NPCRace.HUMAN, NPCGender.MALE, Emotion.NEUTRAL);
+
+    config.backend = VoiceBackend.LOCAL;
+    svc.speak(line);
+    executor.runAll();
+
+    config.backend = VoiceBackend.CLOUD;
+    svc.speak(line);
+    executor.runAll();
+
+    assertEquals("local backend synthesizes the first line", 1, local.requests.size());
+    assertEquals(
+        "switching to cloud must re-synth, not serve the cached local PCM",
+        1,
+        cloud.requests.size());
+    assertEquals("both lines still play", 2, output.streamCalls);
   }
 
   @Test

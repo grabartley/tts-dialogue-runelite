@@ -80,7 +80,7 @@ public class TTSDialoguePlugin extends Plugin {
 
   /** Hands the line to the off-thread synth + playback pipeline; never blocks the game thread. */
   private void speakWithTTS(String text, String speaker, String npcName) {
-    if (audioService == null || ttsEngine == null || ttsEngine.isFailed()) {
+    if (audioService == null || !backendProvider.active().isAvailable()) {
       return;
     }
     VoiceSpec voice = voiceManager.resolveVoice(speaker, npcName);

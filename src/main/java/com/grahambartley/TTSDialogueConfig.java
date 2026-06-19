@@ -52,7 +52,7 @@ public interface TTSDialogueConfig extends Config {
       name = "Enable Emotion",
       description =
           "Carry detected emotion through to synthesis. The local Kokoro backend is neutral-only, so"
-              + " emotion is only audible on the emotional backends.",
+              + " emotion is only audible on the emotional backends. (coming soon)",
       position = 1,
       section = synthesisSection)
   default boolean enableEmotion() {

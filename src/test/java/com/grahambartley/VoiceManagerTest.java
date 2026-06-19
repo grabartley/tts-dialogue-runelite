@@ -85,8 +85,8 @@ public class VoiceManagerTest {
   public void playerResolvesToPlayerSpecWithConfiguredGender() {
     VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_FEMALE);
     VoiceSpec spec = manager.resolveVoice("player", null);
-    assertTrue("player voice should be a player spec", spec.isPlayer());
-    assertEquals(NPCGender.FEMALE, spec.getGender());
+    assertTrue("player voice should be a player spec", spec.player());
+    assertEquals(NPCGender.FEMALE, spec.gender());
     assertEquals("player:FEMALE", spec.key());
   }
 
@@ -101,7 +101,7 @@ public class VoiceManagerTest {
   public void playerSpeakerMatchingIsCaseInsensitive() {
     VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
     VoiceSpec spec = manager.resolveVoice("PLAYER", null);
-    assertTrue(spec.isPlayer());
+    assertTrue(spec.player());
     assertEquals(VoiceProfile.PLAYER_MALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
   }
 
@@ -109,7 +109,7 @@ public class VoiceManagerTest {
   public void npcUsesDefaultVoiceWhenAutomaticVoicesDisabled() {
     VoiceManager manager = newManager(false, true, VoiceProfile.PLAYER_MALE);
     VoiceSpec spec = manager.resolveVoice("npc", "Some Goblin");
-    assertFalse("an NPC resolves to a non-player spec", spec.isPlayer());
+    assertFalse("an NPC resolves to a non-player spec", spec.player());
     assertEquals("npc:HUMAN:MALE", spec.key());
     assertEquals(VoiceProfile.HUMAN_MALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
   }
