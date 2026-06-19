@@ -1,5 +1,7 @@
 .gradle
 /build
+# Gradle build output for any subproject (e.g. the external engine).
+build/
 .idea/
 .project
 .settings/

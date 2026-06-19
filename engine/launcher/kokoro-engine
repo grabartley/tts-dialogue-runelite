@@ -1,0 +1,19 @@
+#!/bin/sh
+# Launcher for the standalone Kokoro TTS engine (Linux / macOS).
+#
+# The release workflow places a self-contained Java runtime under runtime/ next to this script
+# (jlink output), so no system JDK is required. The engine resolves its model from the bundled
+# model/ directory and speaks the --stdio protocol the plugin drives.
+#
+# Usage: kokoro-engine --stdio | --selftest
+set -e
+
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
+if [ -x "$DIR/runtime/bin/java" ]; then
+  JAVA="$DIR/runtime/bin/java"
+else
+  JAVA="java"
+fi
+
+exec "$JAVA" -cp "$DIR/lib/*" com.grahambartley.engine.KokoroEngineMain "$@"

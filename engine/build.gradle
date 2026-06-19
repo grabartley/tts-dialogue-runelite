@@ -1,0 +1,100 @@
+plugins {
+	id 'application'
+	id 'com.diffplug.spotless' version '6.25.0'
+}
+
+repositories {
+	mavenCentral()
+
+	// sherpa-onnx is not published to Maven Central. Resolve its prebuilt jars straight from the
+	// k2-fsa GitHub release assets via an ivy layout, matching the plugin's resolution.
+	ivy {
+		url = 'https://github.com/k2-fsa/sherpa-onnx/releases/download'
+		patternLayout {
+			artifact '[revision]/[artifact]-[revision].jar'
+		}
+		metadataSources { artifact() }
+		content { includeGroup 'com.k2fsa' }
+	}
+}
+
+def sherpaOnnxVersion = 'v1.13.3'
+
+// Which sherpa-onnx native bundle to put on the runtime classpath. Defaults to this host's
+// platform for local smoke tests; the release workflow passes -PtargetPlatform=<id> on each runner
+// so every produced image carries the matching native libs.
+//   osx-aarch64  -> macOS Apple Silicon
+//   osx-x64      -> macOS Intel
+//   linux-x64    -> Linux x64
+//   win-x64      -> Windows x64
+def defaultPlatform() {
+	def os = System.getProperty('os.name').toLowerCase()
+	def arch = System.getProperty('os.arch').toLowerCase()
+	if (os.contains('mac')) {
+		return (arch.contains('aarch64') || arch.contains('arm')) ? 'osx-aarch64' : 'osx-x64'
+	}
+	if (os.contains('win')) {
+		return 'win-x64'
+	}
+	return 'linux-x64'
+}
+
+def targetPlatform = (project.findProperty('targetPlatform') ?: defaultPlatform()).toString()
+ext.targetPlatform = targetPlatform
+
+dependencies {
+	// Pure-Java sherpa-onnx API (compile + run) and the per-target JNI native bundle (run only).
+	// sherpa-onnx auto-extracts the native lib from the classpath at load time.
+	implementation "com.k2fsa:sherpa-onnx:${sherpaOnnxVersion}"
+	runtimeOnly "com.k2fsa:sherpa-onnx-native-lib-${targetPlatform}:${sherpaOnnxVersion}"
+
+	testImplementation 'junit:junit:4.13.2'
+}
+
+group = 'com.grahambartley'
+version = (project.findProperty('engineVersion') ?: '1.0.0').toString()
+
+application {
+	mainClass = 'com.grahambartley.engine.KokoroEngineMain'
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+	options.release.set(17)
+}
+
+test {
+	useJUnit()
+}
+
+spotless {
+	java {
+		googleJavaFormat('1.17.0')
+		target 'src/**/*.java'
+	}
+}
+
+// Stage everything an end user needs into build/engine-image/: the application jar, all runtime
+// dependency jars (sherpa API + per-target native libs), launcher scripts, and licenses. The
+// release workflow runs jlink/jpackage over a JDK to wrap a self-contained runtime around this so
+// users need no JDK; this task gives a portable layout that the conformance test and the workflow
+// both consume.
+tasks.register('engineImage', Sync) {
+	dependsOn tasks.named('jar')
+	into layout.buildDirectory.dir('engine-image')
+
+	into('lib') {
+		from tasks.named('jar')
+		from configurations.runtimeClasspath
+	}
+	into('licenses') {
+		from "${rootDir}/engine/licenses"
+	}
+	from "${rootDir}/engine/launcher"
+}

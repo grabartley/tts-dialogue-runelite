@@ -1,0 +1,278 @@
+name: Engine Release
+
+# MANUAL ONLY. This pipeline builds, signs (when secrets are present), checksums, and publishes the
+# cross-platform Kokoro engine bundles to a GitHub Release. It is never triggered automatically:
+# there is deliberately no `on: push` / `on: push: tags`. A maintainer runs it from the Actions tab
+# ("Run workflow") and supplies the version tag. Re-running with the same tag refreshes the release.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag for the engine bundles (e.g. v1.0.0)"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark the GitHub Release as a pre-release"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  SHERPA_ONNX_VERSION: v1.13.3
+  MODEL_NAME: kokoro-multi-lang-v1_0
+
+jobs:
+  # One job per target, each on a runner whose OS/arch matches the bundle so the jlink runtime and
+  # native libs are native to that platform.
+  build:
+    name: Build ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux-x64
+            os: ubuntu-latest
+            archive: tar.gz
+          - platform: win-x64
+            os: windows-latest
+            archive: zip
+          - platform: osx-aarch64
+            os: macos-14
+            archive: tar.gz
+          - platform: osx-x64
+            os: macos-13
+            archive: tar.gz
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Stage engine image (jars + native libs + licenses)
+        run: ./gradlew :engine:engineImage -PtargetPlatform=${{ matrix.platform }} -PengineVersion=${{ inputs.version }}
+
+      - name: Download and extract the Kokoro model
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMG="engine/build/engine-image"
+          URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/${MODEL_NAME}.tar.bz2"
+          echo "Downloading model bundle (~349 MB) from $URL"
+          curl -fL --retry 3 -o model.tar.bz2 "$URL"
+          mkdir -p "$IMG"
+          tar -xjf model.tar.bz2 -C "$IMG"
+          # The engine resolves a 'model' directory beside the image; the bundle extracts as
+          # kokoro-multi-lang-v1_0, so normalise the name.
+          mv "$IMG/${MODEL_NAME}" "$IMG/model"
+          rm -f model.tar.bz2
+          test -f "$IMG/model/model.onnx"
+
+      - name: Build a self-contained Java runtime (jlink)
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMG="engine/build/engine-image"
+          # Minimal runtime carrying the JDK modules the engine + sherpa-onnx need at run time, so
+          # end users need no JDK installed.
+          jlink \
+            --add-modules java.base,java.logging,java.desktop,jdk.unsupported \
+            --strip-debug --no-header-files --no-man-pages --compress=2 \
+            --output "$IMG/runtime"
+
+      - name: Conformance test against the built engine (Linux only)
+        # The native conformance test runs where bundling the model into the image is cheapest. The
+        # other targets are validated by their own --selftest below; this asserts the full --stdio
+        # frame round-trips on at least one real built engine in CI.
+        if: matrix.platform == 'linux-x64'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export KOKORO_MODEL_DIR="$PWD/engine/build/engine-image/model"
+          ./gradlew :engine:test --tests 'com.grahambartley.engine.EngineConformanceTest'
+
+      - name: Engine self-test (native synthesis smoke)
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMG="engine/build/engine-image"
+          if [ "${{ matrix.platform }}" = "win-x64" ]; then
+            cmd //c "$IMG\\kokoro-engine.bat --selftest"
+          else
+            chmod +x "$IMG/kokoro-engine"
+            "$IMG/kokoro-engine" --selftest
+          fi
+
+      # ---- Optional macOS code-signing + notarization (gated on secrets) ----
+      # Absent these secrets the bundle ships UNSIGNED and the documented right-click -> Open
+      # first-run path (plus the quarantine-xattr clear EngineInstaller does) is the fallback.
+      - name: Sign and notarize (macOS)
+        if: startsWith(matrix.platform, 'osx') && env.APPLE_ID != '' && env.APPLE_TEAM_ID != '' && env.APPLE_APP_PASSWORD != '' && env.MACOS_CERT_P12 != ''
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMG="engine/build/engine-image"
+          KEYCHAIN="$RUNNER_TEMP/engine-signing.keychain-db"
+          security create-keychain -p actions "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p actions "$KEYCHAIN"
+          echo "$MACOS_CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions "$KEYCHAIN"
+          IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN" | awk -F '"' 'NR==1{print $2}')
+          # Sign every Mach-O (native libs + runtime binaries) then the launcher.
+          find "$IMG" \( -name '*.dylib' -o -name '*.jnilib' -o -path '*/runtime/bin/*' \) -type f \
+            -exec codesign --force --options runtime --timestamp --sign "$IDENTITY" {} \;
+          codesign --force --options runtime --timestamp --sign "$IDENTITY" "$IMG/kokoro-engine" || true
+          # Notarize a zip of the image, then record the result. Stapling applies to app bundles;
+          # for a plain directory bundle the notarization ticket plus quarantine clear is the path.
+          ditto -c -k --keepParent "$IMG" "$RUNNER_TEMP/notarize.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" --wait
+          touch "$IMG/signed"
+        # env block above also exposes the secrets for the if: existence checks.
+
+      # ---- Optional Windows code-signing (gated on secrets) ----
+      - name: Sign (Windows)
+        if: matrix.platform == 'win-x64' && env.WINDOWS_CERT_PFX != ''
+        env:
+          WINDOWS_CERT_PFX: ${{ secrets.WINDOWS_CERT_PFX }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        shell: pwsh
+        run: |
+          $img = "engine/build/engine-image"
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\cert.pfx", [Convert]::FromBase64String($env:WINDOWS_CERT_PFX))
+          $targets = Get-ChildItem -Path $img -Recurse -Include *.exe,*.dll
+          foreach ($t in $targets) {
+            & signtool sign /f "$env:RUNNER_TEMP\cert.pfx" /p $env:WINDOWS_CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $t.FullName
+          }
+          New-Item -ItemType File -Path "$img/signed" -Force | Out-Null
+
+      - name: Package bundle + checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMG="engine/build/engine-image"
+          OUT="dist/${{ matrix.platform }}"
+          mkdir -p "$OUT"
+          BUNDLE="kokoro-engine-${{ inputs.version }}-${{ matrix.platform }}"
+          if [ "${{ matrix.archive }}" = "zip" ]; then
+            ( cd "$IMG/.." && 7z a -tzip "$GITHUB_WORKSPACE/$OUT/$BUNDLE.zip" "engine-image/*" >/dev/null )
+            FILE="$OUT/$BUNDLE.zip"
+          else
+            tar -czf "$OUT/$BUNDLE.tar.gz" -C "$IMG" .
+            FILE="$OUT/$BUNDLE.tar.gz"
+          fi
+          # sha256, portable across runners.
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "$FILE" | awk '{print $1}' > "$FILE.sha256"
+          else
+            shasum -a 256 "$FILE" | awk '{print $1}' > "$FILE.sha256"
+          fi
+          # Carry the signed marker (if any) so the manifest generator can flag it.
+          if [ -f "$IMG/signed" ]; then touch "$OUT/signed"; fi
+          echo "Built $FILE ($(cat "$FILE.sha256"))"
+
+      - name: Upload target artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-${{ matrix.platform }}
+          path: dist/${{ matrix.platform }}/*
+
+  # Gather every target, generate the manifest, publish the release, and commit the manifest so the
+  # plugin resource matches the published artifacts.
+  publish:
+    name: Publish release + manifest
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download all target artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Normalise artifact layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          # download-artifact lays each out under release-artifacts/engine-<platform>/...; rename to
+          # the platform id the generator expects.
+          cd release-artifacts
+          for d in engine-*; do
+            mv "$d" "${d#engine-}"
+          done
+          ls -R .
+
+      - name: Generate engine-manifest.json
+        run: |
+          python3 engine/scripts/generate_manifest.py \
+            --version "${{ inputs.version }}" \
+            --repo "${{ github.repository }}" \
+            --artifacts-dir release-artifacts \
+            --out src/main/resources/engine-manifest.json
+          cat src/main/resources/engine-manifest.json
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Re-runnable: create the release if missing, otherwise clobber its assets.
+          if gh release view "${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "Release exists, refreshing assets"
+          else
+            gh release create "${{ inputs.version }}" \
+              --title "Kokoro engine ${{ inputs.version }}" \
+              --notes "Cross-platform Kokoro TTS engine bundles. See engine-manifest.json for per-OS sha256." \
+              ${{ inputs.prerelease && '--prerelease' || '' }}
+          fi
+          # Upload each bundle + its sha256.
+          find release-artifacts -type f \( -name '*.tar.gz' -o -name '*.zip' -o -name '*.sha256' \) \
+            -exec gh release upload "${{ inputs.version }}" {} --clobber \;
+
+      - name: Commit refreshed manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet src/main/resources/engine-manifest.json; then
+            echo "Manifest unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="engine-manifest/${{ inputs.version }}"
+          git checkout -b "$BRANCH"
+          git add src/main/resources/engine-manifest.json
+          git commit -m "chore: update engine-manifest.json for ${{ inputs.version }}"
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: engine-manifest.json for ${{ inputs.version }}" \
+            --body "Auto-generated by the engine-release workflow so the bundled manifest matches the published artifacts for ${{ inputs.version }}." || true

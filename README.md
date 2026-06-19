@@ -100,6 +100,63 @@ You can run it directly from your IDE (such as IntelliJ) or configure it in `bui
 
 Drop the built `.jar` into your RuneLite `plugins` folder, or load it through RuneLite's External Plugin Manager.
 
+## External Engine Build & Release Pipeline
+
+Alongside the in-process path, the repo ships a standalone, self-contained **Kokoro engine** under `engine/`. It is the same `kokoro-multi-lang-v1_0` model and the same sherpa-onnx configuration, repackaged as an external process that speaks a tiny line protocol so the plugin can run synthesis out-of-jar. The engine is built, signed, checksummed, and published to GitHub Releases by a manual pipeline, and the plugin reads a bundled `src/main/resources/engine-manifest.json` to find the right per-OS download.
+
+### The `--stdio` protocol
+
+The engine is launched as `kokoro-engine --stdio`. For each request the caller writes one JSON line to stdin and reads back one JSON header line immediately followed by the raw PCM frame:
+
+```text
+stdin  -> {"text":"hello","voice":{"race":"ELF","gender":"FEMALE","player":false},"emotion":"NEUTRAL","speed":1.0}
+stdout <- {"sampleRate":24000,"samples":59242,"format":"f32le"}
+stdout <- <samples * 4 little-endian float32 bytes>
+```
+
+`emotion` is accepted and ignored: Kokoro is neutral-only by design. `speed` defaults to `1.0`. The `voice` object maps to the same speaker matrix as the in-process path, so a given race/gender sounds identical either way. Run `kokoro-engine --selftest` to synthesize a fixed phrase and print the resulting sample rate and sample count, the local smoke test for a freshly built image.
+
+### Target matrix
+
+| Target | Runner | Archive | Native libs |
+|--------|--------|---------|-------------|
+| `linux-x64` | `ubuntu-latest` | `.tar.gz` | sherpa-onnx Linux x64 |
+| `win-x64` | `windows-latest` | `.zip` | sherpa-onnx Windows x64 |
+| `osx-aarch64` | `macos-14` | `.tar.gz` | sherpa-onnx macOS arm64 |
+| `osx-x64` | `macos-13` | `.tar.gz` | sherpa-onnx macOS x64 |
+
+Each bundle carries the application jar, the per-target sherpa-onnx native libraries, a self-contained `jlink` Java runtime (so end users need no JDK), the Kokoro model, and the Apache-2.0 attribution files under `licenses/`.
+
+### Cutting a release (manual only)
+
+Releases are **never automatic**. There is no tag-push or push-to-`main` release trigger. To cut one:
+
+1. Open the **Actions** tab and select **Engine Release**.
+2. Click **Run workflow**, enter the version tag (for example `v1.0.0`), and run it.
+3. The pipeline builds all four targets on matching runners, runs the `--stdio` conformance test on the Linux bundle and a `--selftest` on every target, computes a sha256 per bundle, publishes them to a GitHub Release under that tag, regenerates `engine-manifest.json`, and opens a PR to update the bundled manifest so it matches the published artifacts.
+
+The workflow is re-runnable: running it again for the same tag refreshes that release's assets.
+
+### Signing secrets
+
+Signing is **optional**. With no secrets configured the pipeline still completes and publishes **unsigned** bundles, and the macOS first-run fallback below covers Gatekeeper. Configure these repository secrets to enable signing/notarization:
+
+| Secret | Enables |
+|--------|---------|
+| `APPLE_ID`, `APPLE_TEAM_ID`, `APPLE_APP_PASSWORD`, `MACOS_CERT_P12`, `MACOS_CERT_PASSWORD` | macOS code-signing + notarization (all five required together) |
+| `WINDOWS_CERT_PFX`, `WINDOWS_CERT_PASSWORD` | Windows Authenticode signing |
+
+When a target is signed the manifest entry records `"signed": true`.
+
+### macOS first-run fallback (unsigned bundles)
+
+If a macOS bundle is unsigned and un-notarized, Gatekeeper blocks it on first launch. Two paths recover it:
+
+- The plugin's installer clears the `com.apple.quarantine` extended attribute on the extracted engine after download.
+- If a launch is still blocked, **right-click the `kokoro-engine` launcher in Finder and choose Open**, then confirm. macOS remembers the approval for subsequent runs.
+
+Windows SmartScreen may warn on an unsigned bundle; choose **More info -> Run anyway**.
+
 ## Configuration
 
 - **Dialogue Volume** sets the volume of the spoken dialogue (0 to 100).
