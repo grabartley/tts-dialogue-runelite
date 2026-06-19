@@ -9,7 +9,7 @@
 
 **Gielinor, out loud.** This plugin voices in-game dialogue in real time, giving NPCs and your own character distinct AI voices so every conversation actually speaks to you.
 
-By default it runs entirely on your machine. No accounts, no cloud calls, no per-line API bills. The first time you talk to someone the plugin pulls down the voice model, and after that every line is synthesized locally, on-device. An optional **Cloud (Azure)** backend is available for stronger, emotional delivery; it is off by default and only used when you explicitly select it and supply your own Azure key.
+By default it runs entirely on your machine. No accounts, no cloud calls, no per-line API bills. The first time you talk to someone the plugin pulls down the voice model, and after that every line is synthesized locally, on-device. Two optional emotional backends are available for delivery that matches each line's detected mood: an offline **Local (GPU)** voice (Zonos) for machines with a supported GPU, and a **Cloud (Azure)** voice. Both are off by default and only used when you explicitly select them; the Cloud backend additionally needs your own Azure key. See [docs/backends.md](docs/backends.md).
 
 > Powered by [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) via [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx), running inside RuneLite.
 
@@ -30,6 +30,7 @@ Every voice is a real, distinct Kokoro speaker, and what you hear is the clean n
 - **Race and gender voice matrix** spanning 8 races times 2 genders plus player voices, each mapped to a distinct Kokoro speaker.
 - **Static NPC voice table** where race and gender resolve from a precomputed `npcId -> {race, gender}` table baked into the plugin via a single in-memory lookup.
 - **Smart playback** that streams off-thread, cancels instantly when you skip a line, and replays repeated lines from an in-memory LRU cache.
+- **Emotional backends** for delivery that matches each line's detected mood: an offline **Local (GPU)** Zonos voice for supported GPUs and a **Cloud (Azure)** voice, both opt-in with graceful fallback to the local voice.
 - **Persistent audio cache** on disk so repeated dialogue plays instantly across sessions and cloud backends are not re-billed; size-bounded with LRU eviction, corruption-safe, and opt-out-able.
 - **Sensible fallbacks** so NPCs missing from the table still get a gender-appropriate human voice.
 - **Debug mode** with detailed NPC voice resolution logging for troubleshooting.
@@ -165,13 +166,17 @@ Windows SmartScreen may warn on an unsigned bundle; choose **More info -> Run an
 - **Player Voice** chooses which Kokoro voice the player character uses.
 - **Enable Voice Fallbacks** falls back to a gender-appropriate human voice when an NPC is missing from the table. When off, those NPCs use the single default voice.
 - **Debug Mode** logs detailed NPC race/gender resolution and the chosen Kokoro voice per NPC for troubleshooting.
-- **Voice Backend** selects the synthesis engine. `Local` is the offline, in-process Kokoro voice (default). `Cloud` routes synthesis through Microsoft Azure Neural TTS for emotional delivery.
-- **Enable Emotion** carries the emotion detected from each speaker's chat-head animation through to synthesis. When off, every line is voiced as Neutral. Because the default Local (Kokoro) backend is neutral-only by design, this only changes how a line *sounds* on an emotional backend (Cloud/Azure); detection still runs either way.
+- **Voice Backend** selects the synthesis engine. `Local` is the offline, neutral-only Kokoro voice (default). `Local (GPU)` is the offline emotional Zonos voice and needs a supported GPU. `Cloud` routes synthesis through Microsoft Azure Neural TTS for emotional delivery. See [docs/backends.md](docs/backends.md) for the full comparison.
+- **Enable Emotion** carries the emotion detected from each speaker's chat-head animation through to synthesis. When off, every line is voiced as Neutral. Because the default Local (Kokoro) backend is neutral-only by design, this only changes how a line *sounds* on an emotional backend (Local GPU Zonos or Cloud Azure); detection still runs either way.
 - **Azure Subscription Key** / **Azure Region** configure the Cloud backend (for example `eastus`). These are required only when **Voice Backend** is `Cloud`; the key is stored locally and never bundled with the plugin.
 
 ### Emotion detection
 
-Each new dialogue line's emotion is read from the speaker's chat-head expression animation: the NPC head for NPC lines, the player head for player lines. The animation id is mapped to an emotion via the bundled expression table; a missing head (sprite/objectbox dialogues), an idle head, or the one-tick race where the head animation lags the text all resolve to Neutral. The detection runs on the game thread as a cheap widget read and never blocks or throws. The resolved emotion rides in the synthesis request, but the active backend may downgrade it: the Local (Kokoro) backend is neutral-only, so emotion is only audible on the Cloud (Azure) backend.
+Each new dialogue line's emotion is read from the speaker's chat-head expression animation: the NPC head for NPC lines, the player head for player lines. The animation id is mapped to an emotion via the bundled expression table; a missing head (sprite/objectbox dialogues), an idle head, or the one-tick race where the head animation lags the text all resolve to Neutral. The detection runs on the game thread as a cheap widget read and never blocks or throws. The resolved emotion rides in the synthesis request, but the active backend may downgrade it: the Local (Kokoro) backend is neutral-only, so emotion is only audible on an emotional backend, the Local (GPU) Zonos voice or the Cloud (Azure) voice.
+
+### Local (GPU) backend
+
+When **Voice Backend** is `Local (GPU)`, dialogue is synthesized fully offline by the Zonos voice (Apache-2.0), the only emotional path that keeps everything on your machine. It runs as a separate external engine reached through the same process transport as the local Kokoro engine, and renders detected emotion by conditioning Zonos on a per-emotion 8-dimensional emotion vector. Each race/gender resolves to a distinct Zonos reference voice, with a default for any unmapped speaker. This backend needs a supported GPU and a one-time engine download larger than the CPU engine; when no GPU is present or the engine is unavailable, dialogue falls back to the local voice with a one-time notice and never crashes or blocks the game thread. See [docs/backends.md](docs/backends.md) for the emotion-vector presets and GPU requirement.
 
 ### Cloud (Azure) backend
 

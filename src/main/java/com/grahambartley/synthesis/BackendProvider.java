@@ -154,6 +154,21 @@ public final class BackendProvider {
     localKokoro.warmUp();
   }
 
+  /**
+   * Warms up the backend the config currently selects, on the pipeline thread, so a GPU backend
+   * gets its off-thread install/spawn/handshake before the first line and {@link #active()} can see
+   * it as available rather than falling back pre-emptively. The Kokoro fallback is warmed
+   * separately via {@link #warmUpLocal}; this is a no-op when the selection is already local
+   * Kokoro. Safe to call repeatedly: each backend's {@code warmUp} is idempotent.
+   */
+  public void warmUpActive() {
+    String wantedId = backendIdFor(config.voiceBackend());
+    SynthesisBackend wanted = backends.get(wantedId);
+    if (wanted != null && wanted != localKokoro) {
+      wanted.warmUp();
+    }
+  }
+
   /** Releases every registered backend. */
   public void close() {
     for (SynthesisBackend backend : backends.values()) {

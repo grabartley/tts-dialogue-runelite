@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "engine": "zonos",
+  "version": "0.0.0-dev",
+  "warning": null,
+  "artifacts": {
+    "osx-aarch64": {
+      "url": "",
+      "sha256": "",
+      "size": 0,
+      "signed": false,
+      "launcher": "zonos-engine"
+    },
+    "osx-x64": {
+      "url": "",
+      "sha256": "",
+      "size": 0,
+      "signed": false,
+      "launcher": "zonos-engine"
+    },
+    "linux-x64": {
+      "url": "",
+      "sha256": "",
+      "size": 0,
+      "signed": false,
+      "launcher": "zonos-engine"
+    },
+    "win-x64": {
+      "url": "",
+      "sha256": "",
+      "size": 0,
+      "signed": false,
+      "launcher": "zonos-engine.bat"
+    }
+  }
+}

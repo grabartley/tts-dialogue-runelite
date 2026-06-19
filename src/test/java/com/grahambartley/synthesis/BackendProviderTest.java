@@ -196,6 +196,56 @@ public class BackendProviderTest {
   }
 
   @Test
+  public void localGpuRoutesToZonosWhenAvailable() {
+    TestConfig config = new TestConfig();
+    config.backend = VoiceBackend.LOCAL_GPU;
+    StubBackend kokoro =
+        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
+    StubBackend zonos = new StubBackend("local-zonos", true, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, zonos);
+
+    assertEquals(
+        "LOCAL_GPU selects local-zonos when it is available",
+        "local-zonos",
+        provider.active().id());
+  }
+
+  @Test
+  public void localGpuFallsBackToKokoroWithNoticeWhenZonosUnavailable() {
+    TestConfig config = new TestConfig();
+    config.backend = VoiceBackend.LOCAL_GPU;
+    StubBackend kokoro =
+        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
+    // No GPU / dev manifest / engine not installed -> Zonos reports unavailable.
+    StubBackend zonos = new StubBackend("local-zonos", false, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, zonos);
+
+    int[] notices = {0};
+    provider.setAvailabilityNotice(msg -> notices[0]++);
+
+    assertEquals(
+        "LOCAL_GPU with Zonos unavailable falls back to local Kokoro",
+        BackendProvider.LOCAL_KOKORO_ID,
+        provider.active().id());
+    provider.active();
+    assertEquals("the GPU fallback notice fires exactly once", 1, notices[0]);
+  }
+
+  @Test
+  public void zonosFullEmotionSetIsNotDowngraded() {
+    TestConfig config = new TestConfig();
+    config.backend = VoiceBackend.LOCAL_GPU;
+    StubBackend kokoro =
+        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
+    StubBackend zonos = new StubBackend("local-zonos", true, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, zonos);
+
+    provider.synthesize(req(Emotion.SCARED));
+
+    assertEquals("Zonos supports the full set, so no downgrade", Emotion.SCARED, zonos.lastEmotion);
+  }
+
+  @Test
   public void missingLocalKokoroBackendIsRejected() {
     StubBackend azure = new StubBackend("cloud-azure", true, EnumSet.allOf(Emotion.class));
     boolean threw = false;

@@ -156,6 +156,22 @@ public class EngineInstallerTest {
     assertNull("dev manifest resource must degrade to no-engine", installer.install());
   }
 
+  @Test
+  public void bundledZonosDevManifestResourceYieldsNull() {
+    // The committed /zonos-engine-manifest.json resource has empty urls -> no installable engine,
+    // resolved through the same installer via the Zonos manifest-resource constructor.
+    Path enginesRoot;
+    try {
+      enginesRoot = tmp.newFolder("engines-zonos").toPath();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    EngineInstaller installer =
+        new EngineInstaller(
+            new OkHttpClient(), gson, enginesRoot, EngineInstaller.ZONOS_MANIFEST_RESOURCE);
+    assertNull("dev Zonos manifest resource must degrade to no-engine", installer.install());
+  }
+
   // --- helpers -----------------------------------------------------------------------------------
 
   /**

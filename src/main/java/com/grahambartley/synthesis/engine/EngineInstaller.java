@@ -45,11 +45,16 @@ import okhttp3.ResponseBody;
 @Slf4j
 public class EngineInstaller {
 
-  private static final String MANIFEST_RESOURCE = "/engine-manifest.json";
+  /** The Kokoro engine manifest, the default for the bare three-arg constructor. */
+  public static final String KOKORO_MANIFEST_RESOURCE = "/engine-manifest.json";
+
+  /** The Zonos engine manifest, a separate artifact resolved through the same installer. */
+  public static final String ZONOS_MANIFEST_RESOURCE = "/zonos-engine-manifest.json";
 
   private final OkHttpClient httpClient;
   private final Gson gson;
   private final Path enginesRoot;
+  private final String manifestResource;
 
   /** Result of a successful install: the resolved launcher path and the engine/version it backs. */
   public static final class Installed {
@@ -82,9 +87,23 @@ public class EngineInstaller {
    * @param enginesRoot base dir, typically {@code ~/.runelite/tts-dialogue/engines}
    */
   public EngineInstaller(OkHttpClient httpClient, Gson gson, Path enginesRoot) {
+    this(httpClient, gson, enginesRoot, KOKORO_MANIFEST_RESOURCE);
+  }
+
+  /**
+   * Same installer, pointed at a specific engine manifest resource so a second engine (Zonos) can
+   * be resolved through the identical download/verify/extract path without a second installer
+   * class.
+   *
+   * @param manifestResource classpath resource, e.g. {@link #KOKORO_MANIFEST_RESOURCE} or {@link
+   *     #ZONOS_MANIFEST_RESOURCE}
+   */
+  public EngineInstaller(
+      OkHttpClient httpClient, Gson gson, Path enginesRoot, String manifestResource) {
     this.httpClient = httpClient;
     this.gson = gson;
     this.enginesRoot = enginesRoot;
+    this.manifestResource = manifestResource;
   }
 
   /**
@@ -176,9 +195,9 @@ public class EngineInstaller {
    * committed dev resource.
    */
   protected JsonObject readManifest() {
-    try (InputStream in = EngineInstaller.class.getResourceAsStream(MANIFEST_RESOURCE)) {
+    try (InputStream in = EngineInstaller.class.getResourceAsStream(manifestResource)) {
       if (in == null) {
-        log.warn("engine-manifest.json resource not found on classpath");
+        log.warn("engine manifest resource {} not found on classpath", manifestResource);
         return null;
       }
       try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {

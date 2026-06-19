@@ -33,9 +33,10 @@ public interface TTSDialogueConfig extends Config {
   String cloudAzureSection = "cloudAzure";
 
   /**
-   * Which synthesis backend dialogue routes through. {@code LOCAL} is the offline, in-process
-   * Kokoro engine (default); {@code LOCAL_GPU} and {@code CLOUD} are reserved for the emotional
-   * backends and fall back to the local engine until those backends ship.
+   * Which synthesis backend dialogue routes through. {@code LOCAL} is the offline, neutral-only
+   * Kokoro engine (default); {@code LOCAL_GPU} is the offline emotional Zonos engine (needs a
+   * supported GPU); {@code CLOUD} is Azure. Each non-local option falls back to the local engine
+   * when its backend is unavailable.
    */
   enum VoiceBackend {
     LOCAL,
@@ -47,8 +48,10 @@ public interface TTSDialogueConfig extends Config {
       keyName = "voiceBackend",
       name = "Voice Backend",
       description =
-          "Which synthesis engine to use. Local is the offline, in-process Kokoro voice (default)."
-              + " Other options fall back to Local until their backends are installed.",
+          "Which synthesis engine to use. Local is the offline, neutral-only Kokoro voice (default)."
+              + " Local (GPU) is the offline emotional Zonos voice and needs a supported GPU; Cloud"
+              + " is Azure. Options other than Local fall back to Local when their backend is"
+              + " unavailable.",
       position = 0,
       section = synthesisSection)
   default VoiceBackend voiceBackend() {
@@ -60,8 +63,9 @@ public interface TTSDialogueConfig extends Config {
       name = "Enable Emotion",
       description =
           "Carry the emotion detected from the speaker's chat-head animation through to synthesis."
-              + " The local Kokoro backend is neutral-only, so emotion is only audible on the"
-              + " emotional backends. When off, every line is voiced as Neutral.",
+              + " The default local Kokoro backend is neutral-only, so emotion is only audible on the"
+              + " emotional backends (Local GPU Zonos or Cloud Azure). When off, every line is voiced"
+              + " as Neutral.",
       position = 1,
       section = synthesisSection)
   default boolean enableEmotion() {

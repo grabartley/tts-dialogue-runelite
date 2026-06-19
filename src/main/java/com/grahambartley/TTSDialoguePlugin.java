@@ -7,6 +7,7 @@ import com.grahambartley.synthesis.BackendProvider;
 import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.ExpressionEmotionTable;
 import com.grahambartley.synthesis.LocalKokoroBackend;
+import com.grahambartley.synthesis.LocalZonosBackend;
 import com.grahambartley.synthesis.SynthesisRequest;
 import com.grahambartley.synthesis.VoiceSpec;
 import com.grahambartley.synthesis.engine.EngineInstaller;
@@ -83,6 +84,17 @@ public class TTSDialoguePlugin extends Plugin {
     EngineInstaller installer = new EngineInstaller(okHttpClient, gson, ttsDir.resolve("engines"));
     LocalKokoroBackend localKokoro =
         new LocalKokoroBackend(installer, launcher -> new ExternalEngineClient(launcher, gson));
+    // The local GPU emotional backend (Zonos) is reached through the same external --stdio
+    // transport
+    // as Kokoro, but resolves a separate engine bundle from its own manifest. Selected when Voice
+    // Backend is Local (GPU); available only when its engine installs, spawns, and reports a usable
+    // GPU. The committed Zonos manifest is the dev placeholder, so until a GPU engine is published
+    // this backend is unavailable and the provider falls back to local Kokoro.
+    EngineInstaller zonosInstaller =
+        new EngineInstaller(
+            okHttpClient, gson, ttsDir.resolve("engines"), EngineInstaller.ZONOS_MANIFEST_RESOURCE);
+    LocalZonosBackend localZonos =
+        new LocalZonosBackend(zonosInstaller, launcher -> new ExternalEngineClient(launcher, gson));
     // The cloud Azure backend is registered alongside the local Kokoro fallback and selected when
     // Voice Backend is Cloud and a key/region are set. It uses the injected OkHttpClient (Hub
     // rule).
@@ -90,7 +102,7 @@ public class TTSDialoguePlugin extends Plugin {
     // Kokoro (with a one-time notice) when the selected backend is unavailable.
     AzureTtsBackend azureBackend = new AzureTtsBackend(okHttpClient, config);
     azureBackend.setNotice(this::notifyBackend);
-    backendProvider = new BackendProvider(config, localKokoro, azureBackend);
+    backendProvider = new BackendProvider(config, localKokoro, localZonos, azureBackend);
     backendProvider.setAvailabilityNotice(this::notifyBackend);
     // Persistent on-disk cache lives under the same RuneLite dir as the engine; on by default so
     // repeated lines survive restarts and cloud backends are not re-billed. It sits in front of the
@@ -109,6 +121,10 @@ public class TTSDialoguePlugin extends Plugin {
     // Install + spawn the engine on the pipeline thread so the first line is not the one that pays
     // the download/launch cost, and the game thread never blocks on it.
     audioService.prewarm(backendProvider::warmUpLocal);
+    // Also warm the selected backend off the game thread so a GPU (Zonos) selection runs its
+    // install/spawn/handshake before the first line and becomes available instead of pre-emptively
+    // falling back. A no-op when the selection is already the local Kokoro fallback.
+    audioService.prewarm(backendProvider::warmUpActive);
 
     log.info("TTSDialogue started");
   }

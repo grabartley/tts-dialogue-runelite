@@ -183,6 +183,76 @@ public class ExternalEngineClientTest {
   }
 
   @Test
+  public void encodeRequestCarriesEmotionVectorWhenSupplied() {
+    float[] vec = {0.8f, 0f, 0f, 0f, 0f, 0f, 0.2f, 0f};
+    String line = ExternalEngineClient.encodeRequest(request(), vec, GSON);
+    JsonObject root = GSON.fromJson(line, JsonObject.class);
+    com.google.gson.JsonArray arr = root.getAsJsonArray("emotionVector");
+    assertNotNull("the Zonos emotion vector must be encoded into the request line", arr);
+    assertEquals(8, arr.size());
+    assertEquals(0.8f, arr.get(0).getAsFloat(), 1e-6f);
+    assertEquals(0.2f, arr.get(6).getAsFloat(), 1e-6f);
+  }
+
+  @Test
+  public void encodeRequestOmitsEmotionVectorByDefault() {
+    JsonObject root =
+        GSON.fromJson(ExternalEngineClient.encodeRequest(request(), GSON), JsonObject.class);
+    assertNull("no vector field for engines that take none (Kokoro)", root.get("emotionVector"));
+  }
+
+  @Test
+  public void synthesizeWithVectorWritesItAndStillDecodesPcm() {
+    float[] samples = {0.0f, 0.5f, -0.25f};
+    FakeProcess process = new FakeProcess(pcmFrame(44100, samples));
+    ExternalEngineClient client = clientFor(process);
+
+    float[] vec = {0f, 0f, 0.8f, 0f, 0f, 0f, 0.2f, 0f};
+    Pcm pcm = client.synthesize(request(), vec);
+
+    assertNotNull("the header+PCM frame must decode after a vector request", pcm);
+    assertEquals(44100, pcm.getSampleRate());
+    assertEquals(samples.length, pcm.getSamples().length);
+    // The vector was actually written on the wire to the engine.
+    assertTrue(process.capturedStdin().contains("\"emotionVector\""));
+  }
+
+  @Test
+  public void handshakeDecodesGpuReport() {
+    byte[] reply =
+        "{\"ok\":true,\"gpu\":true,\"detail\":\"cuda:0\"}\n".getBytes(StandardCharsets.UTF_8);
+    FakeProcess process = new FakeProcess(reply);
+    ExternalEngineClient client = clientFor(process);
+
+    ExternalEngineClient.Health health = client.handshake();
+
+    assertNotNull(health);
+    assertTrue("engine reported ready", health.ok());
+    assertTrue("engine reported a usable GPU", health.gpu());
+    assertTrue(
+        "a health op was written to the engine", process.capturedStdin().contains("\"health\""));
+  }
+
+  @Test
+  public void handshakeReportsNoGpuWhenEngineSaysSo() {
+    byte[] reply =
+        "{\"ok\":true,\"gpu\":false,\"detail\":\"no CUDA\"}\n".getBytes(StandardCharsets.UTF_8);
+    ExternalEngineClient client = clientFor(new FakeProcess(reply));
+
+    ExternalEngineClient.Health health = client.handshake();
+
+    assertNotNull(health);
+    assertTrue(health.ok());
+    assertEquals(false, health.gpu());
+  }
+
+  @Test
+  public void handshakeReturnsNullWhenEngineDiesBeforeReplying() {
+    ExternalEngineClient client = clientFor(new FakeProcess(new byte[0]));
+    assertNull("a dead engine yields no Health rather than throwing", client.handshake());
+  }
+
+  @Test
   public void processDeathBeforeResponseYieldsNull() throws IOException {
     // Empty stdout: the engine produced no header at all (died immediately). EOF on the header read
     // must be a clean null, not an exception out of synthesize().
