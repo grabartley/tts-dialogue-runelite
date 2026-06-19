@@ -30,21 +30,11 @@ public interface TTSDialogueConfig extends Config {
   }
 
   @ConfigItem(
-      keyName = "useInProcessTts",
-      name = "In-Process TTS (Kokoro)",
-      description =
-          "Synthesize dialogue in-process with the embedded Kokoro model instead of the local HTTP"
-              + " voice servers. The model downloads once on first use.",
-      position = 5,
-      section = generalSection)
-  default boolean useInProcessTts() {
-    return true;
-  }
-
-  @ConfigItem(
       keyName = "enableRaceBasedVoices",
       name = "Enable Automatic NPC Voices",
-      description = "Automatically select voices based on NPC race and gender detection",
+      description =
+          "Automatically pick a Kokoro voice per NPC based on race and gender detection. When off,"
+              + " every NPC uses the default voice.",
       position = 1,
       section = generalSection)
   default boolean enableRaceBasedVoices() {
@@ -62,19 +52,11 @@ public interface TTSDialogueConfig extends Config {
   }
 
   @ConfigItem(
-      keyName = "showServerStatus",
-      name = "Show Server Status",
-      description = "Display TTS server health status in logs on startup",
-      position = 2,
-      section = generalSection)
-  default boolean showServerStatus() {
-    return true;
-  }
-
-  @ConfigItem(
       keyName = "enableFallbacks",
       name = "Enable Voice Fallbacks",
-      description = "Use fallback voices when preferred voice servers are unavailable",
+      description =
+          "When an NPC's race can't be detected, fall back to a gender-appropriate human voice."
+              + " When off, undetected NPCs use the single default voice.",
       position = 3,
       section = generalSection)
   default boolean enableFallbacks() {

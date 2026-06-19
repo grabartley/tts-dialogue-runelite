@@ -3,16 +3,7 @@ package com.grahambartley;
 import com.google.inject.Provides;
 import com.grahambartley.tts.KokoroAudio;
 import com.grahambartley.tts.KokoroTtsEngine;
-import java.io.BufferedWriter;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import javax.inject.Inject;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -36,11 +27,6 @@ public class TTSDialoguePlugin extends Plugin {
 
   @Inject private TTSDialogueConfig config;
 
-  // Speaker ids into the Kokoro voice bank. Race/gender mapping is a separate issue, so for now the
-  // player and NPCs just get two distinct built-in voices.
-  private static final int NPC_SPEAKER_ID = 0;
-  private static final int PLAYER_SPEAKER_ID = 1;
-
   private String lastSpoken = "";
 
   private Clip currentClip;
@@ -56,17 +42,10 @@ public class TTSDialoguePlugin extends Plugin {
 
     Path ttsDir = RuneLite.RUNELITE_DIR.toPath().resolve("tts-dialogue");
     ttsEngine = new KokoroTtsEngine(ttsDir);
-    if (config.useInProcessTts()) {
-      // Warm the model on a background thread so the first line is not the one that pays the load.
-      ttsEngine.prewarm();
-    }
+    // Warm the model on a background thread so the first line is not the one that pays the load.
+    ttsEngine.prewarm();
 
     log.info("TTSDialogue started");
-
-    // Show server health status if configured
-    if (config.showServerStatus()) {
-      logServerHealthStatus();
-    }
   }
 
   @Override
@@ -78,20 +57,12 @@ public class TTSDialoguePlugin extends Plugin {
     log.info("TTS Plugin stopped");
   }
 
-  private void speakWithTTS(String text, String speaker, String npcName) {
-    if (config.useInProcessTts()) {
-      speakInProcess(text, speaker);
-      return;
-    }
-    speakWithHttpServer(text, speaker, npcName);
-  }
-
   /** Synthesizes the line in-process with Kokoro, off the game thread, then plays it back. */
-  private void speakInProcess(String text, String speaker) {
+  private void speakWithTTS(String text, String speaker, String npcName) {
     if (ttsEngine == null || ttsEngine.isFailed()) {
       return;
     }
-    int speakerId = "player".equalsIgnoreCase(speaker) ? PLAYER_SPEAKER_ID : NPC_SPEAKER_ID;
+    int speakerId = voiceManager.getSpeakerId(speaker, npcName);
     long requestedAtNanos = System.nanoTime();
     ttsEngine.speak(
         text,
@@ -108,48 +79,9 @@ public class TTSDialoguePlugin extends Plugin {
     return text.length() <= 40 ? text : text.substring(0, 40) + "...";
   }
 
-  private void speakWithHttpServer(String text, String speaker, String npcName) {
-    try {
-      String port;
-      if (config.enableRaceBasedVoices() && voiceManager != null) {
-        port = voiceManager.getPortForSpeaker(speaker, npcName);
-      } else {
-        // Fallback to original behavior
-        port = speaker.equalsIgnoreCase("player") ? "59126" : "59125";
-      }
-
-      URL url = new URL("http://localhost:" + port + "/");
-      HttpURLConnection con = (HttpURLConnection) url.openConnection();
-      con.setRequestMethod("POST");
-      con.setRequestProperty("Content-Type", "text/plain");
-      con.setDoOutput(true);
-
-      try (OutputStream os = con.getOutputStream();
-          BufferedWriter writer =
-              new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
-        writer.write(text);
-        writer.flush();
-      }
-
-      InputStream is = con.getInputStream();
-      Path tempPath = Files.createTempFile("npc_voice", ".wav");
-      Files.copy(is, tempPath, StandardCopyOption.REPLACE_EXISTING);
-
-      playAudio(AudioSystem.getAudioInputStream(tempPath.toFile()));
-      con.disconnect();
-
-      if (config.enableRaceBasedVoices() && !"player".equalsIgnoreCase(speaker)) {
-        log.debug("Used voice for NPC '{}': port {}", npcName, port);
-      }
-    } catch (Exception e) {
-      log.warn("TTS failed: " + e.getMessage());
-    }
-  }
-
   private void playAudio(AudioInputStream audioStream) {
-    // Playback can be triggered from the game thread (HTTP path) or the TTS background thread
-    // (in-process path), and onGameTick stops the clip on skipped dialogue, so guard the shared
-    // clip.
+    // Playback is triggered from the TTS background thread, and onGameTick stops the clip on
+    // skipped dialogue, so guard the shared clip.
     synchronized (audioLock) {
       try {
         if (currentClip != null && currentClip.isRunning()) {
@@ -185,7 +117,7 @@ public class TTSDialoguePlugin extends Plugin {
     return raw.replaceAll("<[^>]+>", "").trim();
   }
 
-  /** Extracts NPC name from dialogue widget or uses current interacting NPC */
+  /** Extracts NPC name from dialogue widget or uses current interacting NPC. */
   private String getCurrentNPCName() {
     // Try to get NPC name from dialogue name widget
     Widget npcNameWidget = client.getWidget(WidgetInfo.DIALOG_NPC_NAME);
@@ -243,49 +175,6 @@ public class TTSDialoguePlugin extends Plugin {
         }
       }
       lastSpoken = "";
-    }
-  }
-
-  /** Log the health status of all TTS voice servers */
-  private void logServerHealthStatus() {
-    if (voiceManager == null) {
-      return;
-    }
-
-    log.info("🎭 TTS Voice Server Health Status:");
-    log.info("====================================");
-
-    var healthStatus = voiceManager.getServerHealthStatus();
-    int healthyCount = 0;
-    int totalCount = healthStatus.size();
-
-    for (var entry : healthStatus.entrySet()) {
-      VoiceManager.VoiceProfile voice = entry.getKey();
-      boolean isHealthy = entry.getValue();
-
-      String status = isHealthy ? "✅ HEALTHY" : "❌ UNAVAILABLE";
-      log.info("  {} (port {}): {}", voice.getDisplayName(), voice.getPort(), status);
-
-      if (isHealthy) {
-        healthyCount++;
-      }
-    }
-
-    log.info("====================================");
-    log.info("📊 Summary: {}/{} voice servers are healthy", healthyCount, totalCount);
-
-    if (healthyCount == 0) {
-      log.warn(
-          "⚠️  No TTS servers are running! Please start voice servers using './setup-voices.sh start'");
-    } else if (healthyCount < totalCount) {
-      log.warn("⚠️  Some TTS servers are unavailable. Fallback voices will be used when needed.");
-      if (config.enableFallbacks()) {
-        log.info("💡 Voice fallbacks are enabled - missing voices will use alternatives");
-      } else {
-        log.warn("⚠️  Voice fallbacks are disabled - some dialogue may fail");
-      }
-    } else {
-      log.info("🎉 All voice servers are healthy!");
     }
   }
 

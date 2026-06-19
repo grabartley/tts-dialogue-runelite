@@ -9,11 +9,11 @@ This plugin reads **in-game dialogue out loud** using different AI voices for NP
 
 ## 🧩 TTS Engine
 
-By default the plugin synthesizes dialogue **in-process** with the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model running on CPU through [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). There is no Docker, no local HTTP server, and no network call at synthesis time. On first use the plugin downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it; every line after that is generated locally.
+The plugin synthesizes dialogue **in-process** with the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model running on CPU through [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). There is no Docker, no local HTTP server, and no network call at synthesis time. On first use the plugin downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it; every line after that is generated locally.
 
 Model load and synthesis run on a dedicated background thread, so the game never stalls on the first line or on repeated dialogue. On Apple Silicon a typical line synthesizes in roughly 1.3–1.8 s of CPU time.
 
-The legacy Docker voice-server path described below remains available behind the **In-Process TTS (Kokoro)** config toggle. Turn it off to fall back to the HTTP voice servers; leave it on (default) for the embedded engine.
+Every voice is a real, distinct Kokoro speaker. The audio you hear is the clean neural output as-is: no resampling pitch shift, no reverb, and no distortion. Character differences between races come from picking genuinely different speakers (accent, timbre, pitch), never from post-processing.
 
 > The native sherpa-onnx library ships per-platform. `build.gradle` bundles the macOS Apple Silicon native jar by default; swap the `sherpa-onnx-native-lib-*` line for your platform when building elsewhere.
 
@@ -22,106 +22,48 @@ The legacy Docker voice-server path described below remains available behind the
 ## ✨ Features
 
 - 🧠 **In-process Kokoro TTS** - offline, on-device synthesis with no server or per-line network call
-
 - 🔊 **Text-to-Speech for all dialogue** (NPC & Player)
-- 🎭 **16-Voice Matrix System** - 8 races × 2 genders each with unique voices:
-  - 📱 **Player Voices**: Male & Female options
-  - 👥 **Human Voices**: Most common NPCs (guards, merchants, etc.)
-  - 🧝 **Elf Voices**: Mystical male, ethereal female
-  - ⛏️ **Dwarf Voices**: Gruff male, sturdy female
-  - 👺 **Goblin Voices**: Raspy male, crude female
-  - 🏔️ **Troll Voices**: Deep male, primitive female
-  - 💀 **Undead Voices**: Hollow male, eerie female
-  - 😈 **Demon Voices**: Sinister male, otherworldly female
+- 🎭 **Race/Gender Voice Matrix** - 8 races × 2 genders plus player voices, each mapped to a distinct Kokoro speaker
 - 🤖 **Automatic NPC Detection** - Intelligently detects race and gender from NPC names, IDs, and context
-- 🧠 **Production-Ready** - Local, fast, offline-capable TTS (no cloud dependencies)
 - ⏩ **Smart Playback** - Cancels audio on skipped dialogue
-- 🏥 **Server Health Monitoring** - Automatic health checks with intelligent fallbacks
-- 🔄 **Robust Fallback System** - Uses alternative voices when preferred servers are unavailable
+- 🔄 **Sensible Fallbacks** - Undetected NPCs fall back to a gender-appropriate human voice
 - 🐛 **Debug Mode** - Detailed NPC detection logging for troubleshooting
+
+### 🎙️ Voice Matrix
+
+Voices are drawn from the English speakers of the `kokoro-multi-lang-v1_0` bank (American `af_/am_`, British `bf_/bm_`). Each category maps to a unique speaker id, so no two categories sound alike.
+
+| Category | Male | Female |
+|----------|------|--------|
+| 👤 **Player** | `am_michael` (16) | `af_heart` (3) |
+| 👥 **Human** | `am_fenrir` (14) | `af_bella` (2) |
+| 🧝 **Elf** | `bm_george` (26) | `bf_emma` (21) |
+| ⛏️ **Dwarf** | `bm_lewis` (27) | `bf_isabella` (22) |
+| 👺 **Goblin** | `am_puck` (18) | `af_sky` (10) |
+| 🏔️ **Troll** | `am_onyx` (17) | `af_sarah` (9) |
+| 💀 **Undead** | `am_echo` (12) | `af_nicole` (6) |
+| 😈 **Demon** | `bm_daniel` (24) | `af_river` (8) |
+| 🧙 **Wizard** | `bm_fable` (25) | `af_alloy` (0) |
+
+The **Human** voices double as the fallback for any NPC whose race can't be detected, and as the default for every NPC when **Automatic NPC Voices** is turned off.
 
 ---
 
 ## 🔧 Dev Setup
 
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/yourusername/runelite-tts-plugin.git
-cd runelite-tts-plugin
-```
-
-### 2. Install & run TTS voice servers (automated)
-
-This plugin uses 16 specialized TTS voice servers (8 races × 2 genders) running in Docker containers. We've included an automated setup script to handle everything!
-
-#### 🚀 One-Command Setup
-
-```bash
-# Start all 16 voice servers automatically
-./setup-voices.sh start
-```
-
-This will:
-- 🐳 Pull the required Docker images
-- 🎭 Start 16 voice containers with optimized voice models
-- ⏳ Wait for all servers to initialize
-- ✅ Verify all voices are working
-
-#### 📊 Voice Server Matrix
-
-The setup script creates the following voice servers:
-
-| Race | Male Voice (Port) | Female Voice (Port) |
-|------|------------------|--------------------|
-| 👤 **Player** | `player-male` (59125) | `player-female` (59126) |
-| 👥 **Human** | `human-male` (59127) | `human-female` (59128) |
-| 🧝 **Elf** | `elf-male` (59129) | `elf-female` (59130) |
-| ⛏️ **Dwarf** | `dwarf-male` (59131) | `dwarf-female` (59132) |
-| 👺 **Goblin** | `goblin-male` (59133) | `goblin-female` (59134) |
-| 🏔️ **Troll** | `troll-male` (59135) | `troll-female` (59136) |
-| 💀 **Undead** | `undead-male` (59137) | `undead-female` (59138) |
-| 😈 **Demon** | `demon-male` (59139) | `demon-female` (59140) |
-
-#### 🛠️ Voice Server Management
-
-```bash
-# Check server status
-./setup-voices.sh status
-
-# Test all voice servers
-./setup-voices.sh test
-
-# Stop all servers
-./setup-voices.sh stop
-
-# Restart everything
-./setup-voices.sh restart
-```
-
-#### 🎭 Voice Model Selection
-
-Each voice uses carefully selected Piper models from [HuggingFace](https://huggingface.co/rhasspy/piper-voices) optimized for their character:
-
-- **Player Voices**: Clear, neutral tones
-- **Human Voices**: Natural British/American accents
-- **Elf Voices**: Elegant, mystical quality
-- **Dwarf Voices**: Gruff, sturdy characteristics
-- **Goblin Voices**: Raspy, crude tones
-- **Troll Voices**: Deep, primitive sounds
-- **Undead Voices**: Hollow, eerie quality
-- **Demon Voices**: Sinister, otherworldly tones
-
-> **⚡ Performance Tip:** The script automatically downloads and caches voice models. First startup takes ~5-10 minutes, subsequent starts are much faster!
-
----
-
-## 🧪 Building & Running the Plugin
-
 ### Requirements
 
 - ✅ Java 17
 - 🛠️ Gradle (wrapper included)
+
+### Clone the repo
+
+```bash
+git clone https://github.com/grabartley/tts-dialogue-runelite.git
+cd tts-dialogue-runelite
+```
+
+There is nothing else to install: no Docker, no voice servers, no model files to fetch by hand. The Kokoro bundle downloads itself on first run.
 
 ### Build the plugin
 
@@ -143,108 +85,54 @@ Drop the built `.jar` into your RuneLite `plugins` folder or use RuneLite's Exte
 
 ---
 
+## ⚙️ Configuration
+
+- **Dialogue Volume** - Volume of the spoken dialogue (0–100)
+- **Enable Automatic NPC Voices** - Pick a Kokoro voice per NPC from race/gender detection. When off, every NPC uses the default Human voice.
+- **Player Voice** - Which Kokoro voice the player character uses
+- **Enable Voice Fallbacks** - When an NPC's race can't be detected, fall back to a gender-appropriate human voice. When off, undetected NPCs use the single default voice.
+- **Debug Mode** - Detailed NPC race/gender detection logging
+
+---
+
 ## 🚑 Troubleshooting
 
-### 🔍 Server Health Checking
-
-The plugin automatically monitors TTS server health and provides fallback options:
-
-#### Check Server Status
-```bash
-# Use the included script
-./setup-voices.sh status
-
-# Or manually check each port
-curl http://localhost:59125  # Default NPC voice
-curl http://localhost:59126  # Player voice
-curl http://localhost:59127  # Dwarf voice
-# ... etc
-```
-
-#### Enable Health Status Logging
-In the plugin configuration:
-1. Enable **"Show Server Status"** 
-2. Restart the plugin
-3. Check RuneLite logs for server health information
-
-#### Common Issues
-
-**⚠️ No TTS servers running:**
-- **Solution:** Run `./setup-voices.sh start`
-- **Check:** Docker containers are running with `docker ps`
-
-**⚠️ Some voices unavailable:**
-- **Fallback enabled:** Plugin will use alternative voices automatically
-- **Fallback disabled:** Enable "Voice Fallbacks" in configuration
-- **Manual fix:** Restart specific containers: `docker restart tts-dwarf`
-
-**⚠️ TTS requests timing out:**
-- **Check:** Server health with `./setup-voices.sh test`
-- **Solution:** Increase timeout or restart containers
-- **Debug:** Check container logs: `docker logs tts-player`
-
-**🎭 Wrong voices (males speaking as females):**
-- **Cause:** Voice model mismatch or wrong port assignment
-- **Check:** Verify voice models are correctly downloaded in containers
-- **Solution:** Restart specific voice containers: `docker restart tts-elf`
-- **Debug:** Check which models are actually loaded: `docker logs tts-elf`
+**🐢 First line is slow or silent:**
+- The model downloads (~349 MB) and loads on first use. Give it a moment; later lines are fast.
+- Check RuneLite logs for `Downloading Kokoro model bundle` and `Kokoro model loaded` messages.
 
 **🔊 No audio output:**
-- **Check:** System audio is working and not muted
-- **Verify:** TTS files are being generated in `/tmp/`
-- **Test:** Manual voice test: `curl -X POST -H "Content-Type: text/plain" -d "test" http://localhost:59126 -o test.wav && afplay test.wav`
+- Check system audio is working and not muted.
+- Confirm the model finished loading (look for `Kokoro model loaded in … ms` in the logs).
 
-#### Plugin Configuration Options
+**🎭 Wrong or unexpected voice:**
+- Enable **Debug Mode** to log the detected race/gender and the chosen Kokoro voice per NPC.
+- Undetected NPCs intentionally fall back to the Human voice; toggle **Enable Voice Fallbacks** to change that behavior.
 
-- **Enable Race-Based Voices** - Turn on/off the race detection system
-- **Show Server Status** - Display server health in logs on startup
-- **Enable Voice Fallbacks** - Use alternative voices when preferred ones are down
-- **Per-race voice selection** - Choose specific voices for each race
-
-#### Voice Server Management
-
-```bash
-# Quick commands
-./setup-voices.sh start    # Start all voice servers
-./setup-voices.sh stop     # Stop all voice servers  
-./setup-voices.sh status   # Check server health
-./setup-voices.sh test     # Test all servers
-./setup-voices.sh restart  # Restart everything
-```
-
-### 📝 Logs to Check
-
-**Plugin logs show:**
-- Server health status on startup
-- Voice fallback usage
-- NPC race detection results
-- TTS request failures
-
-**Docker logs show:**
-- Model download progress
-- Server startup issues
-- TTS processing errors
+**💥 Native library errors on startup:**
+- `build.gradle` bundles the macOS Apple Silicon sherpa-onnx native jar by default. On other platforms, swap the `sherpa-onnx-native-lib-*` dependency for your OS/arch.
 
 ---
 
 ## 🧠 Tech Stack
 
 - Java 🥃
-- Piper (TTS) 🎙️
-- Docker 🐳
+- Kokoro-82M (TTS) 🎙️
+- sherpa-onnx (ONNX inference) 🧠
 - RuneLite Plugin Framework 🧩
 
 ---
 
 ## 🎯 Future Ideas
 
-- Custom voice models for specific NPCs 😈
+- Custom voice overrides for specific NPCs 😈
+- Optional per-category speed tuning via sherpa-onnx's native speed parameter
 
 ---
 
 ## 🙌 Shoutout
 
-Big love to [Rhasspy](https://github.com/rhasspy/piper) for Piper, and the RuneLite devs for making plugin dev actually fun.
+Big love to [hexgrad](https://huggingface.co/hexgrad/Kokoro-82M) for Kokoro, the [k2-fsa](https://github.com/k2-fsa/sherpa-onnx) team for sherpa-onnx, and the RuneLite devs for making plugin dev actually fun.
 
 ---
 
