@@ -33,8 +33,8 @@ public interface TTSDialogueConfig extends Config {
       keyName = "enableRaceBasedVoices",
       name = "Enable Automatic NPC Voices",
       description =
-          "Automatically pick a Kokoro voice per NPC based on race and gender detection. When off,"
-              + " every NPC uses the default voice.",
+          "Automatically pick a Kokoro voice per NPC from the bundled race and gender voice table."
+              + " When off, every NPC uses the default voice.",
       position = 1,
       section = generalSection)
   default boolean enableRaceBasedVoices() {
@@ -55,8 +55,8 @@ public interface TTSDialogueConfig extends Config {
       keyName = "enableFallbacks",
       name = "Enable Voice Fallbacks",
       description =
-          "When an NPC's race can't be detected, fall back to a gender-appropriate human voice."
-              + " When off, undetected NPCs use the single default voice.",
+          "When an NPC's race isn't in the voice table, fall back to a gender-appropriate human"
+              + " voice. When off, those NPCs use the single default voice.",
       position = 3,
       section = generalSection)
   default boolean enableFallbacks() {
@@ -66,7 +66,7 @@ public interface TTSDialogueConfig extends Config {
   @ConfigItem(
       keyName = "debugMode",
       name = "Debug Mode",
-      description = "Show detailed NPC race/gender detection info in logs",
+      description = "Show detailed NPC race/gender resolution info in logs",
       position = 4,
       section = generalSection)
   default boolean debugMode() {
