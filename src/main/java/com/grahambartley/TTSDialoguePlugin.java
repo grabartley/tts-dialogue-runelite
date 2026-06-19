@@ -11,6 +11,7 @@ import com.grahambartley.synthesis.engine.EngineInstaller;
 import com.grahambartley.synthesis.engine.ExternalEngineClient;
 import com.grahambartley.tts.AudioPlayer;
 import com.grahambartley.tts.DialogueAudioService;
+import com.grahambartley.tts.DiskAudioCache;
 import java.nio.file.Path;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -67,9 +68,20 @@ public class TTSDialoguePlugin extends Plugin {
     LocalKokoroBackend localKokoro =
         new LocalKokoroBackend(installer, launcher -> new ExternalEngineClient(launcher, gson));
     backendProvider = new BackendProvider(config, localKokoro);
+    // Persistent on-disk cache lives under the same RuneLite dir as the engine; on by default so
+    // repeated lines survive restarts and cloud backends are not re-billed. It sits in front of the
+    // backend provider's synthesis regardless of which backend (local or cloud) runs. Opt-out via
+    // config.
+    DiskAudioCache diskCache =
+        config.persistentCache() ? new DiskAudioCache(ttsDir.resolve("cache")) : null;
     audioService =
         new DialogueAudioService(
-            backendProvider, new AudioPlayer(), CACHE_SIZE, QUEUE_CAPACITY, config::volume);
+            backendProvider,
+            new AudioPlayer(),
+            diskCache,
+            CACHE_SIZE,
+            QUEUE_CAPACITY,
+            config::volume);
     // Install + spawn the engine on the pipeline thread so the first line is not the one that pays
     // the download/launch cost, and the game thread never blocks on it.
     audioService.prewarm(backendProvider::warmUpLocal);

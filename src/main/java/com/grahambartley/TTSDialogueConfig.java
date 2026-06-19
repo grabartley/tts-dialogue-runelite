@@ -105,6 +105,19 @@ public interface TTSDialogueConfig extends Config {
   }
 
   @ConfigItem(
+      keyName = "persistentCache",
+      name = "Persistent Audio Cache",
+      description =
+          "Save synthesized dialogue to disk so repeated lines play instantly across sessions and"
+              + " cloud backends are not re-billed for audio you have already heard. Cache lives in"
+              + " ~/.runelite/tts-dialogue/cache and is size-bounded.",
+      position = 5,
+      section = generalSection)
+  default boolean persistentCache() {
+    return true;
+  }
+
+  @ConfigItem(
       keyName = "debugMode",
       name = "Debug Mode",
       description = "Show detailed NPC race/gender resolution info in logs",

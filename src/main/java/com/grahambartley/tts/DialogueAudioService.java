@@ -21,9 +21,12 @@ import lombok.extern.slf4j.Slf4j;
  * single background thread fed by a small bounded queue. Synthesis is delegated to the active
  * {@link SynthesisBackend} via {@link BackendProvider}, and repeated lines are served from an
  * {@link LruCache} keyed on {@code (backendId, voiceKey, emotion, text)} so a different backend,
- * voice, or emotion never serves stale audio. An epoch counter makes interruption clean: bumping it
- * on every new line and on {@link #interrupt} causes any queued or in-flight work for a now-stale
- * line to drop instead of playing.
+ * voice, or emotion never serves stale audio. Behind that sits an optional persistent {@link
+ * DiskAudioCache} keyed on the same tuple, so lines survive across sessions and cloud backends are
+ * not re-billed for audio the user has already heard. Lookup order is: in-memory LRU → disk →
+ * synthesize, writing through to both tiers on a synth and promoting disk hits into memory. An
+ * epoch counter makes interruption clean: bumping it on every new line and on {@link #interrupt}
+ * causes any queued or in-flight work for a now-stale line to drop instead of playing.
  */
 @Slf4j
 public final class DialogueAudioService {
@@ -39,27 +42,33 @@ public final class DialogueAudioService {
   private final AudioOutput output;
   private final Executor executor;
   private final LruCache<CacheKey, Pcm> cache;
+  private final DiskAudioCache diskCache;
   private final IntSupplier volume;
   private final AtomicLong epoch = new AtomicLong();
 
   public DialogueAudioService(
       BackendProvider backends,
       AudioOutput output,
+      DiskAudioCache diskCache,
       int cacheSize,
       int queueCapacity,
       IntSupplier volume) {
-    this(backends, output, buildExecutor(queueCapacity), cacheSize, volume);
+    this(backends, output, diskCache, buildExecutor(queueCapacity), cacheSize, volume);
   }
 
-  /** Test seam: lets callers inject an inline executor so behavior is deterministic. */
+  /**
+   * Test seam: lets callers inject an inline executor and disk cache so behavior is deterministic.
+   */
   DialogueAudioService(
       BackendProvider backends,
       AudioOutput output,
+      DiskAudioCache diskCache,
       Executor executor,
       int cacheSize,
       IntSupplier volume) {
     this.backends = backends;
     this.output = output;
+    this.diskCache = diskCache;
     this.executor = executor;
     this.cache = new LruCache<>(cacheSize);
     this.volume = volume;
@@ -115,18 +124,38 @@ public final class DialogueAudioService {
       return;
     }
     Pcm pcm = cache.get(key);
-    if (pcm == null) {
-      pcm = backends.synthesizeWith(backend, request);
-      if (pcm == null) {
-        return;
-      }
-      cache.put(key, pcm);
-    } else {
+    if (pcm != null) {
       log.debug(
-          "Serving \"{}\" ({}/{}) from cache",
+          "Serving \"{}\" ({}/{}) from memory cache",
           abbreviate(key.text()),
           key.backendId(),
           key.voiceKey());
+    } else {
+      // Memory miss: try the persistent on-disk cache (this runs on the pipeline thread, never the
+      // game thread). A disk hit is promoted into memory so subsequent replays skip the disk read.
+      pcm =
+          diskCache == null
+              ? null
+              : diskCache.get(key.backendId(), key.voiceKey(), key.emotion(), key.text());
+      if (pcm != null) {
+        cache.put(key, pcm);
+        log.debug(
+            "Serving \"{}\" ({}/{}) from disk cache",
+            abbreviate(key.text()),
+            key.backendId(),
+            key.voiceKey());
+      } else {
+        // Disk miss too: synthesize once and write through to both tiers so the line is free next
+        // time, this session (memory) and every future session (disk).
+        pcm = backends.synthesizeWith(backend, request);
+        if (pcm == null) {
+          return;
+        }
+        cache.put(key, pcm);
+        if (diskCache != null) {
+          diskCache.put(key.backendId(), key.voiceKey(), key.emotion(), key.text(), pcm);
+        }
+      }
     }
     // Re-check after the (possibly slow) synth: the line may have been skipped meanwhile.
     if (epoch.get() != mine) {

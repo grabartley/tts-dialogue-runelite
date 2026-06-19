@@ -12,13 +12,18 @@ import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.SynthesisBackend;
 import com.grahambartley.synthesis.SynthesisRequest;
 import com.grahambartley.synthesis.VoiceSpec;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.Executor;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class DialogueAudioServiceTest {
+
+  @Rule public TemporaryFolder tmp = new TemporaryFolder();
 
   /** Records synth requests and hands back canned PCM so cache behavior is observable. */
   private static final class FakeBackend implements SynthesisBackend {
@@ -116,7 +121,8 @@ public class DialogueAudioServiceTest {
 
   private static DialogueAudioService service(
       BackendProvider provider, AudioOutput output, Executor executor, int cacheSize, int volume) {
-    return new DialogueAudioService(provider, output, executor, cacheSize, () -> volume);
+    // The existing in-memory cache tests do not exercise the disk layer; pass null for it.
+    return new DialogueAudioService(provider, output, null, executor, cacheSize, () -> volume);
   }
 
   private static SynthesisRequest req(String text, NPCRace race, NPCGender gender) {
@@ -333,5 +339,88 @@ public class DialogueAudioServiceTest {
     assertEquals("downgraded emotion reuses the neutral cache entry", 1, backend.requests.size());
     assertTrue(backend.requests.get(0).contains("|NEUTRAL|"));
     assertEquals("both lines still play", 2, output.streamCalls);
+  }
+
+  @Test
+  public void lineSynthesizedInOneSessionIsServedFromDiskInTheNext() {
+    Path cacheDir = tmp.getRoot().toPath().resolve("cache");
+    SynthesisRequest line = req("Welcome to Lumbridge", NPCRace.HUMAN, NPCGender.FEMALE);
+
+    // Session 1: fresh service with a fresh in-memory cache, real disk cache. Synthesizes once.
+    FakeBackend backend1 = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    DeferredExecutor exec1 = new DeferredExecutor();
+    DialogueAudioService session1 =
+        new DialogueAudioService(
+            provider(backend1),
+            new FakeOutput(),
+            new DiskAudioCache(cacheDir),
+            exec1,
+            8,
+            () -> 100);
+    session1.speak(line);
+    exec1.runAll();
+    assertEquals("first session synthesizes the line", 1, backend1.requests.size());
+
+    // Session 2: brand new service and a brand new in-memory cache, same disk dir. The in-memory
+    // tier is empty, so without disk this would re-synthesize.
+    FakeBackend backend2 = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    FakeOutput output2 = new FakeOutput();
+    DeferredExecutor exec2 = new DeferredExecutor();
+    DialogueAudioService session2 =
+        new DialogueAudioService(
+            provider(backend2), output2, new DiskAudioCache(cacheDir), exec2, 8, () -> 100);
+    session2.speak(line);
+    exec2.runAll();
+
+    assertEquals(
+        "second session must be served from disk, not re-synthesized", 0, backend2.requests.size());
+    assertEquals("the line still plays in the new session", 1, output2.streamCalls);
+  }
+
+  @Test
+  public void crossSessionRepeatCostsTheBackendZeroAdditionalSynthCalls() {
+    // The headline Azure-cost guarantee (#37): a repeated (backendId, voiceKey, emotion, text)
+    // across sessions must never bill the backend again. A fake "Azure" backend counts synth calls.
+    Path cacheDir = tmp.getRoot().toPath().resolve("cache");
+    FakeBackend azure = new FakeBackend("cloud-azure", EnumSet.allOf(Emotion.class));
+    SynthesisRequest line =
+        req("Have you any quests?", NPCRace.HUMAN, NPCGender.MALE, Emotion.HAPPY);
+
+    // Session 1 on the cloud backend: one paid synth call.
+    TestConfig config1 = new TestConfig();
+    config1.backend = VoiceBackend.CLOUD;
+    DeferredExecutor exec1 = new DeferredExecutor();
+    DialogueAudioService session1 =
+        new DialogueAudioService(
+            new BackendProvider(config1, new FakeBackend(EnumSet.of(Emotion.NEUTRAL)), azure),
+            new FakeOutput(),
+            new DiskAudioCache(cacheDir),
+            exec1,
+            8,
+            () -> 100);
+    session1.speak(line);
+    exec1.runAll();
+    int afterFirstSession = azure.requests.size();
+    assertEquals("first hearing of the line costs exactly one API call", 1, afterFirstSession);
+
+    // Session 2: fresh in-memory cache, same disk dir, same line. Must cost ZERO additional calls.
+    TestConfig config2 = new TestConfig();
+    config2.backend = VoiceBackend.CLOUD;
+    DeferredExecutor exec2 = new DeferredExecutor();
+    DialogueAudioService session2 =
+        new DialogueAudioService(
+            new BackendProvider(config2, new FakeBackend(EnumSet.of(Emotion.NEUTRAL)), azure),
+            new FakeOutput(),
+            new DiskAudioCache(cacheDir),
+            exec2,
+            8,
+            () -> 100);
+    session2.speak(line);
+    exec2.runAll();
+
+    assertEquals(
+        "a repeated line across sessions must not re-bill the cloud backend",
+        afterFirstSession,
+        azure.requests.size());
   }
 }

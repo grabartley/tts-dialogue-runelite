@@ -17,7 +17,7 @@ It runs entirely on your machine. No accounts, no cloud calls, no per-line API b
 
 The plugin synthesizes dialogue **in-process** with the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model running on CPU through [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). On first use it downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it. Every line after that is generated locally on-device.
 
-Model load, synthesis, and playback all run off the game thread on a single background pipeline fed by a small bounded queue, so the game stays responsive even when you mash through dialogue. Audio streams through a `SourceDataLine` straight from memory, and a small LRU cache keyed on the active backend, voice, emotion, and text replays repeated NPC lines instantly. On Apple Silicon a typical line synthesizes in roughly 1.3 to 1.8 seconds of CPU time; cached lines are immediate.
+Model load, synthesis, and playback all run off the game thread on a single background pipeline fed by a small bounded queue, so the game stays responsive even when you mash through dialogue. Audio streams through a `SourceDataLine` straight from memory, and a two-tier cache keyed on the active backend, voice, emotion, and text replays repeated NPC lines instantly. A small in-memory LRU serves the current session; behind it a persistent on-disk cache under `~/.runelite/tts-dialogue/cache/` lets already-heard lines survive client restarts and, for cloud backends, avoids re-billing for audio you have already generated. The disk cache is size-bounded (256 MB by default) with least-recently-used eviction and is corruption-safe; it is on by default and can be turned off with the **Persistent Audio Cache** setting. On Apple Silicon a typical line synthesizes in roughly 1.3 to 1.8 seconds of CPU time; cached lines are immediate.
 
 Every voice is a real, distinct Kokoro speaker, and what you hear is the clean neural output as-is. The differences between races come from picking genuinely different speakers: accent, timbre, and pitch.
 
@@ -29,7 +29,8 @@ Every voice is a real, distinct Kokoro speaker, and what you hear is the clean n
 - **Voice for all dialogue**, covering both NPCs and the player character.
 - **Race and gender voice matrix** spanning 8 races times 2 genders plus player voices, each mapped to a distinct Kokoro speaker.
 - **Static NPC voice table** where race and gender resolve from a precomputed `npcId -> {race, gender}` table baked into the plugin via a single in-memory lookup.
-- **Smart playback** that streams off-thread, cancels instantly when you skip a line, and replays repeated lines from an LRU cache.
+- **Smart playback** that streams off-thread, cancels instantly when you skip a line, and replays repeated lines from an in-memory LRU cache.
+- **Persistent audio cache** on disk so repeated dialogue plays instantly across sessions and cloud backends are not re-billed; size-bounded with LRU eviction, corruption-safe, and opt-out-able.
 - **Sensible fallbacks** so NPCs missing from the table still get a gender-appropriate human voice.
 - **Debug mode** with detailed NPC voice resolution logging for troubleshooting.
 
