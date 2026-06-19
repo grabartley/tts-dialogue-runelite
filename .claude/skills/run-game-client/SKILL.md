@@ -9,24 +9,24 @@ Runs the RuneLite dev client with the TTS Dialogue plugin loaded for manual test
 
 ## Quick Start
 
-Ensure Java 17 is active (`jenv local 17` or `sdk use java 17-amzn`), build the plugin, then launch the RuneLite client with the plugin loaded as a builtin:
+Ensure Java 17 is active (`jenv local 17` or `sdk use java 17-amzn`), build the plugin, then launch via the `com.grahambartley.TTSDialoguePluginTest` entry point (the shadow jar's `Main-Class`), passing `--developer-mode` so the dev client logs in and exposes developer tooling:
 
 ```bash
 ./gradlew shadowJar
-java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/tTSDialogue-1.0-SNAPSHOT-all.jar
+java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/tTSDialogue-1.0-SNAPSHOT-all.jar --developer-mode --debug
 ```
 
-The entry point is `com.grahambartley.TTSDialoguePluginTest`, which calls `ExternalPluginManager.loadBuiltin(TTSDialoguePlugin.class)` and starts RuneLite. You can also run that `main` directly from the IDE with the same VM options.
+`TTSDialoguePluginTest.main` forwards these program arguments to `RuneLite.main`. `--developer-mode` belongs only with this launcher and is required for login to work; omit it and login fails. `--debug` is optional and turns on RuneLite debug-level logging, which pairs well with the plugin's Debug Mode config toggle.
 
-## TTS Server Dependency
+The entry point calls `ExternalPluginManager.loadBuiltin(TTSDialoguePlugin.class)` and starts RuneLite. You can also run that `main` directly from the IDE with the same VM options and the `--developer-mode` (and optional `--debug`) program arguments.
 
-The plugin speaks dialogue by calling a local TTS voice server. For manual voice playback to work, that server must be running and reachable on `localhost`. If no server is up, dialogue capture still works but no audio is produced.
+## TTS Engine
 
-Start the server before launching the client. Two paths exist:
-- In-repo Docker voice servers: `./setup-voices.sh start` (and `./setup-voices.sh status` to verify, `./setup-voices.sh stop` to tear down).
-- The companion `runelite-tts-server` repo, run per its own README, when iterating on the server itself.
+The plugin synthesizes dialogue in-process with the embedded Kokoro model via `sherpa-onnx`, on by default. No external voice server, Docker container, or `localhost` port is needed for audio.
 
-The TTS delivery architecture is under active rework, so confirm the current launch command against the repo `README.md` if `setup-voices.sh` has changed.
+On first launch the plugin downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it; the model loads on a background thread, so dialogue may stay silent only until the load finishes (watch the logs for `Kokoro model loaded`). Every later line is generated locally with no network call.
+
+The legacy HTTP voice servers remain available behind the **In-Process TTS (Kokoro)** config toggle. Only when that toggle is off does the plugin POST to a `localhost` server, which must then be running for audio.
 
 ## Testing Flow
 

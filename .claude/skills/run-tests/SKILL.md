@@ -20,9 +20,12 @@ Run unit tests and manual tests for the TTS Dialogue RuneLite plugin.
 ./gradlew clean build
 
 # Manual testing in the RuneLite dev client
+# (run via the TTSDialoguePluginTest entry point; --developer-mode is required for login, --debug is optional)
 ./gradlew shadowJar
-java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/tTSDialogue-1.0-SNAPSHOT-all.jar
+java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/tTSDialogue-1.0-SNAPSHOT-all.jar --developer-mode --debug
 ```
+
+In-process Kokoro TTS is on by default, so manual audio testing needs no voice server running. The model downloads once (~349 MB) into `~/.runelite/tts-dialogue/` on first launch.
 
 ## Test Types
 
