@@ -55,6 +55,12 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.12.0'
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
+	// Put the standalone engine's classes on the plugin test classpath so the drift guard
+	// (SpeakerMatrixVoiceProfileDriftTest) can load the real SpeakerMatrix alongside the plugin's
+	// VoiceManager.VoiceProfile and assert their (player, race, gender) -> speakerId mappings never
+	// diverge. The engine deliberately duplicates this table because it cannot depend on the
+	// RuneLite-coupled plugin classes; this test is the automated guard against silent drift.
+	testImplementation project(':engine')
 }
 
 group = 'com.grahambartley'

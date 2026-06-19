@@ -13,11 +13,11 @@ import java.nio.file.Paths;
  * <ol>
  *   <li>the {@code KOKORO_MODEL_DIR} environment variable (used by the conformance test and any
  *       custom layout),
- *   <li>a {@code model/} directory next to the engine image,
- *   <li>a {@code model/} directory under the process working directory.
+ *   <li>the {@code model/} directory next to the engine image (the shipped bundle layout).
  * </ol>
  *
- * The first location that contains the three core model files wins.
+ * The first location that contains the three core model files wins; otherwise resolution fails with
+ * an explicit error naming both checked locations.
  */
 final class ModelLocator {
 
@@ -37,25 +37,16 @@ final class ModelLocator {
           "KOKORO_MODEL_DIR=" + env + " does not contain the Kokoro model files");
     }
 
-    for (Path candidate : candidates()) {
-      if (hasModel(candidate)) {
-        return candidate;
-      }
+    Path imageModel = imageDir().resolve("model");
+    if (hasModel(imageModel)) {
+      return imageModel;
     }
     throw new IllegalStateException(
         "Could not locate the "
             + MODEL_NAME
-            + " model. Expected a 'model' directory beside the engine image or set KOKORO_MODEL_DIR.");
-  }
-
-  private static Path[] candidates() {
-    Path imageDir = imageDir();
-    return new Path[] {
-      imageDir.resolve("model"),
-      imageDir.resolve(MODEL_NAME),
-      Paths.get("").toAbsolutePath().resolve("model"),
-      Paths.get("").toAbsolutePath().resolve(MODEL_NAME),
-    };
+            + " model. Checked KOKORO_MODEL_DIR (unset or empty) and the bundled image model at '"
+            + imageModel
+            + "'. Set KOKORO_MODEL_DIR or ship a 'model' directory beside the engine image.");
   }
 
   /** Directory the running engine jar lives in, used as the anchor for the bundled model. */

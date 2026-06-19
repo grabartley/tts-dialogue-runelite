@@ -60,7 +60,7 @@ public final class KokoroEngineMain {
         StdioProtocol.writeResponse(out, pcm.sampleRate, frame);
       } catch (Exception e) {
         // Surface the failure as a parseable header so the plugin can recover without a hung pipe.
-        String err = Json.error(e.getMessage()) + System.lineSeparator();
+        String err = StdioProtocol.error(e.getMessage()) + System.lineSeparator();
         out.write(err.getBytes(StandardCharsets.UTF_8));
         out.flush();
         System.err.println("Synthesis failed: " + e.getMessage());

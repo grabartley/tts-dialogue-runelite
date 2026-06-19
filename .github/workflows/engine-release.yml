@@ -101,6 +101,8 @@ jobs:
           export KOKORO_MODEL_DIR="$PWD/engine/build/engine-image/model"
           ./gradlew :engine:test --tests 'com.grahambartley.engine.EngineConformanceTest'
 
+      # Run the native --selftest BEFORE any signing/notarization so a self-test failure is cheap
+      # and fast-fails the job: a signed/notarized bundle then always implies "passed self-test".
       - name: Engine self-test (native synthesis smoke)
         shell: bash
         run: |
@@ -113,15 +115,15 @@ jobs:
             "$IMG/kokoro-engine" --selftest
           fi
 
-      # ---- Optional macOS code-signing + notarization (gated on secrets) ----
+      # ---- Optional macOS code-signing (gated on secrets) ----
       # Absent these secrets the bundle ships UNSIGNED and the documented right-click -> Open
       # first-run path (plus the quarantine-xattr clear EngineInstaller does) is the fallback.
-      - name: Sign and notarize (macOS)
-        if: startsWith(matrix.platform, 'osx') && env.APPLE_ID != '' && env.APPLE_TEAM_ID != '' && env.APPLE_APP_PASSWORD != '' && env.MACOS_CERT_P12 != ''
+      # Signing and notarization are split into separate steps so a notarize failure after a
+      # successful codesign doesn't force re-signing every Mach-O from scratch on a re-run.
+      - name: Codesign (macOS)
+        if: startsWith(matrix.platform, 'osx') && env.APPLE_TEAM_ID != '' && env.MACOS_CERT_P12 != ''
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
           MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
           MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
         shell: bash
@@ -141,13 +143,44 @@ jobs:
           find "$IMG" \( -name '*.dylib' -o -name '*.jnilib' -o -path '*/runtime/bin/*' \) -type f \
             -exec codesign --force --options runtime --timestamp --sign "$IDENTITY" {} \;
           codesign --force --options runtime --timestamp --sign "$IDENTITY" "$IMG/kokoro-engine" || true
-          # Notarize a zip of the image, then record the result. Stapling applies to app bundles;
-          # for a plain directory bundle the notarization ticket plus quarantine clear is the path.
+          # Mark codesigned outside the image (so it never ships in the bundle) for the summary step.
+          touch "$RUNNER_TEMP/codesigned"
+
+      - name: Notarize (macOS)
+        if: startsWith(matrix.platform, 'osx') && env.APPLE_ID != '' && env.APPLE_TEAM_ID != '' && env.APPLE_APP_PASSWORD != '' && env.MACOS_CERT_P12 != ''
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMG="engine/build/engine-image"
+          # Notarize a zip of the (already codesigned) image. Stapling applies to app bundles; for a
+          # plain directory bundle the notarization ticket plus quarantine clear is the path.
           ditto -c -k --keepParent "$IMG" "$RUNNER_TEMP/notarize.zip"
           xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
             --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" --wait
+          # The "signed" marker the package step + manifest generator key off is set only once both
+          # codesign and notarize succeeded.
           touch "$IMG/signed"
-        # env block above also exposes the secrets for the if: existence checks.
+
+      - name: macOS signing summary
+        if: startsWith(matrix.platform, 'osx')
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMG="engine/build/engine-image"
+          if [ -f "$IMG/signed" ]; then
+            MSG="macOS signing: applied (codesigned + notarized)"
+          elif [ -f "$RUNNER_TEMP/codesigned" ]; then
+            MSG="macOS signing: partial (codesigned, NOT notarized; check Apple notary secrets)"
+          else
+            MSG="macOS signing: skipped (APPLE_TEAM_ID / MACOS_CERT_P12 not set) -> bundle ships UNSIGNED"
+          fi
+          echo "$MSG"
+          echo "$MSG" >> "$GITHUB_STEP_SUMMARY"
 
       # ---- Optional Windows code-signing (gated on secrets) ----
       - name: Sign (Windows)
@@ -164,6 +197,20 @@ jobs:
             & signtool sign /f "$env:RUNNER_TEMP\cert.pfx" /p $env:WINDOWS_CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $t.FullName
           }
           New-Item -ItemType File -Path "$img/signed" -Force | Out-Null
+
+      - name: Windows signing summary
+        if: matrix.platform == 'win-x64'
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMG="engine/build/engine-image"
+          if [ -f "$IMG/signed" ]; then
+            MSG="Windows signing: applied (signtool)"
+          else
+            MSG="Windows signing: skipped (WINDOWS_CERT_PFX not set) -> bundle ships UNSIGNED"
+          fi
+          echo "$MSG"
+          echo "$MSG" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Package bundle + checksum
         shell: bash

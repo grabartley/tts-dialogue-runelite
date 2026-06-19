@@ -1,11 +1,12 @@
 package com.grahambartley.engine;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 /**
  * Pure encode/decode helpers for the {@code --stdio} wire protocol, kept separate from the I/O loop
@@ -26,6 +27,8 @@ final class StdioProtocol {
 
   static final String FORMAT = "f32le";
 
+  private static final Gson GSON = new Gson();
+
   private StdioProtocol() {}
 
   /** Encodes mono float samples to little-endian float32 bytes, the protocol PCM frame. */
@@ -39,32 +42,56 @@ final class StdioProtocol {
 
   /** Decodes a request line into the fields the engine needs. */
   static Request decodeRequest(String line) {
-    Map<String, String> m = Json.parseRequest(line);
-    String text = m.getOrDefault("text", "");
-    boolean player = Boolean.parseBoolean(m.getOrDefault("voice.player", "false"));
-    String race = m.get("voice.race");
-    String gender = m.get("voice.gender");
-    float speed = parseFloat(m.get("speed"), 1.0f);
+    JsonObject root = line == null ? new JsonObject() : GSON.fromJson(line, JsonObject.class);
+    if (root == null) {
+      root = new JsonObject();
+    }
+    String text = asString(root.get("text"), "");
+    JsonObject voice =
+        root.has("voice") && root.get("voice").isJsonObject()
+            ? root.getAsJsonObject("voice")
+            : new JsonObject();
+    boolean player = voice.has("player") && voice.get("player").getAsBoolean();
+    String race = asString(voice.get("race"), null);
+    String gender = asString(voice.get("gender"), null);
+    float speed =
+        root.has("speed") && !root.get("speed").isJsonNull()
+            ? root.get("speed").getAsFloat()
+            : 1.0f;
     return new Request(text, player, race, gender, speed);
   }
 
   /** Writes the header line then the raw PCM frame to {@code out}, flushing once complete. */
   static void writeResponse(OutputStream out, int sampleRate, byte[] pcm) throws IOException {
-    String header = Json.header(sampleRate, pcm.length / 4, FORMAT) + System.lineSeparator();
+    String header = header(sampleRate, pcm.length / 4) + System.lineSeparator();
     out.write(header.getBytes(StandardCharsets.UTF_8));
     out.write(pcm);
     out.flush();
   }
 
-  private static float parseFloat(String s, float fallback) {
-    if (s == null || s.isEmpty()) {
-      return fallback;
-    }
-    try {
-      return Float.parseFloat(s);
-    } catch (NumberFormatException e) {
-      return fallback;
-    }
+  /**
+   * The response header object the plugin reads before the PCM frame. Field insertion order
+   * (sampleRate, samples, format) is preserved by Gson's compact serializer, so the emitted bytes
+   * stay {@code {"sampleRate":24000,"samples":N,"format":"f32le"}} exactly as the #32 contract and
+   * the conformance test expect.
+   */
+  static String header(int sampleRate, int samples) {
+    JsonObject obj = new JsonObject();
+    obj.addProperty("sampleRate", sampleRate);
+    obj.addProperty("samples", samples);
+    obj.addProperty("format", FORMAT);
+    return GSON.toJson(obj);
+  }
+
+  /** An error object so a failed request still yields a parseable line on stdout. */
+  static String error(String message) {
+    JsonObject obj = new JsonObject();
+    obj.addProperty("error", message == null ? "" : message);
+    return GSON.toJson(obj);
+  }
+
+  private static String asString(com.google.gson.JsonElement el, String fallback) {
+    return el == null || el.isJsonNull() ? fallback : el.getAsString();
   }
 
   /** A decoded synthesis request. {@code emotion} is intentionally absent: it is ignored. */

@@ -81,7 +81,13 @@ public class EngineConformanceTest {
     }
   }
 
-  /** Reads a single line from a binary stream without buffering past the newline. */
+  /**
+   * Reads a single line one byte at a time. This is deliberate: a buffering reader (e.g.
+   * BufferedReader/DataInputStream.readLine) would read ahead past the newline and swallow the
+   * leading bytes of the binary PCM frame that immediately follows the header line. Reading byte by
+   * byte stops exactly at the newline, leaving the float32 frame intact in the stream for the
+   * subsequent {@code readFully}.
+   */
   private static String readLine(InputStream in) throws Exception {
     StringBuilder sb = new StringBuilder();
     int c;

@@ -33,6 +33,14 @@ public class EngineManifestResourceTest {
     assertEquals("kokoro", root.get("engine").getAsString());
     assertEquals(1, root.get("schemaVersion").getAsInt());
     assertNotNull("version field is required", root.get("version"));
+    // The repo-committed copy is the dev placeholder; the release workflow overwrites version with
+    // the real tag (e.g. v1.0.0). Asserting the placeholder shape makes the un-released state a
+    // real
+    // signal rather than just "the field exists".
+    String version = root.get("version").getAsString();
+    assertTrue(
+        "dev manifest version must be a 0.x placeholder, was: " + version,
+        version.startsWith("0."));
 
     JsonObject artifacts = root.getAsJsonObject("artifacts");
     assertNotNull("artifacts object is required", artifacts);

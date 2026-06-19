@@ -48,6 +48,12 @@ dependencies {
 	implementation "com.k2fsa:sherpa-onnx:${sherpaOnnxVersion}"
 	runtimeOnly "com.k2fsa:sherpa-onnx-native-lib-${targetPlatform}:${sherpaOnnxVersion}"
 
+	// Gson for the --stdio wire protocol (request parse + header/error write). It is an
+	// `implementation` dep so the jar lands on runtimeClasspath and is staged into the engine image
+	// (and the jlink/jpackage bundle), keeping the CLI fully standalone. The engine is NOT a
+	// RuneLite plugin, so the Hub "use injected Gson" rule does not apply: `new Gson()` is fine here.
+	implementation 'com.google.code.gson:gson:2.10.1'
+
 	testImplementation 'junit:junit:4.13.2'
 }
 
