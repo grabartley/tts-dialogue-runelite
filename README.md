@@ -45,7 +45,46 @@ An opt-in cloud voice with the strongest emotion and near-zero setup beyond supp
 
 ## Emotion
 
-Each new dialogue line's emotion is read from the speaker's chat-head expression animation, the NPC head for NPC lines and the player head for player lines, and mapped to one of five emotions (Neutral, Happy, Sad, Angry, Scared). The resolved emotion rides in every synthesis request and is rendered by the active backend: Azure as SSML styles, Zonos as emotion vectors. The default local Kokoro voice speaks every line neutrally, so emotion becomes audible once you select an emotional backend. Detection is controlled by the **Enable Emotion** toggle, which is on by default; when it is off, every line is voiced as Neutral. See [docs/expression-emotions.md](docs/expression-emotions.md) for the expression-to-emotion table.
+Each new dialogue line's emotion is read from the speaker's chat-head expression animation, the NPC head for NPC lines and the player head for player lines, and mapped to one of five emotions (Neutral, Happy, Sad, Angry, Scared). The resolved emotion rides in every synthesis request and is rendered by the active backend: Azure as SSML styles, Zonos as emotion vectors. The default local Kokoro voice speaks every line neutrally, so emotion becomes audible once you select an emotional backend. Detection is controlled by the **Enable Emotion** toggle, which is on by default; when it is off, every line is voiced as Neutral.
+
+The mapping is derived from the documented RuneScape chathead expression animation enum, a named set spanning ids **9760-9862**, with every documented expression mapped to the nearest of the five emotions. Any animation id not present in the table, and `-1` (no animation or a stale head), resolves to Neutral, so an unseen expression or a non-human head (trolls, ogres, children, monsters often emit ids outside the documented set) is a safe no-op. Five expressions do not map cleanly onto the five emotions and are mapped to the nearest one: `9800` MANIC_FACE -> Angry, `9812` LOOK_DOWN -> Sad, `9816` WHAT_THE -> Neutral, `9820` WHAT_THE_TWO -> Neutral, and `9824` EYES_WIDE -> Scared.
+
+<details>
+<summary>Full expression-to-emotion mapping</summary>
+
+| Animation ID | Expression | Emotion |
+|---|---|---|
+| 9760 | NO_EXPRESSION | NEUTRAL |
+| 9764 | SAD | SAD |
+| 9768 | SAD_TWO | SAD |
+| 9772 | NO_EXPRESSION_TWO | NEUTRAL |
+| 9776 | WHY | NEUTRAL |
+| 9780 | SCARED | SCARED |
+| 9784 | MILDLY_ANGRY | ANGRY |
+| 9788 | ANGRY | ANGRY |
+| 9792 | VERY_ANGRY | ANGRY |
+| 9796 | ANGRY_TWO | ANGRY |
+| 9800 | MANIC_FACE | ANGRY * |
+| 9804 | JUST_LISTEN | NEUTRAL |
+| 9808 | PLAIN_TALKING | NEUTRAL |
+| 9812 | LOOK_DOWN | SAD * |
+| 9816 | WHAT_THE | NEUTRAL * |
+| 9820 | WHAT_THE_TWO | NEUTRAL * |
+| 9824 | EYES_WIDE | SCARED * |
+| 9828 | CROOKED_HEAD | NEUTRAL |
+| 9832 | GLANCE_DOWN | NEUTRAL |
+| 9836 | UNSURE | NEUTRAL |
+| 9840 | LISTEN_LAUGH | HAPPY |
+| 9844 | TALK_SWING | NEUTRAL |
+| 9847 | NORMAL | NEUTRAL |
+| 9851 | GOOFY_LAUGH | HAPPY |
+| 9855 | NORMAL_STILL | NEUTRAL |
+| 9859 | THINKING_STILL | NEUTRAL |
+| 9862 | LOOKING_UP | NEUTRAL |
+
+`* mapped to the nearest of the five emotions (no surprise or confused category).`
+
+</details>
 
 ## Voices
 

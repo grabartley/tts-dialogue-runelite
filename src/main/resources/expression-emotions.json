@@ -1,5 +1,5 @@
 {
-  "_meta": "Maps the documented RuneScape chathead expression animation enum (ids 9760-9862) to com.grahambartley.synthesis.Emotion names; see docs/expression-emotions.md.",
+  "_meta": "Maps the documented RuneScape chathead expression animation enum (ids 9760-9862) to com.grahambartley.synthesis.Emotion names; see the Emotion section of README.md.",
   "9760": "NEUTRAL",
   "9764": "SAD",
   "9768": "SAD",

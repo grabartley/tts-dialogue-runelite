@@ -16,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
  * expression animation id to a canonical {@link Emotion}, and resolves ids against it.
  *
  * <p>The table is the complete documented RuneScape chathead expression enum (ids 9760-9862) mapped
- * to the nearest {@link Emotion}, covering the standard human dialogue expressions (see {@code
- * docs/expression-emotions.md}); non-human head classes may emit ids outside this set. This class
+ * to the nearest {@link Emotion}, covering the standard human dialogue expressions (see the Emotion
+ * section of {@code README.md}); non-human head classes may emit ids outside this set. This class
  * owns the documented default contract that every consumer depends on: <strong>any unmapped
  * animation id, and {@code -1} (no/stale head animation), resolves to {@link
  * Emotion#NEUTRAL}</strong>. That makes an unseen expression, a non-human head, or the one-tick
