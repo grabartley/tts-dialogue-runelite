@@ -1,5 +1,9 @@
 package com.grahambartley.tts;
 
+import com.grahambartley.synthesis.BackendProvider;
+import com.grahambartley.synthesis.Emotion;
+import com.grahambartley.synthesis.SynthesisBackend;
+import com.grahambartley.synthesis.SynthesisRequest;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -14,18 +18,24 @@ import lombok.extern.slf4j.Slf4j;
  * Drives synthesis and playback off the game thread.
  *
  * <p>The game thread only calls {@link #speak} / {@link #interrupt}; everything heavy runs on a
- * single background thread fed by a small bounded queue. Repeated lines are served from an {@link
- * LruCache} keyed on {@code (text, speakerId)} so they never re-synthesize. An epoch counter makes
- * interruption clean: bumping it on every new line and on {@link #interrupt} causes any queued or
- * in-flight work for a now-stale line to drop instead of playing.
+ * single background thread fed by a small bounded queue. Synthesis is delegated to the active
+ * {@link SynthesisBackend} via {@link BackendProvider}, and repeated lines are served from an
+ * {@link LruCache} keyed on {@code (backendId, voiceKey, emotion, text)} so a different backend,
+ * voice, or emotion never serves stale audio. An epoch counter makes interruption clean: bumping it
+ * on every new line and on {@link #interrupt} causes any queued or in-flight work for a now-stale
+ * line to drop instead of playing.
  */
 @Slf4j
 public final class DialogueAudioService {
 
-  /** Identifies a synthesized line: distinct text or distinct voice is a distinct entry. */
-  private record CacheKey(int speakerId, String text) {}
+  /**
+   * Identifies a synthesized line. The active backend, the resolved voice, the (possibly
+   * downgraded) emotion, and the text are all part of the identity, so the same words spoken with a
+   * different backend, voice, or emotion are distinct cache entries.
+   */
+  private record CacheKey(String backendId, String voiceKey, Emotion emotion, String text) {}
 
-  private final Synthesizer synth;
+  private final BackendProvider backends;
   private final AudioOutput output;
   private final Executor executor;
   private final LruCache<CacheKey, Pcm> cache;
@@ -33,14 +43,22 @@ public final class DialogueAudioService {
   private final AtomicLong epoch = new AtomicLong();
 
   public DialogueAudioService(
-      Synthesizer synth, AudioOutput output, int cacheSize, int queueCapacity, IntSupplier volume) {
-    this(synth, output, buildExecutor(queueCapacity), cacheSize, volume);
+      BackendProvider backends,
+      AudioOutput output,
+      int cacheSize,
+      int queueCapacity,
+      IntSupplier volume) {
+    this(backends, output, buildExecutor(queueCapacity), cacheSize, volume);
   }
 
   /** Test seam: lets callers inject an inline executor so behavior is deterministic. */
   DialogueAudioService(
-      Synthesizer synth, AudioOutput output, Executor executor, int cacheSize, IntSupplier volume) {
-    this.synth = synth;
+      BackendProvider backends,
+      AudioOutput output,
+      Executor executor,
+      int cacheSize,
+      IntSupplier volume) {
+    this.backends = backends;
     this.output = output;
     this.executor = executor;
     this.cache = new LruCache<>(cacheSize);
@@ -56,14 +74,20 @@ public final class DialogueAudioService {
    * Enqueues a line for synthesis and playback. Interrupts whatever is playing now so dialogue
    * advancement replaces the previous line rather than overlapping it.
    */
-  public void speak(String text, int speakerId) {
-    if (text == null || text.isEmpty()) {
+  public void speak(SynthesisRequest request) {
+    if (request == null || request.getText() == null || request.getText().isEmpty()) {
       return;
     }
     long mine = epoch.incrementAndGet();
     output.stop();
-    CacheKey key = new CacheKey(speakerId, text);
-    submit(() -> run(mine, key));
+    // Resolve the active backend now so the cache key reflects the backend that will actually run,
+    // even if the user switches backend before this line reaches the pipeline thread.
+    SynthesisBackend backend = backends.active();
+    SynthesisRequest effective = BackendProvider.downgradeFor(backend, request);
+    CacheKey key =
+        new CacheKey(
+            backend.id(), effective.getVoice().key(), effective.getEmotion(), effective.getText());
+    submit(() -> run(mine, backend, effective, key));
   }
 
   /** Stops current playback and drops any queued lines for the now-stale dialogue. */
@@ -87,19 +111,23 @@ public final class DialogueAudioService {
     output.close();
   }
 
-  private void run(long mine, CacheKey key) {
+  private void run(long mine, SynthesisBackend backend, SynthesisRequest request, CacheKey key) {
     if (epoch.get() != mine) {
       return;
     }
     Pcm pcm = cache.get(key);
     if (pcm == null) {
-      pcm = synth.synthesize(key.text(), key.speakerId());
+      pcm = backends.synthesizeWith(backend, request);
       if (pcm == null) {
         return;
       }
       cache.put(key, pcm);
     } else {
-      log.debug("Serving \"{}\" (sid {}) from cache", abbreviate(key.text()), key.speakerId());
+      log.debug(
+          "Serving \"{}\" ({}/{}) from cache",
+          abbreviate(key.text()),
+          key.backendId(),
+          key.voiceKey());
     }
     // Re-check after the (possibly slow) synth: the line may have been skipped meanwhile.
     if (epoch.get() != mine) {

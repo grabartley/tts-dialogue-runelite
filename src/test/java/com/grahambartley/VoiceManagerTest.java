@@ -1,9 +1,12 @@
 package com.grahambartley;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.grahambartley.VoiceManager.NPCGender;
 import com.grahambartley.VoiceManager.VoiceProfile;
+import com.grahambartley.synthesis.VoiceSpec;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Test;
@@ -79,22 +82,36 @@ public class VoiceManagerTest {
   }
 
   @Test
-  public void playerUsesConfiguredVoice() {
+  public void playerResolvesToPlayerSpecWithConfiguredGender() {
     VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_FEMALE);
-    assertEquals(VoiceProfile.PLAYER_FEMALE.getSpeakerId(), manager.getSpeakerId("player", null));
+    VoiceSpec spec = manager.resolveVoice("player", null);
+    assertTrue("player voice should be a player spec", spec.isPlayer());
+    assertEquals(NPCGender.FEMALE, spec.getGender());
+    assertEquals("player:FEMALE", spec.key());
+  }
+
+  @Test
+  public void playerSpecMapsToConfiguredKokoroSpeaker() {
+    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_FEMALE);
+    VoiceSpec spec = manager.resolveVoice("player", null);
+    assertEquals(VoiceProfile.PLAYER_FEMALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
   }
 
   @Test
   public void playerSpeakerMatchingIsCaseInsensitive() {
     VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
-    assertEquals(VoiceProfile.PLAYER_MALE.getSpeakerId(), manager.getSpeakerId("PLAYER", null));
+    VoiceSpec spec = manager.resolveVoice("PLAYER", null);
+    assertTrue(spec.isPlayer());
+    assertEquals(VoiceProfile.PLAYER_MALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
   }
 
   @Test
   public void npcUsesDefaultVoiceWhenAutomaticVoicesDisabled() {
     VoiceManager manager = newManager(false, true, VoiceProfile.PLAYER_MALE);
-    assertEquals(
-        VoiceProfile.HUMAN_MALE.getSpeakerId(), manager.getSpeakerId("npc", "Some Goblin"));
+    VoiceSpec spec = manager.resolveVoice("npc", "Some Goblin");
+    assertFalse("an NPC resolves to a non-player spec", spec.isPlayer());
+    assertEquals("npc:HUMAN:MALE", spec.key());
+    assertEquals(VoiceProfile.HUMAN_MALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
   }
 
   @Test
@@ -102,7 +119,24 @@ public class VoiceManagerTest {
     VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
     // No client, so the NPC can't be found and detection falls back.
     assertEquals(VoiceProfile.HUMAN_MALE, manager.getVoiceForNPC("Hans"));
-    assertEquals(VoiceProfile.HUMAN_MALE.getSpeakerId(), manager.getSpeakerId("npc", "Hans"));
+    VoiceSpec spec = manager.resolveVoice("npc", "Hans");
+    assertEquals("npc:HUMAN:MALE", spec.key());
+    assertEquals(VoiceProfile.HUMAN_MALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
+  }
+
+  @Test
+  public void kokoroSpeakerIdRoundTripsEveryRaceGenderProfile() {
+    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
+    for (VoiceProfile profile : VoiceProfile.values()) {
+      if (profile == VoiceProfile.PLAYER_MALE || profile == VoiceProfile.PLAYER_FEMALE) {
+        continue; // Player profiles share HUMAN race; covered by the player-spec tests.
+      }
+      VoiceSpec spec = VoiceSpec.npc(profile.getRace(), profile.getGender());
+      assertEquals(
+          profile + " should round-trip to its own speaker id",
+          profile.getSpeakerId(),
+          manager.kokoroSpeakerId(spec));
+    }
   }
 
   @Test

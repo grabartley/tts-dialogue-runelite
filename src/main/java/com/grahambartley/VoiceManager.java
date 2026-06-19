@@ -2,16 +2,20 @@ package com.grahambartley;
 
 import com.grahambartley.data.NPCAttributes;
 import com.grahambartley.data.NPCDemographicAnalyzer;
+import com.grahambartley.synthesis.VoiceSpec;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 
 /**
- * Resolves an NPC (or the player) to a Kokoro speaker.
+ * Resolves an NPC (or the player) to a backend-neutral {@link VoiceSpec} and, for the local Kokoro
+ * backend, to a concrete Kokoro speaker id.
  *
- * <p>Output is a real Kokoro speaker id into the in-process voice bank, never a network port or a
- * post-processing effect chain. Each race/gender category maps to a distinct, clean Kokoro voice so
- * the neural output is the product as-is: no resampling pitch shift, no reverb, no distortion.
+ * <p>Resolution carries race/gender categories so any backend can map the same speaker to its own
+ * voice bank. The local Kokoro backend turns a spec into a real speaker id via {@link
+ * #kokoroSpeakerId(VoiceSpec)} from the {@link VoiceProfile} matrix: each race/gender category maps
+ * to a distinct, clean Kokoro voice so the neural output is the product as-is, with no resampling
+ * pitch shift, reverb, or distortion.
  */
 @Slf4j
 public class VoiceManager {
@@ -44,49 +48,64 @@ public class VoiceManager {
    */
   public enum VoiceProfile {
     // Player voices
-    PLAYER_MALE(16, "am_michael", "Player Male"),
-    PLAYER_FEMALE(3, "af_heart", "Player Female"),
+    PLAYER_MALE(16, "am_michael", "Player Male", NPCRace.HUMAN, NPCGender.MALE),
+    PLAYER_FEMALE(3, "af_heart", "Player Female", NPCRace.HUMAN, NPCGender.FEMALE),
 
     // Human voices (most common NPCs) - clear, neutral
-    HUMAN_MALE(14, "am_fenrir", "Human Male"),
-    HUMAN_FEMALE(2, "af_bella", "Human Female"),
+    HUMAN_MALE(14, "am_fenrir", "Human Male", NPCRace.HUMAN, NPCGender.MALE),
+    HUMAN_FEMALE(2, "af_bella", "Human Female", NPCRace.HUMAN, NPCGender.FEMALE),
 
     // Elf voices (elegant, refined) - British accent
-    ELF_MALE(26, "bm_george", "Elf Male"),
-    ELF_FEMALE(21, "bf_emma", "Elf Female"),
+    ELF_MALE(26, "bm_george", "Elf Male", NPCRace.ELF, NPCGender.MALE),
+    ELF_FEMALE(21, "bf_emma", "Elf Female", NPCRace.ELF, NPCGender.FEMALE),
 
     // Dwarf voices (gruff, sturdy) - deeper British timbres
-    DWARF_MALE(27, "bm_lewis", "Dwarf Male"),
-    DWARF_FEMALE(22, "bf_isabella", "Dwarf Female"),
+    DWARF_MALE(27, "bm_lewis", "Dwarf Male", NPCRace.DWARF, NPCGender.MALE),
+    DWARF_FEMALE(22, "bf_isabella", "Dwarf Female", NPCRace.DWARF, NPCGender.FEMALE),
 
     // Goblin voices (small, crude) - lighter, mischievous
-    GOBLIN_MALE(18, "am_puck", "Goblin Male"),
-    GOBLIN_FEMALE(10, "af_sky", "Goblin Female"),
+    GOBLIN_MALE(18, "am_puck", "Goblin Male", NPCRace.GOBLIN, NPCGender.MALE),
+    GOBLIN_FEMALE(10, "af_sky", "Goblin Female", NPCRace.GOBLIN, NPCGender.FEMALE),
 
     // Troll voices (big, deep, primitive)
-    TROLL_MALE(17, "am_onyx", "Troll Male"),
-    TROLL_FEMALE(9, "af_sarah", "Troll Female"),
+    TROLL_MALE(17, "am_onyx", "Troll Male", NPCRace.TROLL, NPCGender.MALE),
+    TROLL_FEMALE(9, "af_sarah", "Troll Female", NPCRace.TROLL, NPCGender.FEMALE),
 
     // Undead voices (hollow, eerie)
-    UNDEAD_MALE(12, "am_echo", "Undead Male"),
-    UNDEAD_FEMALE(6, "af_nicole", "Undead Female"),
+    UNDEAD_MALE(12, "am_echo", "Undead Male", NPCRace.UNDEAD, NPCGender.MALE),
+    UNDEAD_FEMALE(6, "af_nicole", "Undead Female", NPCRace.UNDEAD, NPCGender.FEMALE),
 
     // Demon voices (sinister, deep, otherworldly)
-    DEMON_MALE(24, "bm_daniel", "Demon Male"),
-    DEMON_FEMALE(8, "af_river", "Demon Female"),
+    DEMON_MALE(24, "bm_daniel", "Demon Male", NPCRace.DEMON, NPCGender.MALE),
+    DEMON_FEMALE(8, "af_river", "Demon Female", NPCRace.DEMON, NPCGender.FEMALE),
 
     // Wizard voices (wise, mystical) - storyteller British male, distinct female
-    WIZARD_MALE(25, "bm_fable", "Wizard Male"),
-    WIZARD_FEMALE(0, "af_alloy", "Wizard Female");
+    WIZARD_MALE(25, "bm_fable", "Wizard Male", NPCRace.WIZARD, NPCGender.MALE),
+    WIZARD_FEMALE(0, "af_alloy", "Wizard Female", NPCRace.WIZARD, NPCGender.FEMALE);
 
     private final int speakerId;
     private final String kokoroVoice;
     private final String displayName;
+    private final NPCRace race;
+    private final NPCGender gender;
 
-    VoiceProfile(int speakerId, String kokoroVoice, String displayName) {
+    VoiceProfile(
+        int speakerId, String kokoroVoice, String displayName, NPCRace race, NPCGender gender) {
       this.speakerId = speakerId;
       this.kokoroVoice = kokoroVoice;
       this.displayName = displayName;
+      this.race = race;
+      this.gender = gender;
+    }
+
+    /** The race category this profile voices. */
+    public NPCRace getRace() {
+      return race;
+    }
+
+    /** The gender category this profile voices. */
+    public NPCGender getGender() {
+      return gender;
     }
 
     /** The Kokoro speaker id fed straight to the in-process synth engine. */
@@ -116,18 +135,39 @@ public class VoiceManager {
   }
 
   /**
-   * Resolves the Kokoro speaker id for a line of dialogue. The player uses the configured player
-   * voice; NPCs use their race/gender voice when automatic voices are enabled, otherwise the
-   * default NPC voice.
+   * Resolves a backend-neutral {@link VoiceSpec} for a line of dialogue. The player uses the gender
+   * of the configured player voice; NPCs use their race/gender voice when automatic voices are
+   * enabled, otherwise the default NPC voice. Fallback semantics are unchanged.
    */
-  public int getSpeakerId(String speaker, String npcName) {
+  public VoiceSpec resolveVoice(String speaker, String npcName) {
     if ("player".equalsIgnoreCase(speaker)) {
+      return VoiceSpec.player(playerGender());
+    }
+    VoiceProfile profile =
+        config.enableRaceBasedVoices() ? getVoiceForNPC(npcName) : getDefaultNPCVoice();
+    return profileToSpec(profile);
+  }
+
+  /**
+   * The Kokoro speaker id for a resolved {@link VoiceSpec}, used only by the local Kokoro backend.
+   * The player maps to the configured player voice; NPCs map through the {@link VoiceProfile}
+   * matrix.
+   */
+  public int kokoroSpeakerId(VoiceSpec voice) {
+    if (voice.isPlayer()) {
       return config.playerVoice().getSpeakerId();
     }
-    if (!config.enableRaceBasedVoices()) {
-      return getDefaultNPCVoice().getSpeakerId();
-    }
-    return getVoiceForNPC(npcName).getSpeakerId();
+    return getVoiceForRaceAndGender(voice.getRace(), voice.getGender()).getSpeakerId();
+  }
+
+  /** Gender implied by the configured player voice profile. */
+  private NPCGender playerGender() {
+    return config.playerVoice() == VoiceProfile.PLAYER_FEMALE ? NPCGender.FEMALE : NPCGender.MALE;
+  }
+
+  /** Turns a resolved NPC {@link VoiceProfile} back into its race/gender {@link VoiceSpec}. */
+  private static VoiceSpec profileToSpec(VoiceProfile profile) {
+    return VoiceSpec.npc(profile.getRace(), profile.getGender());
   }
 
   /** Determines the appropriate voice for an NPC based on their race and gender. */

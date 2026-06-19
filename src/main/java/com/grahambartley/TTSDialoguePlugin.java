@@ -1,6 +1,11 @@
 package com.grahambartley;
 
 import com.google.inject.Provides;
+import com.grahambartley.synthesis.BackendProvider;
+import com.grahambartley.synthesis.Emotion;
+import com.grahambartley.synthesis.LocalKokoroBackend;
+import com.grahambartley.synthesis.SynthesisRequest;
+import com.grahambartley.synthesis.VoiceSpec;
 import com.grahambartley.tts.AudioPlayer;
 import com.grahambartley.tts.DialogueAudioService;
 import com.grahambartley.tts.KokoroTtsEngine;
@@ -37,6 +42,8 @@ public class TTSDialoguePlugin extends Plugin {
 
   private KokoroTtsEngine ttsEngine;
 
+  private BackendProvider backendProvider;
+
   private DialogueAudioService audioService;
 
   @Override
@@ -45,11 +52,14 @@ public class TTSDialoguePlugin extends Plugin {
 
     Path ttsDir = RuneLite.RUNELITE_DIR.toPath().resolve("tts-dialogue");
     ttsEngine = new KokoroTtsEngine(ttsDir);
+    // The in-JVM Kokoro engine is wrapped as the first (and currently only) synthesis backend; the
+    // provider routes every line through it until the GPU and cloud backends ship.
+    backendProvider = new BackendProvider(config, new LocalKokoroBackend(ttsEngine, voiceManager));
     audioService =
         new DialogueAudioService(
-            ttsEngine, new AudioPlayer(), CACHE_SIZE, QUEUE_CAPACITY, config::volume);
+            backendProvider, new AudioPlayer(), CACHE_SIZE, QUEUE_CAPACITY, config::volume);
     // Warm the model on the pipeline thread so the first line is not the one that pays the load.
-    audioService.prewarm(ttsEngine::load);
+    audioService.prewarm(backendProvider::warmUpLocal);
 
     log.info("TTSDialogue started");
   }
@@ -60,10 +70,11 @@ public class TTSDialoguePlugin extends Plugin {
       audioService.close();
       audioService = null;
     }
-    if (ttsEngine != null) {
-      ttsEngine.close();
-      ttsEngine = null;
+    if (backendProvider != null) {
+      backendProvider.close();
+      backendProvider = null;
     }
+    ttsEngine = null;
     log.info("TTS Plugin stopped");
   }
 
@@ -72,8 +83,11 @@ public class TTSDialoguePlugin extends Plugin {
     if (audioService == null || ttsEngine == null || ttsEngine.isFailed()) {
       return;
     }
-    int speakerId = voiceManager.getSpeakerId(speaker, npcName);
-    audioService.speak(text, speakerId);
+    VoiceSpec voice = voiceManager.resolveVoice(speaker, npcName);
+    // Emotion detection (#26) is not wired yet, and it is suppressed entirely when disabled in
+    // config; for now every line is neutral.
+    Emotion emotion = Emotion.NEUTRAL;
+    audioService.speak(new SynthesisRequest(text, voice, emotion));
   }
 
   private String cleanDialogueText(String raw) {

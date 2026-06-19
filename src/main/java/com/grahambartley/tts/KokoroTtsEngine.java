@@ -15,9 +15,12 @@ import lombok.extern.slf4j.Slf4j;
  * the model: {@link #synthesize} runs synchronously on the caller's thread, and the {@link
  * DialogueAudioService} is responsible for keeping that call off the game thread. The model is
  * loaded lazily on first use and reused for the lifetime of the engine.
+ *
+ * <p>This is the engine wrapped by the {@code local-kokoro} {@link
+ * com.grahambartley.synthesis.SynthesisBackend}; the dialogue pipeline never calls it directly.
  */
 @Slf4j
-public class KokoroTtsEngine implements Synthesizer {
+public class KokoroTtsEngine {
 
   private final KokoroModelAssets assets;
 
@@ -41,7 +44,6 @@ public class KokoroTtsEngine implements Synthesizer {
    * Synthesizes {@code text} for {@code speakerId} on the calling thread, returning the PCM or
    * {@code null} if the model failed to load.
    */
-  @Override
   public Pcm synthesize(String text, int speakerId) {
     OfflineTts engine = ensureLoaded();
     if (engine == null) {

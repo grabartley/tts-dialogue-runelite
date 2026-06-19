@@ -18,6 +18,47 @@ public interface TTSDialogueConfig extends Config {
       position = 1)
   String voiceSection = "voices";
 
+  @ConfigSection(
+      name = "Synthesis",
+      description = "Choose the synthesis backend and emotion behaviour",
+      position = 2)
+  String synthesisSection = "synthesis";
+
+  /**
+   * Which synthesis backend dialogue routes through. {@code LOCAL} is the offline, in-process
+   * Kokoro engine (default); {@code LOCAL_GPU} and {@code CLOUD} are reserved for the emotional
+   * backends and fall back to the local engine until those backends ship.
+   */
+  enum VoiceBackend {
+    LOCAL,
+    LOCAL_GPU,
+    CLOUD
+  }
+
+  @ConfigItem(
+      keyName = "voiceBackend",
+      name = "Voice Backend",
+      description =
+          "Which synthesis engine to use. Local is the offline, in-process Kokoro voice (default)."
+              + " Other options fall back to Local until their backends are installed.",
+      position = 0,
+      section = synthesisSection)
+  default VoiceBackend voiceBackend() {
+    return VoiceBackend.LOCAL;
+  }
+
+  @ConfigItem(
+      keyName = "enableEmotion",
+      name = "Enable Emotion",
+      description =
+          "Carry detected emotion through to synthesis. The local Kokoro backend is neutral-only, so"
+              + " emotion is only audible on the emotional backends.",
+      position = 1,
+      section = synthesisSection)
+  default boolean enableEmotion() {
+    return true;
+  }
+
   @ConfigItem(
       keyName = "volume",
       name = "Dialogue Volume",

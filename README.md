@@ -17,7 +17,7 @@ It runs entirely on your machine. No accounts, no cloud calls, no per-line API b
 
 The plugin synthesizes dialogue **in-process** with the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) model running on CPU through [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). On first use it downloads the Kokoro model bundle (~349 MB) once into `~/.runelite/tts-dialogue/` and caches it. Every line after that is generated locally on-device.
 
-Model load, synthesis, and playback all run off the game thread on a single background pipeline fed by a small bounded queue, so the game stays responsive even when you mash through dialogue. Audio streams through a `SourceDataLine` straight from memory, and a small LRU cache keyed on `(text, voice)` replays repeated NPC lines instantly. On Apple Silicon a typical line synthesizes in roughly 1.3 to 1.8 seconds of CPU time; cached lines are immediate.
+Model load, synthesis, and playback all run off the game thread on a single background pipeline fed by a small bounded queue, so the game stays responsive even when you mash through dialogue. Audio streams through a `SourceDataLine` straight from memory, and a small LRU cache keyed on the active backend, voice, emotion, and text replays repeated NPC lines instantly. On Apple Silicon a typical line synthesizes in roughly 1.3 to 1.8 seconds of CPU time; cached lines are immediate.
 
 Every voice is a real, distinct Kokoro speaker, and what you hear is the clean neural output as-is. The differences between races come from picking genuinely different speakers: accent, timbre, and pitch.
 
