@@ -50,13 +50,26 @@ public class NPCDemographicAnalyzerTest {
   }
 
   @Test
-  public void unknownIdFallsBackToDeterministicDefault() {
+  public void unknownIdFallsBackToUnknownRaceSoFallbackVoiceApplies() {
+    // Race must be Unknown (not Human) so VoiceManager routes through the configured fallback voice
+    // rather than silently using the human voice and making the fallback toggle a no-op.
     NPCAttributes attributes = analyzer.lookup(987654321, "Totally Made Up NPC");
     assertNotNull(attributes);
-    assertEquals("Human", attributes.getRace());
+    assertEquals("Unknown", attributes.getRace());
     assertEquals("Male", attributes.getGender());
     assertEquals("Default", attributes.getSource());
     assertEquals(987654321, attributes.getNpcId());
+  }
+
+  @Test
+  public void unknownFemaleNamedNpcGetsFemaleFallbackGender() {
+    // The lone runtime name check: an explicit female word picks the female fallback gender for
+    // missing-id NPCs, keeping the "gender-appropriate human voice" fallback meaningful.
+    assertEquals("Female", analyzer.lookup(987654322, "Mysterious Woman").getGender());
+    assertEquals("Female", analyzer.lookup(987654323, "Lost Princess").getGender());
+    // No female signal stays Male; a substring inside a larger word must not trigger it.
+    assertEquals("Male", analyzer.lookup(987654324, "Old Sailor").getGender());
+    assertEquals("Male", analyzer.lookup(987654325, "Womanizer Larry").getGender());
   }
 
   @Test
@@ -79,7 +92,7 @@ public class NPCDemographicAnalyzerTest {
     // rather than throwing, so a missing resource can never break voice selection.
     NPCDemographicAnalyzer fresh = new NPCDemographicAnalyzer();
     NPCAttributes attributes = fresh.lookup(101, "Goblin");
-    assertEquals("Human", attributes.getRace());
+    assertEquals("Unknown", attributes.getRace());
     assertEquals("Male", attributes.getGender());
     assertEquals("Default", attributes.getSource());
   }

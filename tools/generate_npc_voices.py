@@ -53,6 +53,12 @@ VALID_GENDERS = {"Male", "Female"}
 # race). The first match wins, so list the more specific races first. Patterns
 # use word boundaries to avoid false positives (e.g. "elf" must not match
 # "self", "imp" must not match "important").
+#
+# Buckets are voice-categorical, not lore-accurate: there are only the 8 voice
+# profiles in VoiceProfile, so lore-distinct creatures are mapped to the closest
+# available voice (e.g. dragon/wyvern/kalphite -> Demon, gnome -> Goblin,
+# cyclops/ogre/ent/golem -> Troll). Don't "fix" these to lore races; they're
+# deliberate Kokoro speaker-slot assignments.
 RACE_RULES = [
     (r"demon|devil|\bimp\b|imps\b|abyssal|hellhound|pyrefiend|nechryael", "Demon"),
     (r"dragon|wyvern|wyrm|drake|kalphite", "Demon"),
