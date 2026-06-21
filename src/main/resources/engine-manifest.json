@@ -1,27 +1,27 @@
 {
   "schemaVersion": 1,
   "engine": "kokoro",
-  "version": "0.0.0-dev",
+  "version": "v0.1.0",
   "warning": null,
   "artifacts": {
     "osx-aarch64": {
-      "url": "",
-      "sha256": "",
-      "size": 0,
+      "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/v0.1.0/kokoro-engine-v0.1.0-osx-aarch64.tar.gz",
+      "sha256": "fa1ba0b35b203ebf3d6000074cebf21f43a5baa24280f897338a91a557686e1e",
+      "size": 385034570,
       "signed": false,
       "launcher": "kokoro-engine"
     },
     "linux-x64": {
-      "url": "",
-      "sha256": "",
-      "size": 0,
+      "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/v0.1.0/kokoro-engine-v0.1.0-linux-x64.tar.gz",
+      "sha256": "cf9b6feb51713a004cbbd2c1cc07836cbf9877c3f297744fbc12d2d0ea2c5d78",
+      "size": 387393673,
       "signed": false,
       "launcher": "kokoro-engine"
     },
     "win-x64": {
-      "url": "",
-      "sha256": "",
-      "size": 0,
+      "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/v0.1.0/kokoro-engine-v0.1.0-win-x64.zip",
+      "sha256": "9bdd97733265b7541351c9882e27ed043c0a0846b5304f90e3c079661eec6fe2",
+      "size": 380772292,
       "signed": false,
       "launcher": "kokoro-engine.bat"
     }
