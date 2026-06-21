@@ -41,19 +41,13 @@ public class ZonosEngineManifestResourceTest {
     for (String platform : PLATFORMS) {
       assertTrue("missing artifact entry for " + platform, artifacts.has(platform));
       JsonObject entry = artifacts.getAsJsonObject(platform);
-      assertTrue(platform + " entry needs a url field", entry.has("url"));
+      // A platform entry is either a single-file artifact (url) or a split artifact (parts).
+      // Dev placeholders carry an empty url; the release workflow fills real values (and may
+      // switch a populated platform to the split `parts` form), so do not require emptiness here.
+      assertTrue(
+          platform + " entry needs a url or parts field", entry.has("url") || entry.has("parts"));
       assertTrue(platform + " entry needs a sha256 field", entry.has("sha256"));
       assertTrue(platform + " entry needs a launcher field", entry.has("launcher"));
-
-      // Dev placeholder: empty url/sha so the installer treats it as "nothing to install".
-      assertEquals(
-          platform + " url should be empty in the dev manifest",
-          "",
-          entry.get("url").getAsString());
-      assertEquals(
-          platform + " sha256 should be empty in the dev manifest",
-          "",
-          entry.get("sha256").getAsString());
 
       String launcher = entry.get("launcher").getAsString();
       String expected = platform.startsWith("win") ? "zonos-engine.bat" : "zonos-engine";

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "engine": "zonos",
-  "version": "0.0.0-dev",
+  "version": "v0.1.0",
   "warning": null,
   "artifacts": {
     "osx-aarch64": {
@@ -26,11 +26,23 @@
       "launcher": "zonos-engine"
     },
     "win-x64": {
-      "url": "",
-      "sha256": "",
-      "size": 0,
+      "archive": "zonos-engine-v0.1.0-win-x64.zip",
+      "sha256": "ea2e6b593030ac0c4342033cf6248fee024c98da47f5c5f5af048cbd31463c93",
+      "size": 2975327324,
       "signed": false,
-      "launcher": "zonos-engine.bat"
+      "launcher": "zonos-engine.bat",
+      "parts": [
+        {
+          "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/v0.1.0/zonos-engine-v0.1.0-win-x64.zip.part00",
+          "sha256": "3c96a588cfb1817614156475be6a842068cf4904156dacc0f00481786c735a83",
+          "size": 1992294400
+        },
+        {
+          "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/v0.1.0/zonos-engine-v0.1.0-win-x64.zip.part01",
+          "sha256": "6882b860fca5a1935b8c1c772fe4418d3bcb076592600554b64f4538dc5695ec",
+          "size": 983032924
+        }
+      ]
     }
   }
 }
