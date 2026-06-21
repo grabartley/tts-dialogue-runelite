@@ -1,0 +1,4 @@
+repository=https://github.com/grabartley/tts-dialogue-runelite.git
+commit=REPLACE_WITH_40_CHAR_RELEASE_COMMIT_SHA
+authors=grabartley
+warning=With the Cloud (Azure) voice backend selected, the dialogue text being spoken and your configured Azure region are sent to Microsoft Azure over HTTPS using your subscription key. The two local backends stay fully offline and send nothing off your machine.
