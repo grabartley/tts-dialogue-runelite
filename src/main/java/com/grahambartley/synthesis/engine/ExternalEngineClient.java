@@ -206,6 +206,20 @@ public final class ExternalEngineClient {
    * from the single pipeline thread.
    */
   public synchronized Pcm synthesize(SynthesisRequest request, float[] emotionVector) {
+    return synthesize(request, emotionVector, null);
+  }
+
+  /**
+   * Synthesizes one request, optionally carrying both the {@code emotionVector} (Zonos's 8-dim
+   * emotion conditioning) and a {@code playerReferenceClip} path the Zonos engine clones the player
+   * voice from instead of the bundled reference (issue #50). Both are optional: pass {@code null}
+   * for either and that field is absent from the wire line. {@code playerReferenceClip} is only
+   * ever set by the Zonos backend for player-voice lines, so Kokoro/Azure framing is unchanged.
+   * Returns the decoded {@link Pcm} or {@code null} on failure. Must be called from the single
+   * pipeline thread.
+   */
+  public synchronized Pcm synthesize(
+      SynthesisRequest request, float[] emotionVector, String playerReferenceClip) {
     if (request == null || request.text() == null || request.text().isEmpty()) {
       return null;
     }
@@ -216,7 +230,7 @@ public final class ExternalEngineClient {
       return null;
     }
     try {
-      writeRequest(request, emotionVector);
+      writeRequest(request, emotionVector, playerReferenceClip);
       return readResponse();
     } catch (IOException e) {
       log.warn("External engine request failed ({}); tearing down for restart", e.getMessage());
@@ -227,8 +241,10 @@ public final class ExternalEngineClient {
   }
 
   /** Encodes the request as the protocol JSON line and writes it to the engine's stdin. */
-  private void writeRequest(SynthesisRequest request, float[] emotionVector) throws IOException {
-    String line = encodeRequest(request, emotionVector, gson);
+  private void writeRequest(
+      SynthesisRequest request, float[] emotionVector, String playerReferenceClip)
+      throws IOException {
+    String line = encodeRequest(request, emotionVector, playerReferenceClip, gson);
     toEngine.write(line.getBytes(StandardCharsets.UTF_8));
     toEngine.write('\n');
     toEngine.flush();
@@ -236,7 +252,7 @@ public final class ExternalEngineClient {
 
   /** Builds the one-line JSON request the engine's {@code StdioProtocol} decodes. */
   static String encodeRequest(SynthesisRequest request, Gson gson) {
-    return encodeRequest(request, null, gson);
+    return encodeRequest(request, null, null, gson);
   }
 
   /**
@@ -245,6 +261,25 @@ public final class ExternalEngineClient {
    * line is byte-for-byte the base request, so Kokoro/Azure framing is unchanged.
    */
   static String encodeRequest(SynthesisRequest request, float[] emotionVector, Gson gson) {
+    return encodeRequest(request, emotionVector, null, gson);
+  }
+
+  /**
+   * Builds the one-line JSON request, optionally including the {@code emotionVector} (Zonos emotion
+   * conditioning) and a {@code playerReferenceClip} local file path (Zonos custom player voice
+   * cloning, issue #50). A {@code null} field is omitted from the JSON, so:
+   *
+   * <ul>
+   *   <li>both {@code null} → byte-for-byte the base Kokoro/Azure request,
+   *   <li>only the vector set → the standard Zonos request,
+   *   <li>both set → a Zonos player-voice request whose reference clip the engine clones from.
+   * </ul>
+   *
+   * The {@code playerReferenceClip} field is therefore absent for every NPC line and for every
+   * non-Zonos backend.
+   */
+  static String encodeRequest(
+      SynthesisRequest request, float[] emotionVector, String playerReferenceClip, Gson gson) {
     VoiceSpec spec = request.voice();
     JsonObject voice = new JsonObject();
     voice.addProperty("player", spec.player());
@@ -263,6 +298,9 @@ public final class ExternalEngineClient {
         vec.add(v);
       }
       root.add("emotionVector", vec);
+    }
+    if (playerReferenceClip != null && !playerReferenceClip.isEmpty()) {
+      root.addProperty("playerReferenceClip", playerReferenceClip);
     }
     return gson.toJson(root);
   }

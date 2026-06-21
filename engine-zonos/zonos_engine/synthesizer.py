@@ -56,6 +56,7 @@ class Synthesizer:
         emotion: str,
         speed: float,
         emotion_vector: Optional[List[float]],
+        player_reference_clip: Optional[str] = None,
     ) -> Tuple[int, List[float]]:
         raise NotImplementedError
 
@@ -85,8 +86,16 @@ class MockSynthesizer(Synthesizer):
     def gpu_detail(self) -> str:
         return "mock synthesizer (framing only, no GPU, not real speech)"
 
-    def synthesize(self, text, player, race, gender, emotion, speed, emotion_vector):
+    def synthesize(
+        self, text, player, race, gender, emotion, speed, emotion_vector,
+        player_reference_clip=None,
+    ):
         voice_id = voices.voice_for(player, race, gender)
+        # A custom player clip changes the effective player voice, so reflect it in the mock's tone
+        # too: this keeps the mock's framing observably distinct (the cloned player line is not the
+        # same audio as the default player line), matching the plugin's cache-key variant.
+        if player and player_reference_clip:
+            voice_id = "player_custom:" + str(player_reference_clip)
         vec = emotion_mod.resolve_emotion_vector(emotion_vector, emotion)
         # Base 220 Hz, shifted a little by which emotion axis dominates, so distinct emotions
         # produce distinct tones in framing tests.
@@ -186,25 +195,63 @@ class ZonosSynthesizer(Synthesizer):
             return self._speaker_cache[voice_id]
         import os
 
-        import torchaudio  # type: ignore  # noqa: WPS433
-
         path = voices.embedding_path_for(self._bundle_root, voice_id)
         if not os.path.isfile(path):
             path = voices.embedding_path_for(self._bundle_root, voices.DEFAULT_VOICE)
-        wav, sr = torchaudio.load(path)
-        embedding = self._model.make_speaker_embedding(wav, sr)
+        embedding = self._embed_clip(path)
         self._speaker_cache[voice_id] = embedding
         return embedding
 
+    def _custom_player_embedding(self, clip_path: str, fallback_voice_id: str):
+        """Resolve a user-supplied player reference clip (issue #50) to a speaker embedding,
+        cloning the player voice from it. Engine-side safety net on top of the plugin's validation:
+        if the file is missing/unreadable/undecodable, fall back to the bundled player reference so a
+        bad clip degrades to the default voice instead of erroring the line.
+
+        Cached per absolute clip path so re-cloning the same clip across lines is cheap; the cache
+        key is namespaced so it never collides with a bundled voice id."""
+        import os
+
+        cache_key = "custom:" + os.path.abspath(clip_path)
+        if cache_key in self._speaker_cache:
+            return self._speaker_cache[cache_key]
+        try:
+            if not os.path.isfile(clip_path):
+                raise FileNotFoundError(clip_path)
+            embedding = self._embed_clip(clip_path)
+        except Exception as exc:  # noqa: BLE001 - any decode failure falls back to the default
+            print(
+                "Custom player reference clip unusable ({}); using bundled player voice".format(exc),
+                file=__import__("sys").stderr,
+            )
+            embedding = self._speaker_embedding(fallback_voice_id)
+        self._speaker_cache[cache_key] = embedding
+        return embedding
+
+    def _embed_clip(self, path: str):
+        """Load a wav file and turn it into a Zonos speaker embedding."""
+        import torchaudio  # type: ignore  # noqa: WPS433
+
+        wav, sr = torchaudio.load(path)
+        return self._model.make_speaker_embedding(wav, sr)
+
     # -- Synthesis -------------------------------------------------------------------------------
 
-    def synthesize(self, text, player, race, gender, emotion, speed, emotion_vector):
+    def synthesize(
+        self, text, player, race, gender, emotion, speed, emotion_vector,
+        player_reference_clip=None,
+    ):
         self.load()
         torch = self._torch
         from zonos.conditioning import make_cond_dict  # type: ignore  # noqa: WPS433
 
         voice_id = voices.voice_for(player, race, gender)
-        speaker = self._speaker_embedding(voice_id)
+        # A custom player reference clip overrides the bundled player voice for player lines only;
+        # NPC lines always use the bundled bank. A bad clip falls back to the bundled player voice.
+        if player and player_reference_clip:
+            speaker = self._custom_player_embedding(player_reference_clip, voice_id)
+        else:
+            speaker = self._speaker_embedding(voice_id)
         vec = emotion_mod.resolve_emotion_vector(emotion_vector, emotion)
         emotion_tensor = torch.tensor([vec], device=self._device, dtype=torch.float32)
 

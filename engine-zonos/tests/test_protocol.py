@@ -31,7 +31,7 @@ from zonos_engine.synthesizer import MockSynthesizer  # noqa: E402
 # The exact request line shape the plugin's ExternalEngineClient.encodeRequest writes, including the
 # 8-dim emotionVector that LocalZonosBackend always sends.
 def plugin_request_line(text="Hello there", player=False, race="ELF", gender="FEMALE",
-                        emotion_name="ANGRY", vector=None):
+                        emotion_name="ANGRY", vector=None, player_reference_clip=None):
     if vector is None:
         vector = [0.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.0]
     root = {
@@ -41,6 +41,9 @@ def plugin_request_line(text="Hello there", player=False, race="ELF", gender="FE
         "speed": 1.0,
         "emotionVector": vector,
     }
+    # The plugin only adds playerReferenceClip for player-voice Zonos lines (issue #50).
+    if player_reference_clip is not None:
+        root["playerReferenceClip"] = player_reference_clip
     # Plugin uses Gson; field order is text, voice, emotion, speed, emotionVector. Order is
     # irrelevant to the engine's JSON decode, so any compact JSON is a faithful stand-in.
     return json.dumps(root)
@@ -76,6 +79,22 @@ class DecodeRequestTest(unittest.TestCase):
     def test_health_op_line(self):
         req = protocol.decode_request(json.dumps({"op": "health"}))
         self.assertTrue(req.is_health)
+
+    def test_decodes_player_reference_clip(self):
+        line = plugin_request_line(player=True, race="HUMAN", gender="MALE",
+                                   player_reference_clip="/voices/me.wav")
+        req = protocol.decode_request(line)
+        self.assertEqual(req.player_reference_clip, "/voices/me.wav")
+
+    def test_absent_clip_is_none(self):
+        # A standard request (no clip field) and an NPC request both decode with no clip.
+        self.assertIsNone(protocol.decode_request(plugin_request_line()).player_reference_clip)
+
+    def test_blank_clip_is_none(self):
+        # An empty/whitespace clip path is treated as "use the bundled player reference".
+        line = plugin_request_line(player=True, race="HUMAN", gender="MALE",
+                                   player_reference_clip="   ")
+        self.assertIsNone(protocol.decode_request(line).player_reference_clip)
 
 
 class HeaderFramingTest(unittest.TestCase):
@@ -195,6 +214,16 @@ class StdioLoopTest(unittest.TestCase):
         self.assertFalse(reply["gpu"])  # mock never claims a GPU
         self.assertIn("detail", reply)
 
+    def test_player_clip_line_produces_a_frame(self):
+        # A player line carrying a custom reference clip must still frame correctly end-to-end. The
+        # mock does not read the file, but it proves the field flows through decode -> synthesize.
+        raw = self._run([plugin_request_line(player=True, race="HUMAN", gender="MALE",
+                                             player_reference_clip="/voices/me.wav")])
+        newline = raw.index(b"\n")
+        header = json.loads(raw[:newline].decode("utf-8"))
+        self.assertEqual(header["format"], "f32le")
+        self.assertGreater(header["samples"], 0)
+
     def test_malformed_line_yields_error_then_keeps_going(self):
         raw = self._run(["{not json", plugin_request_line()])
         # First line: an error JSON line; then a valid header + PCM frame.
@@ -205,6 +234,55 @@ class StdioLoopTest(unittest.TestCase):
         second_nl = rest.index(b"\n")
         second = json.loads(rest[:second_nl].decode("utf-8"))
         self.assertEqual(second["format"], "f32le")
+
+
+class MockSynthesizerClipTest(unittest.TestCase):
+    """The mock makes the custom-player-clip path observable: a player line with a clip produces
+    different audio than the default player line, mirroring the plugin's cache-key variant. This
+    runs torch-free."""
+
+    def test_custom_player_clip_changes_mock_audio(self):
+        synth = MockSynthesizer()
+        _, default_player = synth.synthesize(
+            "hello", True, "HUMAN", "MALE", "NEUTRAL", 1.0, None, None)
+        _, custom_player = synth.synthesize(
+            "hello", True, "HUMAN", "MALE", "NEUTRAL", 1.0, None, "/voices/me.wav")
+        self.assertNotEqual(default_player, custom_player)
+
+    def test_clip_ignored_for_npc_lines(self):
+        # A clip passed alongside an NPC line must not change the NPC's audio (it is player-only).
+        synth = MockSynthesizer()
+        _, npc_a = synth.synthesize(
+            "hello", False, "ELF", "FEMALE", "NEUTRAL", 1.0, None, None)
+        _, npc_b = synth.synthesize(
+            "hello", False, "ELF", "FEMALE", "NEUTRAL", 1.0, None, "/voices/me.wav")
+        self.assertEqual(npc_a, npc_b)
+
+
+class ZonosCustomPlayerEmbeddingFallbackTest(unittest.TestCase):
+    """The real ZonosSynthesizer's engine-side safety net (issue #50): a missing/unreadable custom
+    clip falls back to the bundled player reference instead of erroring. Exercised torch-free by
+    stubbing the heavy embedding helpers, so only the missing-file fallback branch is tested."""
+
+    def test_missing_clip_falls_back_to_bundled_player_voice(self):
+        from zonos_engine.synthesizer import ZonosSynthesizer
+
+        synth = ZonosSynthesizer(bundle_root="/nonexistent-bundle")
+        sentinel = object()
+        calls = {}
+
+        def fake_speaker_embedding(voice_id):
+            calls["fallback_voice_id"] = voice_id
+            return sentinel
+
+        # The clip does not exist, so _embed_clip must never be reached; the fallback wins.
+        synth._speaker_embedding = fake_speaker_embedding  # type: ignore[assignment]
+        synth._embed_clip = lambda path: (_ for _ in ()).throw(  # type: ignore[assignment]
+            AssertionError("_embed_clip must not be called for a missing clip"))
+
+        result = synth._custom_player_embedding("/voices/does-not-exist.wav", "player_male")
+        self.assertIs(result, sentinel)
+        self.assertEqual(calls["fallback_voice_id"], "player_male")
 
 
 if __name__ == "__main__":

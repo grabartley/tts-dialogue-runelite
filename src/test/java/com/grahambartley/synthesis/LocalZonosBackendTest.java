@@ -15,9 +15,18 @@ import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.synthesis.engine.EngineInstaller;
 import com.grahambartley.synthesis.engine.ExternalEngineClient;
 import com.grahambartley.tts.Pcm;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.EnumSet;
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -27,6 +36,22 @@ import org.mockito.ArgumentCaptor;
  * through the shared {@link ExternalEngineClient}.
  */
 public class LocalZonosBackendTest {
+
+  @Rule public TemporaryFolder tmp = new TemporaryFolder();
+
+  /** Writes a valid mono 16-bit PCM WAV of the given duration so the real validator accepts it. */
+  private File wav(String name, double seconds) throws IOException {
+    int sampleRate = 16000;
+    int frames = (int) (sampleRate * seconds);
+    AudioFormat format = new AudioFormat(sampleRate, 16, 1, true, false);
+    byte[] data = new byte[frames * 2];
+    File out = tmp.newFile(name);
+    try (AudioInputStream ais =
+        new AudioInputStream(new ByteArrayInputStream(data), format, frames)) {
+      AudioSystem.write(ais, AudioFileFormat.Type.WAVE, out);
+    }
+    return out;
+  }
 
   private static SynthesisRequest request(Emotion emotion) {
     return new SynthesisRequest("hi", VoiceSpec.npc(NPCRace.ELF, NPCGender.FEMALE), emotion);
@@ -125,7 +150,7 @@ public class LocalZonosBackendTest {
     when(client.handshake()).thenReturn(new ExternalEngineClient.Health(true, true, "gpu"));
     when(client.isHealthy()).thenReturn(true);
     Pcm expected = new Pcm(new float[] {0.1f, -0.2f}, 44100);
-    when(client.synthesize(any(), any())).thenReturn(expected);
+    when(client.synthesize(any(), any(), any())).thenReturn(expected);
 
     LocalZonosBackend backend =
         new LocalZonosBackend(installerReturning(fakeInstall()), l -> client);
@@ -136,7 +161,7 @@ public class LocalZonosBackendTest {
 
     // The ANGRY 8-dim vector (anger-dominant) is what travels to the engine.
     ArgumentCaptor<float[]> vector = ArgumentCaptor.forClass(float[].class);
-    verify(client).synthesize(any(SynthesisRequest.class), vector.capture());
+    verify(client).synthesize(any(SynthesisRequest.class), vector.capture(), any());
     float[] sent = vector.getValue();
     assertEquals("vector is exactly the 8-dim preset", 8, sent.length);
     int dominant = 0;
@@ -146,6 +171,83 @@ public class LocalZonosBackendTest {
       }
     }
     assertEquals("ANGRY must send an anger-dominant vector", ZonosEmotionVectors.ANGER, dominant);
+  }
+
+  private static SynthesisRequest playerRequest() {
+    return new SynthesisRequest("hi", VoiceSpec.player(NPCGender.MALE), Emotion.NEUTRAL);
+  }
+
+  private static ExternalEngineClient warmGpuClient() {
+    ExternalEngineClient client = mock(ExternalEngineClient.class);
+    when(client.handshake()).thenReturn(new ExternalEngineClient.Health(true, true, "gpu"));
+    when(client.isHealthy()).thenReturn(true);
+    when(client.synthesize(any(), any(), any())).thenReturn(new Pcm(new float[] {0.1f}, 44100));
+    return client;
+  }
+
+  @Test
+  public void playerRequestWithCustomClipCarriesItToTheTransport() throws IOException {
+    ExternalEngineClient client = warmGpuClient();
+    File validClip = wav("me.wav", 4.0);
+    LocalZonosBackend backend =
+        new LocalZonosBackend(
+            installerReturning(fakeInstall()),
+            l -> client,
+            validClip::getPath,
+            new PlayerVoiceClip());
+    backend.warmUp();
+
+    backend.synthesize(playerRequest());
+
+    ArgumentCaptor<String> ref = ArgumentCaptor.forClass(String.class);
+    verify(client).synthesize(any(SynthesisRequest.class), any(float[].class), ref.capture());
+    assertEquals(
+        "the custom player reference clip must ride a player line",
+        validClip.getAbsolutePath(),
+        ref.getValue());
+  }
+
+  @Test
+  public void npcRequestNeverCarriesTheCustomClip() throws IOException {
+    ExternalEngineClient client = warmGpuClient();
+    File validClip = wav("me.wav", 4.0);
+    LocalZonosBackend backend =
+        new LocalZonosBackend(
+            installerReturning(fakeInstall()),
+            l -> client,
+            validClip::getPath,
+            new PlayerVoiceClip());
+    backend.warmUp();
+
+    backend.synthesize(request(Emotion.HAPPY)); // an NPC (ELF/FEMALE) line
+
+    ArgumentCaptor<String> ref = ArgumentCaptor.forClass(String.class);
+    verify(client).synthesize(any(SynthesisRequest.class), any(float[].class), ref.capture());
+    assertNull("an NPC line must never carry the custom player clip", ref.getValue());
+  }
+
+  @Test
+  public void cacheVariantDistinguishesCustomPlayerClip() throws IOException {
+    File validClip = wav("me.wav", 4.0);
+    LocalZonosBackend withClip =
+        new LocalZonosBackend(
+            installerReturning(fakeInstall()),
+            l -> mock(ExternalEngineClient.class),
+            validClip::getPath,
+            new PlayerVoiceClip());
+    LocalZonosBackend noClip =
+        new LocalZonosBackend(
+            installerReturning(fakeInstall()),
+            l -> mock(ExternalEngineClient.class),
+            () -> "",
+            new PlayerVoiceClip());
+
+    // A player line with a custom clip set yields a non-empty variant; without one it is empty,
+    // so the custom-clip player line cannot collide with the default-player-voice cache entry.
+    assertFalse(withClip.cacheVariant(playerRequest()).isEmpty());
+    assertTrue(noClip.cacheVariant(playerRequest()).isEmpty());
+    // NPC lines never get a variant, regardless of the configured clip.
+    assertTrue(withClip.cacheVariant(request(Emotion.HAPPY)).isEmpty());
   }
 
   @Test

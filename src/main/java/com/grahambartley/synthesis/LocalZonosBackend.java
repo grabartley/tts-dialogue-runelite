@@ -5,6 +5,7 @@ import com.grahambartley.synthesis.engine.ExternalEngineClient;
 import com.grahambartley.tts.Pcm;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,6 +43,16 @@ public final class LocalZonosBackend implements SynthesisBackend {
   private final ClientFactory clientFactory;
   private final ZonosVoiceMap voiceMap = new ZonosVoiceMap();
 
+  /**
+   * Supplies the raw {@code playerVoiceClipPath} config string on demand (read live so a config
+   * edit applies without a restart). The custom-clip override is Zonos-only and player-only, so the
+   * supplier lives on this backend and nowhere else.
+   */
+  private final Supplier<String> rawPlayerClipPath;
+
+  /** Validates the raw config path into a usable absolute clip path or {@code null} (default). */
+  private final PlayerVoiceClip playerClip;
+
   private volatile ExternalEngineClient client;
   private volatile boolean installAttempted;
 
@@ -53,9 +64,23 @@ public final class LocalZonosBackend implements SynthesisBackend {
     ExternalEngineClient create(Path launcher);
   }
 
+  /**
+   * Backwards-compatible constructor with no custom player clip: the player always uses the bundled
+   * default reference. Used by tests that do not exercise the clip path.
+   */
   public LocalZonosBackend(EngineInstaller installer, ClientFactory clientFactory) {
+    this(installer, clientFactory, () -> "", new PlayerVoiceClip());
+  }
+
+  public LocalZonosBackend(
+      EngineInstaller installer,
+      ClientFactory clientFactory,
+      Supplier<String> rawPlayerClipPath,
+      PlayerVoiceClip playerClip) {
     this.installer = installer;
     this.clientFactory = clientFactory;
+    this.rawPlayerClipPath = rawPlayerClipPath == null ? () -> "" : rawPlayerClipPath;
+    this.playerClip = playerClip == null ? new PlayerVoiceClip() : playerClip;
   }
 
   @Override
@@ -136,7 +161,41 @@ public final class LocalZonosBackend implements SynthesisBackend {
       }
     }
     float[] emotionVector = ZonosEmotionVectors.forEmotion(request.emotion());
-    return c.synthesize(request, emotionVector);
+    // The custom player reference is Zonos-only (this backend) and player-only: it rides the
+    // request
+    // only for player-voice lines and is absent (null) for every NPC line, so NPC voices keep using
+    // the bundled bank. An empty/invalid config path resolves to null here, falling the engine back
+    // to the default player reference.
+    String playerReferenceClip = resolvePlayerReferenceClip(request);
+    return c.synthesize(request, emotionVector, playerReferenceClip);
+  }
+
+  /**
+   * Resolves the custom player reference clip path for this request, or {@code null} when none
+   * applies. Returns {@code null} for any NPC line (the override is player-only) and for an
+   * empty/invalid configured path (fall back to the default player reference). Player + Zonos +
+   * valid clip is the only case that yields a path.
+   */
+  private String resolvePlayerReferenceClip(SynthesisRequest request) {
+    if (request.voice() == null || !request.voice().player()) {
+      return null;
+    }
+    return playerClip.resolve(rawPlayerClipPath.get());
+  }
+
+  /**
+   * Folds the custom player clip identity into the cache key for player + Zonos lines so a line
+   * cloned from a user clip never serves, or is served by, the default-player-voice cache entry.
+   * Returns {@code ""} for NPC lines and when no custom clip is configured, so those keys are
+   * unchanged.
+   */
+  @Override
+  public String cacheVariant(SynthesisRequest request) {
+    String clip = resolvePlayerReferenceClip(request);
+    if (clip == null) {
+      return "";
+    }
+    return "clip:" + Integer.toHexString(clip.hashCode());
   }
 
   @Override

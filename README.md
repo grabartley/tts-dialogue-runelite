@@ -37,6 +37,8 @@ A real neural voice that runs on your CPU, fully offline. Nothing about a dialog
 
 An offline emotional voice for machines with a supported CUDA GPU. It runs as its own external engine alongside the local voice and renders each line's detected emotion by conditioning on a per-emotion emotion vector, the only path that gives you spoken emotion while keeping everything on your machine. It needs a heavier one-time engine download than the CPU engine, and a usable GPU; when no GPU is present or the engine is unavailable, dialogue falls back to the local voice.
 
+Because Zonos clones a voice from a short reference clip, this backend can clone your character's voice from a recording you provide. Point the **Player Voice Clip** setting at a clean few-second `.wav` file and the player's dialogue is synthesized in that cloned voice. The clip is validated locally (it must exist, be a readable WAV, and be a sane length); an empty, missing, or unsupported file falls back to the default player voice with a one-time notice. The override applies only to the Local (GPU) backend and only to the player voice: NPC lines and the Local and Cloud backends ignore it. The clip stays entirely on your machine and is never uploaded.
+
 ### Cloud (Azure)
 
 An opt-in cloud voice with the strongest emotion and near-zero setup beyond supplying a key. Create a Microsoft Azure Speech resource, then enter its subscription key and region (for example `eastus`) in the config. Azure renders each line's detected emotion as a neural SSML express-as style.
@@ -118,6 +120,7 @@ Synthesis and playback run off the game thread, so the client stays responsive e
 | **Dialogue Volume** | `100` | Volume of the spoken dialogue (0 to 100). |
 | **Enable Automatic NPC Voices** | `On` | Picks a voice per NPC from the race and gender table. When off, every NPC uses the default Human voice. |
 | **Player Voice** | `Player Male` | The voice used for the player character. |
+| **Player Voice Clip** | empty | Optional path to a local `.wav` to clone your character's voice. Applies only to the Local (GPU) Zonos backend and the player voice; ignored otherwise. Stays on your machine; an invalid or missing file falls back to the default player voice. |
 | **Enable Voice Fallbacks** | `On` | Falls back to a gender-appropriate human voice for NPCs missing from the table. When off, those NPCs use the single default voice. |
 | **Debug Mode** | `Off` | Logs detailed NPC race/gender resolution and the chosen voice per NPC. |
 | **Azure Subscription Key** | empty | Your Azure Speech resource key. Required for the Cloud backend; stored locally and never bundled with the plugin. |

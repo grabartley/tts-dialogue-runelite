@@ -107,6 +107,7 @@ def _run_stdio(synth: Synthesizer) -> int:
                 req.emotion,
                 req.speed,
                 req.emotion_vector,
+                req.player_reference_clip,
             )
             protocol.write_response(out, sample_rate, samples)
         except Exception as exc:  # noqa: BLE001 - keep the process alive across one failure

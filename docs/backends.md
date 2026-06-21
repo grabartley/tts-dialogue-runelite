@@ -65,6 +65,16 @@ Each race/gender resolves to a distinct Zonos reference voice (the engine maps a
 speaker embedding), mirroring the spirit of the Kokoro and Azure voice maps, with a neutral default
 voice for any unmapped speaker.
 
+Because Zonos is a zero-shot cloning model, the player voice can additionally be cloned from a
+user-supplied reference clip. The **Player Voice Clip** config item takes a path to a local `.wav`;
+when it is set and valid, player-voice lines carry an optional `playerReferenceClip` field on the
+`--stdio` request line and the engine clones from that clip instead of the bundled `player_*` voice.
+This is Zonos-only and player-only: the field is absent for every NPC line and for the Kokoro/Azure
+backends, so their request framing is unchanged. The plugin validates the file (exists, readable WAV,
+sane length) and folds a custom-clip token into the cache key so a cloned player line never collides
+with the default-player-voice cache entry; the engine performs its own decode-and-fallback to the
+bundled player reference if the clip is unreadable. The clip never leaves the machine.
+
 ## Cloud (Azure) backend
 
 Azure Neural TTS over HTTPS, selected when **Voice Backend** is `Cloud` and a key and region are set.

@@ -25,11 +25,19 @@ public interface TTSDialogueConfig extends Config {
   String synthesisSection = "synthesis";
 
   @ConfigSection(
+      name = "Local GPU (Zonos)",
+      description =
+          "Settings for the offline emotional Zonos voice backend. These apply only when Voice"
+              + " Backend is Local (GPU); everything here stays on your machine.",
+      position = 3)
+  String localGpuSection = "localGpu";
+
+  @ConfigSection(
       name = "Cloud (Azure)",
       description =
           "Microsoft Azure Neural TTS settings. Used only when Voice Backend is Cloud. Dialogue text"
               + " and your region leave your machine when this backend is active.",
-      position = 3)
+      position = 4)
   String cloudAzureSection = "cloudAzure";
 
   /**
@@ -70,6 +78,22 @@ public interface TTSDialogueConfig extends Config {
       section = synthesisSection)
   default boolean enableEmotion() {
     return true;
+  }
+
+  @ConfigItem(
+      keyName = "playerVoiceClipPath",
+      name = "Player Voice Clip",
+      description =
+          "Optional path to a local .wav file used to clone YOUR character's voice. Applies only to"
+              + " the Local (GPU) Zonos backend and only to the player voice; it is ignored for the"
+              + " Local and Cloud backends and for every NPC line. Point it at a clean few-second"
+              + " (about 3-10s) WAV recording of the voice you want. The clip stays entirely on your"
+              + " machine and is never uploaded. Leave empty to use the default bundled player"
+              + " voice; an invalid, missing, or unsupported file falls back to that default.",
+      position = 0,
+      section = localGpuSection)
+  default String playerVoiceClipPath() {
+    return "";
   }
 
   @ConfigItem(

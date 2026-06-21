@@ -217,6 +217,54 @@ public class ExternalEngineClientTest {
     assertTrue(process.capturedStdin().contains("\"emotionVector\""));
   }
 
+  private static SynthesisRequest playerRequest() {
+    return new SynthesisRequest("Hi there.", VoiceSpec.player(NPCGender.MALE), Emotion.NEUTRAL);
+  }
+
+  @Test
+  public void encodeRequestCarriesPlayerReferenceClipWhenSupplied() {
+    float[] vec = {0.8f, 0f, 0f, 0f, 0f, 0f, 0.2f, 0f};
+    String line =
+        ExternalEngineClient.encodeRequest(playerRequest(), vec, "/tmp/my-voice.wav", GSON);
+    JsonObject root = GSON.fromJson(line, JsonObject.class);
+    assertEquals("/tmp/my-voice.wav", root.get("playerReferenceClip").getAsString());
+  }
+
+  @Test
+  public void encodeRequestOmitsPlayerReferenceClipByDefault() {
+    // The standard Zonos request (vector only, no custom clip) must not carry the clip field.
+    float[] vec = {0.8f, 0f, 0f, 0f, 0f, 0f, 0.2f, 0f};
+    JsonObject withVector =
+        GSON.fromJson(ExternalEngineClient.encodeRequest(request(), vec, GSON), JsonObject.class);
+    assertNull(
+        "no clip field for an NPC/standard Zonos request", withVector.get("playerReferenceClip"));
+  }
+
+  @Test
+  public void kokoroAzureRequestBytesUnchangedWithoutAnyExtensions() {
+    // The base (no vector, no clip) request line must be byte-for-byte stable so Kokoro/Azure
+    // framing is untouched by the issue #50 plumbing.
+    String base = ExternalEngineClient.encodeRequest(request(), GSON);
+    String viaFullOverload = ExternalEngineClient.encodeRequest(request(), null, null, GSON);
+    assertEquals("the base request line must be unchanged", base, viaFullOverload);
+    JsonObject root = GSON.fromJson(base, JsonObject.class);
+    assertNull(root.get("emotionVector"));
+    assertNull(root.get("playerReferenceClip"));
+  }
+
+  @Test
+  public void synthesizeWithClipWritesItAndStillDecodesPcm() {
+    float[] samples = {0.0f, 0.5f, -0.25f};
+    FakeProcess process = new FakeProcess(pcmFrame(44100, samples));
+    ExternalEngineClient client = clientFor(process);
+
+    float[] vec = {0.8f, 0f, 0f, 0f, 0f, 0f, 0.2f, 0f};
+    Pcm pcm = client.synthesize(playerRequest(), vec, "/tmp/clip.wav");
+
+    assertNotNull("a clip request must still decode its header+PCM frame", pcm);
+    assertTrue(process.capturedStdin().contains("\"playerReferenceClip\":\"/tmp/clip.wav\""));
+  }
+
   @Test
   public void handshakeDecodesGpuReport() {
     byte[] reply =

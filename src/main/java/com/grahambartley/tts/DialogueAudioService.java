@@ -93,8 +93,12 @@ public final class DialogueAudioService {
     // even if the user switches backend before this line reaches the pipeline thread.
     SynthesisBackend backend = backends.active();
     SynthesisRequest effective = BackendProvider.downgradeFor(backend, request);
-    CacheKey key =
-        new CacheKey(backend.id(), effective.voice().key(), effective.emotion(), effective.text());
+    // Fold any backend-specific render variant (e.g. a Zonos custom player reference clip) into the
+    // voice key so audio cloned from a user clip never collides with the default-voice cache entry.
+    String variant = backend.cacheVariant(effective);
+    String voiceKey =
+        variant.isEmpty() ? effective.voice().key() : effective.voice().key() + "|" + variant;
+    CacheKey key = new CacheKey(backend.id(), voiceKey, effective.emotion(), effective.text());
     submit(() -> run(mine, backend, effective, key));
   }
 

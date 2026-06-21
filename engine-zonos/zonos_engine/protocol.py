@@ -10,11 +10,16 @@ Protocol (must match the plugin byte-for-byte):
 
 * The plugin writes one JSON request line on stdin::
 
-      {"text", "voice": {"player", "race", "gender"}, "emotion", "speed", "emotionVector": [...]}
+      {"text", "voice": {"player", "race", "gender"}, "emotion", "speed", "emotionVector": [...],
+       "playerReferenceClip": "/abs/path.wav"}
 
   ``race`` and ``gender`` are the uppercase enum names the plugin sends (e.g. ``HUMAN``,
-  ``MALE``). ``emotionVector`` is an 8-float array (Zonos emotion conditioning) and is the only
-  field beyond the base Kokoro request; it is optional so a bare request still decodes.
+  ``MALE``). ``emotionVector`` is an 8-float array (Zonos emotion conditioning). Both
+  ``emotionVector`` and ``playerReferenceClip`` are optional fields beyond the base Kokoro request,
+  so a bare request still decodes. ``playerReferenceClip`` is a local file path the plugin sets only
+  for player-voice lines on the Zonos backend (issue #50); the engine clones the player voice from
+  it instead of the bundled ``player_*.wav``, falling back to the bundled default if the file is
+  missing/unreadable/undecodable. It is absent for every NPC line and every other backend.
 
 * For a synthesis request the engine writes one JSON header line::
 
@@ -62,6 +67,9 @@ class Request:
     emotion: str = "NEUTRAL"
     speed: float = 1.0
     emotion_vector: Optional[List[float]] = None
+    # Optional local path to a custom player reference clip (issue #50). ``None`` when the request
+    # omits it (every NPC line and every non-Zonos request). Only consulted for player-voice lines.
+    player_reference_clip: Optional[str] = None
     # The raw op, if any. A synthesis line has no "op"; a handshake line has {"op": "health"}.
     op: Optional[str] = None
     raw: dict = field(default_factory=dict)
@@ -107,6 +115,11 @@ def decode_request(line: str) -> Request:
         except (TypeError, ValueError):
             emotion_vector = None
 
+    # Optional custom player reference clip path. Only a non-empty string is meaningful; anything
+    # else (absent, null, blank) means "use the bundled player reference".
+    clip = root.get("playerReferenceClip")
+    player_reference_clip = clip if isinstance(clip, str) and clip.strip() else None
+
     return Request(
         text=text,
         player=player,
@@ -115,6 +128,7 @@ def decode_request(line: str) -> Request:
         emotion=emotion,
         speed=speed,
         emotion_vector=emotion_vector,
+        player_reference_clip=player_reference_clip,
         op=op,
         raw=root,
     )

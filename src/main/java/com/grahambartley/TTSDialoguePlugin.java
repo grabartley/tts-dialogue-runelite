@@ -93,8 +93,16 @@ public class TTSDialoguePlugin extends Plugin {
     EngineInstaller zonosInstaller =
         new EngineInstaller(
             okHttpClient, gson, ttsDir.resolve("engines"), EngineInstaller.ZONOS_MANIFEST_RESOURCE);
+    // The custom player-voice reference clip (issue #50) is Zonos-only and player-only: the backend
+    // reads the live config path on each player line, validates it (existence, readable WAV, sane
+    // length), and either clones from it or falls back to the bundled default with a one-time
+    // notice.
     LocalZonosBackend localZonos =
-        new LocalZonosBackend(zonosInstaller, launcher -> new ExternalEngineClient(launcher, gson));
+        new LocalZonosBackend(
+            zonosInstaller,
+            launcher -> new ExternalEngineClient(launcher, gson),
+            config::playerVoiceClipPath,
+            new com.grahambartley.synthesis.PlayerVoiceClip(this::notifyBackend));
     // The cloud Azure backend is registered alongside the local Kokoro fallback and selected when
     // Voice Backend is Cloud and a key/region are set. It uses the injected OkHttpClient (Hub
     // rule).
