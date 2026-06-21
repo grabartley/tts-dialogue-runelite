@@ -151,4 +151,50 @@ public class VoiceManagerTest {
     assertEquals(VoiceProfile.HUMAN_MALE, manager.getVoiceForNPC(""));
     assertEquals(VoiceProfile.HUMAN_MALE, manager.getVoiceForNPC(null));
   }
+
+  @Test
+  public void normalizeNameStripsColorTagsTrimsAndNormalisesNbsp() {
+    // Dialogue name widget can carry colour markup, non-breaking spaces, and stray whitespace; the
+    // world composition name does not. Both must normalise to the same string so matching succeeds.
+    assertEquals("Hans", VoiceManager.normalizeName("<col=0000ff>Hans</col>"));
+    assertEquals("Hans", VoiceManager.normalizeName("  Hans  "));
+    assertEquals("Father Aereck", VoiceManager.normalizeName("Father Aereck"));
+    assertEquals("", VoiceManager.normalizeName(null));
+    assertEquals("", VoiceManager.normalizeName("<col=ff0000></col>"));
+  }
+
+  @Test
+  public void buildNpcTraceShowsWorldHitTableSourceAndFinalVoice() {
+    String trace =
+        VoiceManager.buildNpcTrace(
+            "Goblin",
+            101,
+            VoiceManager.NPCRace.GOBLIN,
+            NPCGender.MALE,
+            "table-hit",
+            VoiceProfile.GOBLIN_MALE);
+    assertTrue(trace, trace.contains("npc='Goblin'"));
+    assertTrue(trace, trace.contains("world=HIT(id=101)"));
+    assertTrue(trace, trace.contains("source=table-hit"));
+    assertTrue(trace, trace.contains("voice=Goblin Male"));
+    assertTrue(trace, trace.contains("speakerId=" + VoiceProfile.GOBLIN_MALE.getSpeakerId()));
+  }
+
+  @Test
+  public void buildNpcTraceShowsWorldMissForUntabledNpc() {
+    String trace =
+        VoiceManager.buildNpcTrace(
+            "Hans", null, null, NPCGender.UNKNOWN, "not-in-world", VoiceProfile.HUMAN_MALE);
+    assertTrue(trace, trace.contains("world=MISS"));
+    assertTrue(trace, trace.contains("race=UNKNOWN"));
+    assertTrue(trace, trace.contains("voice=Human Male"));
+  }
+
+  @Test
+  public void buildPlayerTraceNamesTheVoiceAndSpeaker() {
+    String trace = VoiceManager.buildPlayerTrace(VoiceProfile.PLAYER_FEMALE);
+    assertTrue(trace, trace.contains("player ->"));
+    assertTrue(trace, trace.contains("voice=Player Female"));
+    assertTrue(trace, trace.contains("speakerId=" + VoiceProfile.PLAYER_FEMALE.getSpeakerId()));
+  }
 }

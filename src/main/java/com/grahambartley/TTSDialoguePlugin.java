@@ -171,7 +171,7 @@ public class TTSDialoguePlugin extends Plugin {
     VoiceSpec voice = voiceManager.resolveVoice(speaker, npcName);
     Emotion emotion = resolveLineEmotion(headAnimationId, config.enableEmotion());
     if (config.debugMode()) {
-      log.debug("Resolved emotion {} for head animation {}", emotion, headAnimationId);
+      log.info("[TTS voice] resolved emotion {} for head animation {}", emotion, headAnimationId);
     }
     audioService.speak(new SynthesisRequest(text, voice, emotion));
   }

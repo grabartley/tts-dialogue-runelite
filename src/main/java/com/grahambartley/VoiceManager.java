@@ -141,6 +141,9 @@ public class VoiceManager {
    */
   public VoiceSpec resolveVoice(String speaker, String npcName) {
     if ("player".equalsIgnoreCase(speaker)) {
+      if (config != null && config.debugMode()) {
+        log.info(buildPlayerTrace(config.playerVoice()));
+      }
       return VoiceSpec.player(playerGender());
     }
     VoiceProfile profile =
@@ -179,55 +182,126 @@ public class VoiceManager {
   /** Determines the appropriate voice for an NPC based on their race and gender. */
   public VoiceProfile getVoiceForNPC(String npcName) {
     if (npcName == null || npcName.isEmpty()) {
-      return getFallbackVoice(NPCGender.UNKNOWN);
+      VoiceProfile voice = getFallbackVoice(NPCGender.UNKNOWN);
+      traceNpc(npcName, null, null, NPCGender.UNKNOWN, "blank-name", voice);
+      return voice;
     }
 
     NPC npc = findNPCByName(npcName);
     if (npc == null) {
-      log.debug("Could not find NPC '{}' in game world, using fallback voice", npcName);
-      return getFallbackVoice(NPCGender.UNKNOWN);
+      VoiceProfile voice = getFallbackVoice(NPCGender.UNKNOWN);
+      traceNpc(npcName, null, null, NPCGender.UNKNOWN, "not-in-world", voice);
+      return voice;
     }
 
     NPCAttributes attributes = demographicAnalyzer.analyzeNPC(npc);
     if (attributes == null) {
-      log.debug("Analysis failed for NPC '{}', using fallback voice", npcName);
-      return getFallbackVoice(NPCGender.UNKNOWN);
+      VoiceProfile voice = getFallbackVoice(NPCGender.UNKNOWN);
+      traceNpc(npcName, npc.getId(), null, NPCGender.UNKNOWN, "analysis-failed", voice);
+      return voice;
     }
 
     NPCRace race = convertToNPCRace(attributes.getRace());
     NPCGender gender = convertToNPCGender(attributes.getGender());
+    boolean tableHit = "StaticTable".equals(attributes.getSource());
 
     // An unrecognised race falls back rather than silently borrowing the human voice, so the
     // fallback toggle stays meaningful.
     if (race == NPCRace.UNKNOWN) {
-      return getFallbackVoice(gender);
+      VoiceProfile voice = getFallbackVoice(gender);
+      traceNpc(npcName, npc.getId(), race, gender, tableHit ? "table-hit" : "table-miss", voice);
+      return voice;
     }
 
     VoiceProfile voice = getVoiceForRaceAndGender(race, gender);
-    log.debug(
-        "NPC '{}' (ID {}) -> Race {}, Gender {} -> {} ({}) [source {}, confidence {}]",
-        npcName,
-        npc.getId(),
-        race,
-        gender,
-        voice.getDisplayName(),
-        voice.getKokoroVoice(),
-        attributes.getSource(),
-        attributes.getConfidence());
+    traceNpc(npcName, npc.getId(), race, gender, tableHit ? "table-hit" : "table-miss", voice);
     return voice;
   }
 
-  /** Find NPC entity by name in the current game world. */
+  /**
+   * Emits a single INFO trace per dialogue line when Debug Mode is on, silent otherwise. The line
+   * exposes the whole resolution path (world hit/id, table hit/miss, resolved race/gender + source,
+   * final voice + Kokoro speaker id) so a user can pinpoint exactly where a voice came from in
+   * their normal client log, with no {@code --debug} flag.
+   */
+  private void traceNpc(
+      String npcName,
+      Integer npcId,
+      NPCRace race,
+      NPCGender gender,
+      String source,
+      VoiceProfile voice) {
+    if (config == null || !config.debugMode()) {
+      return;
+    }
+    log.info(buildNpcTrace(npcName, npcId, race, gender, source, voice));
+  }
+
+  /**
+   * Builds the NPC voice-resolution trace string. Factored out (and package-private) so it is
+   * unit-testable without a live client or logger.
+   */
+  static String buildNpcTrace(
+      String npcName,
+      Integer npcId,
+      NPCRace race,
+      NPCGender gender,
+      String source,
+      VoiceProfile voice) {
+    return String.format(
+        "[TTS voice] npc='%s' world=%s race=%s gender=%s source=%s -> voice=%s (%s, speakerId=%d)",
+        npcName,
+        npcId == null ? "MISS" : "HIT(id=" + npcId + ")",
+        race == null ? "UNKNOWN" : race,
+        gender,
+        source,
+        voice.getDisplayName(),
+        voice.getKokoroVoice(),
+        voice.getSpeakerId());
+  }
+
+  /** Builds the player voice-resolution trace string. Package-private for unit testing. */
+  static String buildPlayerTrace(VoiceProfile voice) {
+    return String.format(
+        "[TTS voice] player -> voice=%s (%s, speakerId=%d)",
+        voice.getDisplayName(), voice.getKokoroVoice(), voice.getSpeakerId());
+  }
+
+  /**
+   * Find NPC entity by name in the current game world. Matching is tolerant of presentation
+   * differences between the dialogue name widget (which can carry {@code <col=...>} markup,
+   * non-breaking spaces, and casing) and the raw composition name: both sides are stripped of any
+   * {@code <...>} tags, have non-breaking spaces normalised, are trimmed, and compared
+   * case-insensitively. This stops cosmetic markup from forcing a false miss and the fallback
+   * voice.
+   */
   private NPC findNPCByName(String targetName) {
     if (client == null || client.getNpcs() == null) {
       return null;
     }
 
+    String wanted = normalizeName(targetName);
+    if (wanted.isEmpty()) {
+      return null;
+    }
+
     return client.getNpcs().stream()
         .filter(npc -> npc != null && npc.getName() != null)
-        .filter(npc -> npc.getName().equals(targetName))
+        .filter(npc -> normalizeName(npc.getName()).equalsIgnoreCase(wanted))
         .findFirst()
         .orElse(null);
+  }
+
+  /**
+   * Normalises an NPC name for tolerant matching: strips any {@code <...>} tags, converts
+   * non-breaking spaces to regular spaces, and trims. Case is handled by the caller's comparison.
+   * Package-private for unit testing.
+   */
+  static String normalizeName(String name) {
+    if (name == null) {
+      return "";
+    }
+    return name.replaceAll("<[^>]*>", "").replace(' ', ' ').trim();
   }
 
   /** Get voice profile for a known race and gender combination. */
