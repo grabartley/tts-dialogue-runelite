@@ -1,10 +1,12 @@
 package com.grahambartley.synthesis.engine;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,7 +14,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -36,13 +40,24 @@ import okhttp3.ResponseBody;
  * com.apple.quarantine} xattr on the extracted files so Gatekeeper does not block an
  * unsigned/non-notarized binary.
  *
+ * <p>A platform entry is one of two shapes, distinguished by the presence of a {@code parts} array
+ * (issue #60). A single-file entry carries {@code url}/{@code sha256} and is downloaded, verified,
+ * and extracted directly (Kokoro, and any Zonos bundle under GitHub's 2 GiB asset cap). A split
+ * entry carries an ordered {@code parts} list (each {@code url}/{@code sha256}/{@code size}) plus a
+ * combined {@code sha256} of the reassembled archive (the ~2.97 GB Zonos bundle, which exceeds the
+ * cap): each part is downloaded and verified, concatenated in order into the final {@code .zip},
+ * the combined sha256 is verified, and the same extraction path runs. The single-file path is
+ * unchanged.
+ *
  * <p>It is idempotent: a bundle already extracted with a present launcher is reused without a
  * re-download. The dev manifest ships empty urls/sha256 (a real release has not been published
  * yet); that case is treated as "no installable engine" and surfaces as {@link #install()}
  * returning {@code null}, never a crash. A platform with no manifest entry at all (e.g. Intel Mac,
  * which resolves to {@code osx-x64} but ships no bundle) is likewise treated as "no installable
- * engine" -> {@code null}, not an error. All of this is blocking I/O and is expected to run off the
- * game thread (the pipeline executor, via the backend's {@code warmUp}).
+ * engine" -> {@code null}, not an error. Any missing/short/corrupt part or hash mismatch fails
+ * cleanly to {@code null} (backend unavailable) with no partial install. All of this is blocking
+ * I/O and is expected to run off the game thread (the pipeline executor, via the backend's {@code
+ * warmUp}).
  */
 @Slf4j
 public class EngineInstaller {
@@ -138,11 +153,19 @@ public class EngineInstaller {
       return null;
     }
     JsonObject entry = artifacts.getAsJsonObject(platform);
+    String launcherName = optString(entry, "launcher", null);
+    JsonArray parts =
+        entry.has("parts") && entry.get("parts").isJsonArray()
+            ? entry.getAsJsonArray("parts")
+            : null;
+    boolean split = parts != null && parts.size() > 0;
+
+    // A split entry carries the combined sha256 (of the reassembled archive); a single-file entry
+    // carries the artifact url + sha256. The launcher is required either way.
     String url = optString(entry, "url", "");
     String sha256 = optString(entry, "sha256", "");
-    String launcherName = optString(entry, "launcher", null);
 
-    if (url.isEmpty() || sha256.isEmpty() || launcherName == null) {
+    if (launcherName == null || sha256.isEmpty() || (!split && url.isEmpty())) {
       // Dev manifest placeholder: no release published yet. Not an error, just "nothing to
       // install".
       log.info(
@@ -165,7 +188,11 @@ public class EngineInstaller {
       Files.createDirectories(installDir);
       Path archive = Files.createTempFile(enginesRoot, engine + "-" + version, ".zip");
       try {
-        download(url, archive);
+        if (split) {
+          assembleParts(parts, archive);
+        } else {
+          download(url, archive);
+        }
         verifySha256(archive, sha256);
         extractZip(archive, installDir);
       } finally {
@@ -228,6 +255,57 @@ public class EngineInstaller {
       }
     }
     log.info("Engine bundle download complete");
+  }
+
+  /**
+   * Downloads each split part via the injected client, verifies its sha256, and concatenates the
+   * parts IN ORDER into {@code archive} (streamed, so the ~2.97 GB reassembled bundle never sits in
+   * memory). Each part is fetched to a sibling temp file, hash-checked, appended, then deleted, so
+   * a failure mid-way leaves no large stray files. Any missing field, failed download, or per-part
+   * hash mismatch throws {@link IOException}; the caller turns that into a clean {@code null}
+   * (backend unavailable) and deletes the partial archive. The combined sha256 is verified by the
+   * caller after assembly.
+   */
+  private void assembleParts(JsonArray parts, Path archive) throws IOException {
+    log.info("Downloading external engine bundle in {} part(s) (one time)", parts.size());
+    List<Path> tempParts = new ArrayList<>();
+    // The archive temp file was just created (empty); newOutputStream truncates by default.
+    try (OutputStream out = Files.newOutputStream(archive)) {
+      for (int i = 0; i < parts.size(); i++) {
+        if (!parts.get(i).isJsonObject()) {
+          throw new IOException("malformed engine manifest part at index " + i);
+        }
+        JsonObject part = parts.get(i).getAsJsonObject();
+        String partUrl = optString(part, "url", "");
+        String partSha = optString(part, "sha256", "");
+        if (partUrl.isEmpty() || partSha.isEmpty()) {
+          throw new IOException("engine manifest part " + i + " is missing url/sha256");
+        }
+        Path partFile = Files.createTempFile(enginesRoot, archive.getFileName() + ".part" + i, "");
+        tempParts.add(partFile);
+        download(partUrl, partFile);
+        verifySha256(partFile, partSha);
+        try (InputStream in = Files.newInputStream(partFile)) {
+          byte[] buffer = new byte[64 * 1024];
+          int read;
+          while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+          }
+        }
+        Files.deleteIfExists(partFile);
+        tempParts.remove(partFile);
+      }
+    } finally {
+      // Best-effort cleanup of any part temp file left behind by a mid-assembly failure.
+      for (Path p : tempParts) {
+        try {
+          Files.deleteIfExists(p);
+        } catch (IOException ignored) {
+          // leave it; the OS temp sweep will reclaim it
+        }
+      }
+    }
+    log.info("Engine bundle reassembled from {} part(s)", parts.size());
   }
 
   /** Verifies the file's sha256 hex digest against the expected value (case-insensitive). */

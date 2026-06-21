@@ -19,10 +19,27 @@ Differences from the Kokoro generator:
   without a bundle, so the committed resource keeps a stable shape (and a clean machine on an
   unsupported platform reads an empty url/sha => "nothing to install").
 
-Each per-platform input dir contains:
-  <platform>/<bundle-file>           the release artifact (.zip)
-  <platform>/<bundle-file>.sha256    its sha256 (first whitespace token used)
-  <platform>/signed                  optional marker file; presence => "signed": true
+A platform entry is emitted in one of two shapes, distinguished unambiguously by the presence of a
+``parts`` array:
+
+* Single-file (Kokoro-style, and any Zonos bundle that fits under GitHub's 2 GiB asset cap)::
+
+    {"url", "sha256", "size", "signed", "launcher"}
+
+* Split (a Zonos bundle too large for a single asset; see issue #60). The reassembled ``.zip`` is
+  uploaded as ordered ``.partNN`` files; the entry carries the ordered ``parts`` list plus the
+  combined sha256 of the reassembled archive::
+
+    {"archive", "sha256", "size", "signed", "launcher",
+     "parts": [{"url", "sha256", "size"}, ...]}
+
+  ``sha256``/``size`` describe the reassembled archive; ``archive`` is its file name. The
+  installer concatenates the parts in order, verifies each part and then the combined sha256.
+
+Each per-platform input dir contains EITHER a single ``.zip`` (single-file) OR a set of ordered
+``.partNN`` files (split), with a ``.sha256`` sidecar per uploaded file (first whitespace token
+used). For a split bundle the combined ``<archive>.zip.sha256`` is also present (the sha256 of the
+reassembled archive). A ``signed`` marker file => ``"signed": true``.
 
 Usage:
   generate_zonos_manifest.py \
@@ -34,10 +51,15 @@ Usage:
 import argparse
 import json
 import os
+import re
 import sys
 
 # The committed resource keeps all four keys; Zonos only populates the CUDA-capable ones.
 ALL_PLATFORMS = ["osx-aarch64", "osx-x64", "linux-x64", "win-x64"]
+
+# Ordered split parts are named "<archive>.zip.part00", ".part01", ...; capture the archive name
+# (everything up to and including ".zip") and the numeric ordinal so parts sort deterministically.
+PART_RE = re.compile(r"^(?P<archive>.+\.zip)\.part(?P<ordinal>\d+)$")
 
 
 def launcher_for(platform):
@@ -59,14 +81,65 @@ def read_sha256(path):
         return f.read().strip().split()[0]
 
 
+def url_for(repo, version, name):
+    return "https://github.com/{}/releases/download/{}/{}".format(repo, version, name)
+
+
+def find_parts(platform_dir):
+    """Return the ordered list of (ordinal, name) split parts in a dir, or [] if not a split bundle.
+
+    Parts are matched by the ``<archive>.zip.partNN`` pattern and sorted by their numeric ordinal so
+    the manifest lists them in reassembly order regardless of filesystem listing order.
+    """
+    found = []
+    for name in os.listdir(platform_dir):
+        m = PART_RE.match(name)
+        if m and os.path.isfile(os.path.join(platform_dir, name)):
+            found.append((int(m.group("ordinal")), name, m.group("archive")))
+    found.sort(key=lambda t: t[0])
+    return found
+
+
 def find_bundle(platform_dir):
     for name in sorted(os.listdir(platform_dir)):
-        if name.endswith(".sha256") or name == "signed":
+        if name.endswith(".sha256") or name == "signed" or PART_RE.match(name):
             continue
         full = os.path.join(platform_dir, name)
         if os.path.isfile(full):
             return name, full
     raise FileNotFoundError("No bundle file found in {}".format(platform_dir))
+
+
+def split_entry(platform, platform_dir, repo, version, parts, signed):
+    """Build a split platform entry from the ordered parts plus the combined archive sha256.
+
+    ``parts`` is the list returned by :func:`find_parts`. The archive name is taken from the first
+    part (all parts share it); the combined sha256 is read from ``<archive>.sha256`` and the
+    reassembled size is the sum of the part sizes.
+    """
+    archive = parts[0][2]
+    combined_sha = read_sha256(os.path.join(platform_dir, archive + ".sha256"))
+    part_entries = []
+    total_size = 0
+    for _ordinal, name, _archive in parts:
+        part_path = os.path.join(platform_dir, name)
+        size = os.path.getsize(part_path)
+        total_size += size
+        part_entries.append(
+            {
+                "url": url_for(repo, version, name),
+                "sha256": read_sha256(part_path + ".sha256"),
+                "size": size,
+            }
+        )
+    return {
+        "archive": archive,
+        "sha256": combined_sha,
+        "size": total_size,
+        "signed": signed,
+        "launcher": launcher_for(platform),
+        "parts": part_entries,
+    }
 
 
 def main():
@@ -85,18 +158,23 @@ def main():
             # Keep a stable, empty placeholder for platforms with no Zonos bundle (e.g. macOS).
             artifacts[platform] = empty_entry(platform)
             continue
-        bundle_name, bundle_path = find_bundle(pdir)
-        sha = read_sha256(bundle_path + ".sha256")
-        url = "https://github.com/{}/releases/download/{}/{}".format(
-            args.repo, args.version, bundle_name
-        )
-        artifacts[platform] = {
-            "url": url,
-            "sha256": sha,
-            "size": os.path.getsize(bundle_path),
-            "signed": os.path.isfile(os.path.join(pdir, "signed")),
-            "launcher": launcher_for(platform),
-        }
+        signed = os.path.isfile(os.path.join(pdir, "signed"))
+        parts = find_parts(pdir)
+        if parts:
+            # Split bundle (issue #60): the .zip exceeded the 2 GiB asset cap and was uploaded as
+            # ordered .partNN files. Emit the parts list + combined archive sha256.
+            artifacts[platform] = split_entry(
+                platform, pdir, args.repo, args.version, parts, signed
+            )
+        else:
+            bundle_name, bundle_path = find_bundle(pdir)
+            artifacts[platform] = {
+                "url": url_for(args.repo, args.version, bundle_name),
+                "sha256": read_sha256(bundle_path + ".sha256"),
+                "size": os.path.getsize(bundle_path),
+                "signed": signed,
+                "launcher": launcher_for(platform),
+            }
         built += 1
 
     manifest = {

@@ -134,6 +134,28 @@ jobs:
           test -f "$OUT"/*.zip
           test -f "$OUT"/*.zip.sha256
 
+      - name: Split bundle into sub-2GiB release parts
+        shell: bash
+        run: |
+          set -euo pipefail
+          # GitHub caps release assets at 2 GiB/file; the self-contained Zonos bundle is ~2.97 GB, so
+          # a single-.zip upload returns HTTP 422 (issue #60). Split the .zip into ordered parts well
+          # under the cap (1900 MiB leaves comfortable margin) and keep the combined .zip.sha256
+          # already written by build_bundle.py (it hashes the reassembled archive). Then checksum
+          # each part and drop the original .zip so only the parts + sidecars are uploaded.
+          OUT="engine-zonos/dist/${{ matrix.platform }}"
+          ZIP=$(ls "$OUT"/*.zip)
+          # Deterministic two-digit ordinals: <bundle>.zip.part00, .part01, ... in reassembly order.
+          split -b 1900m -d -a 2 "$ZIP" "${ZIP}.part"
+          for PART in "${ZIP}".part*; do
+            sha256sum "$PART" | awk '{print $1}' > "${PART}.sha256"
+          done
+          rm -f "$ZIP"
+          echo "Split $(basename "$ZIP") into:"
+          ls -la "$OUT"
+          # Fail loud if no part00 was produced (e.g. an empty/missing zip).
+          test -f "${ZIP}.part00"
+
       - name: Upload target artifact
         uses: actions/upload-artifact@v4
         with:
@@ -195,13 +217,17 @@ jobs:
               --notes "Self-contained Zonos GPU TTS engine bundle (embedded Python + PyTorch CUDA + Zonos + weights). Needs only an NVIDIA driver. See zonos-engine-manifest.json for per-OS sha256." \
               ${{ inputs.prerelease && '--prerelease' || '' }}
           fi
-          # Upload each bundle + its sha256. A per-file loop (not find -exec) so any failed upload
-          # fails the step: find -exec swallows the per-file exit code, which previously let an
-          # oversize bundle (HTTP 422) report SUCCESS while the asset was missing.
+          # Upload each bundle part + every sha256 sidecar. A split bundle (issue #60) lands as
+          # ordered <bundle>.zip.partNN files plus per-part .sha256 and the combined <bundle>.zip
+          # .sha256; a single-file bundle (if ever under the cap) lands as <bundle>.zip + .sha256.
+          # Matching '*.zip', '*.part*', and '*.sha256' covers all three. A per-file loop (not
+          # find -exec) so any failed upload fails the step: find -exec swallows the per-file exit
+          # code, which previously let an oversize bundle (HTTP 422) report SUCCESS while the asset
+          # was missing.
           while IFS= read -r -d '' f; do
             gh release upload "$TAG" "$f" --clobber \
               || { echo "::error::release asset upload failed for $f"; exit 1; }
-          done < <(find release-artifacts -type f \( -name '*.zip' -o -name '*.sha256' \) -print0)
+          done < <(find release-artifacts -type f \( -name '*.zip' -o -name '*.part*' -o -name '*.sha256' \) -print0)
 
       - name: Commit refreshed manifest
         env:
