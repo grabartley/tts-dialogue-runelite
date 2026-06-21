@@ -31,7 +31,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import okhttp3.OkHttpClient;
 
 @Slf4j
-@PluginDescriptor(name = "TTSDialogue")
+@PluginDescriptor(name = "Voiced Dialogue")
 public class TTSDialoguePlugin extends Plugin {
 
   /** Cache enough recent lines that loops of NPC chatter replay instantly without re-synthesis. */
