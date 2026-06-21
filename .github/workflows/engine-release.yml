@@ -110,7 +110,9 @@ jobs:
           set -euo pipefail
           IMG="engine/build/engine-image"
           if [ "${{ matrix.platform }}" = "win-x64" ]; then
-            cmd //c "$IMG\\kokoro-engine.bat --selftest"
+            # cmd.exe can't take a forward-slash relative path (it parses `/build` as a switch), so
+            # resolve the launcher to an absolute Windows path with cygpath before handing it to cmd.
+            cmd //c "$(cygpath -w "$IMG/kokoro-engine.bat") --selftest"
           else
             chmod +x "$IMG/kokoro-engine"
             "$IMG/kokoro-engine" --selftest

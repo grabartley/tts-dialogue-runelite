@@ -51,6 +51,22 @@ if HERE not in sys.path:
 
 import voice_sources  # noqa: E402
 
+
+def launcher_command(launcher: str, *args: str) -> list:
+    """Build the argv to spawn ``launcher`` with ``args``, handling Windows batch launchers.
+
+    On Windows the bundled Kokoro launcher is a ``.bat`` (``kokoro-engine.bat``). Python's
+    ``subprocess`` calls ``CreateProcess``, which cannot directly execute a ``.bat``/``.cmd`` the way
+    it runs a unix binary: a batch file must be run through the command interpreter. So for a batch
+    launcher we wrap it in ``cmd /c <abs-path> <args...>``; for a unix launcher (no batch suffix) we
+    spawn it directly exactly as before. ``launcher`` should already be an absolute path.
+    """
+    if launcher.lower().endswith((".bat", ".cmd")):
+        comspec = os.environ.get("COMSPEC", "cmd.exe")
+        return [comspec, "/c", launcher, *args]
+    return [launcher, *args]
+
+
 # A neutral, content-light phrase a few seconds long. It carries no race/gender/emotion cues of its
 # own (those come from the Kokoro speaker), giving Zonos a clean, representative embedding. The same
 # phrase is used for every voice so clips differ only by speaker, not by content.
@@ -137,7 +153,7 @@ def generate(launcher: str, out_dir: str, phrase: str) -> int:
     voice_ids = voice_sources.all_voice_ids()
 
     proc = subprocess.Popen(
-        [launcher, "--stdio"],
+        launcher_command(launcher, "--stdio"),
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=None,  # let engine logs flow to this process's stderr
