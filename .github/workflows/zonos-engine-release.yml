@@ -170,6 +170,7 @@ jobs:
           ls -R .
 
       - name: Generate zonos-engine-manifest.json
+        shell: bash
         run: |
           python3 engine-zonos/packaging/generate_zonos_manifest.py \
             --version "${{ inputs.version }}" \

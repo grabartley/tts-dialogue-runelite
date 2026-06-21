@@ -60,7 +60,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Stage engine image (jars + native libs + licenses)
-        run: ./gradlew :engine:engineImage -PtargetPlatform=${{ matrix.platform }} -PengineVersion=${{ inputs.version }}
+        shell: bash
+        run: ./gradlew :engine:engineImage -PtargetPlatform="${{ matrix.platform }}" -PengineVersion="${{ inputs.version }}"
 
       - name: Download and extract the Kokoro model
         shell: bash
@@ -276,6 +277,7 @@ jobs:
           ls -R .
 
       - name: Generate engine-manifest.json
+        shell: bash
         run: |
           python3 engine/scripts/generate_manifest.py \
             --version "${{ inputs.version }}" \
