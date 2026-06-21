@@ -184,12 +184,11 @@ class ZonosSynthesizer(Synthesizer):
         the default voice if the specific reference clip is missing from the bundle."""
         if voice_id in self._speaker_cache:
             return self._speaker_cache[voice_id]
-        import torchaudio  # type: ignore  # noqa: WPS433
-        from zonos.model import Zonos  # type: ignore  # noqa: WPS433  (kept for symmetry)
-
-        path = voices.embedding_path_for(self._bundle_root, voice_id)
         import os
 
+        import torchaudio  # type: ignore  # noqa: WPS433
+
+        path = voices.embedding_path_for(self._bundle_root, voice_id)
         if not os.path.isfile(path):
             path = voices.embedding_path_for(self._bundle_root, voices.DEFAULT_VOICE)
         wav, sr = torchaudio.load(path)
