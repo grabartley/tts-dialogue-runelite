@@ -12,3 +12,13 @@ nbproject/
 .claude/worktrees/
 .claude/tmp/
 .claude/settings.local.json
+
+# Zonos engine (engine-zonos/) build + packaging outputs and large/local-only assets. These are
+# produced by the manual zonos-engine-release workflow on the CI runner, never committed.
+__pycache__/
+*.pyc
+engine-zonos/dist/
+engine-zonos/model/
+# Reference-voice clips are audio assets staged by the release workflow; keep the directory's
+# ATTRIBUTION.md but not the .wav clips themselves.
+engine-zonos/voices/*.wav

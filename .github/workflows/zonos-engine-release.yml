@@ -1,0 +1,179 @@
+name: Zonos Engine Release
+
+# MANUAL ONLY. This pipeline builds, checksums, and publishes the self-contained Zonos GPU engine
+# bundle(s) to a GitHub Release, then regenerates zonos-engine-manifest.json. It is never triggered
+# automatically: there is deliberately no `on: push` / tag trigger, mirroring engine-release.yml. A
+# maintainer runs it from the Actions tab ("Run workflow") and supplies the version tag.
+#
+# IMPORTANT: PACKAGING NEEDS NO GPU. The bundle is assembled (PyInstaller freeze of an embedded
+# Python + the PyTorch CUDA wheels + Zonos + weights) on a standard windows-latest runner. Only
+# RUNNING the bundle's real synthesis needs an NVIDIA GPU, which is the end user's machine (or a
+# maintainer's GPU box via the --selftest runbook in docs/engine-pipeline.md). So CI cannot run the
+# real --selftest; it validates the wire framing with the torch-free mock instead.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag for the Zonos engine bundle (e.g. v0.1.0)"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark the GitHub Release as a pre-release"
+        required: false
+        default: true
+        type: boolean
+      zonos_ref:
+        description: "Zonos upstream git ref (sha or tag) to pin for a reproducible bundle"
+        required: false
+        default: "main"
+        type: string
+      torch_index:
+        description: "PyTorch CUDA wheel index URL"
+        required: false
+        default: "https://download.pytorch.org/whl/cu124"
+        type: string
+      skip_weights:
+        description: "Build a smaller bundle that fetches weights on first run instead of embedding"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  # One job per CUDA-capable target. Windows x64 is the primary gaming-PC target for v1; linux-x64 is
+  # wired here behind a flag for a later follow-up. macOS is intentionally absent: Zonos targets
+  # CUDA/NVIDIA, so there is no Apple-GPU bundle and the plugin correctly falls back to Kokoro there.
+  build:
+    name: Build ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: win-x64
+            os: windows-latest
+          # - platform: linux-x64
+          #   os: ubuntu-latest   # uncomment to also ship the Linux x64 (NVIDIA) bundle
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Stage reference-voice bank
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The reference clips are audio assets kept out of source control. A real release stages
+          # them into engine-zonos/voices/ here (e.g. from a secret-pinned source or a release
+          # asset). Until that source is wired, the build asserts the bank is complete and fails
+          # loudly rather than shipping a bundle that cannot voice every race/gender.
+          ls engine-zonos/voices/
+          echo "NOTE: build_bundle.py asserts every required <id>.wav is present and fails if not."
+
+      - name: Build self-contained Zonos bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARGS="--platform ${{ matrix.platform }} --version ${{ inputs.version }}"
+          ARGS="$ARGS --zonos-ref ${{ inputs.zonos_ref }} --torch-index ${{ inputs.torch_index }}"
+          if [ "${{ inputs.skip_weights }}" = "true" ]; then ARGS="$ARGS --skip-weights"; fi
+          python engine-zonos/packaging/build_bundle.py $ARGS
+
+      - name: Verify bundle checksum exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="engine-zonos/dist/${{ matrix.platform }}"
+          ls -la "$OUT"
+          test -f "$OUT"/*.zip
+          test -f "$OUT"/*.zip.sha256
+
+      - name: Upload target artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zonos-engine-${{ matrix.platform }}
+          path: engine-zonos/dist/${{ matrix.platform }}/*
+
+  # Gather every built target, generate the Zonos manifest, publish the Release, and open an auto-PR
+  # to commit the refreshed manifest so the plugin resource matches the published bundles.
+  publish:
+    name: Publish release + manifest
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download all target artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Normalise artifact layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release-artifacts
+          for d in zonos-engine-*; do
+            mv "$d" "${d#zonos-engine-}"
+          done
+          ls -R .
+
+      - name: Generate zonos-engine-manifest.json
+        run: |
+          python3 engine-zonos/packaging/generate_zonos_manifest.py \
+            --version "${{ inputs.version }}" \
+            --repo "${{ github.repository }}" \
+            --artifacts-dir release-artifacts \
+            --out src/main/resources/zonos-engine-manifest.json
+          cat src/main/resources/zonos-engine-manifest.json
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="zonos-${{ inputs.version }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release exists, refreshing assets"
+          else
+            gh release create "$TAG" \
+              --title "Zonos GPU engine ${{ inputs.version }}" \
+              --notes "Self-contained Zonos GPU TTS engine bundle (embedded Python + PyTorch CUDA + Zonos + weights). Needs only an NVIDIA driver. See zonos-engine-manifest.json for per-OS sha256." \
+              ${{ inputs.prerelease && '--prerelease' || '' }}
+          fi
+          find release-artifacts -type f \( -name '*.zip' -o -name '*.sha256' \) \
+            -exec gh release upload "$TAG" {} --clobber \;
+
+      - name: Commit refreshed manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet src/main/resources/zonos-engine-manifest.json; then
+            echo "Manifest unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="zonos-engine-manifest/${{ inputs.version }}"
+          git checkout -b "$BRANCH"
+          git add src/main/resources/zonos-engine-manifest.json
+          git commit -m "chore: update zonos-engine-manifest.json for ${{ inputs.version }}"
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: zonos-engine-manifest.json for ${{ inputs.version }}" \
+            --body "Auto-generated by the zonos-engine-release workflow so the bundled manifest matches the published Zonos bundles for ${{ inputs.version }}." || true
