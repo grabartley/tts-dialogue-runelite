@@ -19,7 +19,11 @@ block_cipher = None
 
 # Repo paths are relative to the engine-zonos dir PyInstaller is invoked from.
 HERE = os.path.abspath(os.getcwd())
-ENTRY = os.path.join(HERE, "zonos_engine", "engine.py")
+# Freeze the top-level runner, NOT zonos_engine/engine.py directly: PyInstaller runs the entry as
+# __main__ with no package context, so freezing engine.py directly breaks its package-relative
+# imports ("attempted relative import with no known parent package"). zonos_engine_cli.py imports
+# the package by absolute name, so the package's internal relative imports resolve in the bundle.
+ENTRY = os.path.join(HERE, "zonos_engine_cli.py")
 
 # Collect the data/metadata torch + zonos + phonemizer need at runtime. These hidden imports and
 # collected packages are what make the frozen exe actually self-contained.
