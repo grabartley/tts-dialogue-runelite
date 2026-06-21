@@ -28,8 +28,8 @@ import okhttp3.ResponseBody;
  * ExternalEngineClient} launches.
  *
  * <p>It reads the bundled {@code /engine-manifest.json} resource (produced by issue #36) with the
- * injected {@link Gson}, resolves the current OS/arch to one of the four platform ids ({@code
- * osx-aarch64 | osx-x64 | linux-x64 | win-x64}), downloads that artifact from its manifest {@code
+ * injected {@link Gson}, resolves the current OS/arch to a platform id ({@code osx-aarch64 |
+ * linux-x64 | win-x64} are the built targets), downloads that artifact from its manifest {@code
  * url} with the injected {@link OkHttpClient} (Hub rule: never {@code new OkHttpClient()}),
  * verifies its sha256 against the manifest, and extracts it under {@code
  * ~/.runelite/tts-dialogue/engines/<engine>-<version>/}. On macOS it clears the {@code
@@ -39,7 +39,9 @@ import okhttp3.ResponseBody;
  * <p>It is idempotent: a bundle already extracted with a present launcher is reused without a
  * re-download. The dev manifest ships empty urls/sha256 (a real release has not been published
  * yet); that case is treated as "no installable engine" and surfaces as {@link #install()}
- * returning {@code null}, never a crash. All of this is blocking I/O and is expected to run off the
+ * returning {@code null}, never a crash. A platform with no manifest entry at all (e.g. Intel Mac,
+ * which resolves to {@code osx-x64} but ships no bundle) is likewise treated as "no installable
+ * engine" -> {@code null}, not an error. All of this is blocking I/O and is expected to run off the
  * game thread (the pipeline executor, via the backend's {@code warmUp}).
  */
 @Slf4j
@@ -336,6 +338,8 @@ public class EngineInstaller {
     boolean aarch64 = arch.contains("aarch64") || arch.contains("arm64") || arch.contains("arm");
     boolean x64 = arch.contains("amd64") || arch.contains("x86_64") || arch.equals("x64");
     if (os.contains("mac") || os.contains("darwin") || os.contains("osx")) {
+      // Intel Mac still resolves to osx-x64, but no osx-x64 bundle is built; install() then finds
+      // no manifest entry for it and degrades to "no engine" (null) rather than crashing.
       return aarch64 ? "osx-aarch64" : "osx-x64";
     }
     if (os.contains("win")) {

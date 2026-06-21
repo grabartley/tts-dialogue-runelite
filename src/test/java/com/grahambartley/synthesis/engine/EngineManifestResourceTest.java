@@ -18,14 +18,14 @@ import org.junit.Test;
  *
  * <p>The release workflow regenerates this resource so its URLs and checksums match the published
  * artifacts; the dev copy in the repo carries empty values. This test pins the contract every
- * version must satisfy: a top-level engine/version, and a per-platform entry for each of the four
+ * version must satisfy: a top-level engine/version, and a per-platform entry for each of the three
  * supported targets carrying a download URL, sha256, and launcher name. Keeping the shape under
  * test lets #32 code against it without re-deriving the schema.
  */
 public class EngineManifestResourceTest {
 
   private static final String RESOURCE = "/engine-manifest.json";
-  private static final String[] PLATFORMS = {"osx-aarch64", "osx-x64", "linux-x64", "win-x64"};
+  private static final String[] PLATFORMS = {"osx-aarch64", "linux-x64", "win-x64"};
 
   @Test
   public void manifestResourceIsPresentAndWellShaped() throws Exception {

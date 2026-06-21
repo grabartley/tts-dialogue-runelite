@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate engine-manifest.json from a set of built+checksummed engine bundles.
 
-This is run by the manual release workflow (issue #36) after all four target bundles have been
+This is run by the manual release workflow (issue #36) after the target bundles have been
 built, checksummed, and uploaded to a GitHub Release. It produces the small JSON resource the
 plugin's EngineInstaller (#32) reads via getResourceAsStream to resolve the per-OS/arch download
 URL, verify the sha256, and pin the version. The shape is intentionally flat and stable so #32 can
@@ -12,7 +12,10 @@ Each per-platform input is a directory containing:
   <platform>/<bundle-file>.sha256    its sha256 (first whitespace-delimited token used)
   <platform>/signed                  optional marker file; presence => "signed": true
 
-Platform ids: osx-aarch64, osx-x64, linux-x64, win-x64.
+Platform ids: osx-aarch64, linux-x64, win-x64.
+
+Only platforms with a present artifacts directory are emitted, so the manifest always matches the
+set of bundles the release workflow actually built.
 
 Usage:
   generate_manifest.py \
@@ -26,7 +29,7 @@ import json
 import os
 import sys
 
-PLATFORMS = ["osx-aarch64", "osx-x64", "linux-x64", "win-x64"]
+PLATFORMS = ["osx-aarch64", "linux-x64", "win-x64"]
 
 
 def launcher_for(platform):

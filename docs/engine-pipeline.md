@@ -36,14 +36,13 @@ These are two distinct workflows with non-overlapping responsibilities.
 ### `engine-release.yml` — the manual release (build bundles + sign + publish)
 
 - Trigger: `on: workflow_dispatch` **only**. There is intentionally no `push`/tag trigger. Inputs are a `version` tag string (e.g. `v1.0.0`) and a `prerelease` boolean flag (defaults to `true`).
-- A matrix `build` job produces the four Kokoro bundles, each on a runner matching its OS/arch so the jlink runtime and native libs are native to the target:
+- A matrix `build` job produces the three Kokoro bundles, each on a runner matching its OS/arch so the jlink runtime and native libs are native to the target:
 
   | Target | Runner | Archive |
   |--------|--------|---------|
   | `linux-x64` | `ubuntu-latest` | `.tar.gz` |
   | `win-x64` | `windows-latest` | `.zip` |
   | `osx-aarch64` | `macos-14` | `.tar.gz` |
-  | `osx-x64` | `macos-13` | `.tar.gz` |
 
   Each bundle carries the engine application jar, the per-target sherpa-onnx native libraries, a self-contained `jlink` Java runtime (so end users need no JDK), the Kokoro model (`kokoro-multi-lang-v1_0`, downloaded from the sherpa-onnx model release and normalized to a `model/` dir), and the Apache-2.0 attribution files under `licenses/`.
 - Per-target validation runs before any signing: the `--stdio` conformance test runs on the Linux bundle (`EngineConformanceTest`, asserting the full frame round-trips on a real built engine), and every target runs a native `--selftest` (synthesize a fixed phrase, report sample rate + sample count). Self-test runs before signing so a self-test failure fast-fails cheaply and a signed bundle always implies "passed self-test".
@@ -64,7 +63,7 @@ The Zonos GPU engine has its own manual release workflow, mirroring the Kokoro o
 
 ## The manifest is the glue
 
-The plugin jar ships tiny: no engine binary, no voice model. `src/main/resources/engine-manifest.json` is the small JSON resource that binds the jar to a published engine release. Its shape is flat and stable: a `version`, an `engine` name, and an `artifacts` map keyed by platform id (`osx-aarch64`, `osx-x64`, `linux-x64`, `win-x64`), each entry carrying `url`, `sha256`, `size`, `signed`, and `launcher`.
+The plugin jar ships tiny: no engine binary, no voice model. `src/main/resources/engine-manifest.json` is the small JSON resource that binds the jar to a published engine release. Its shape is flat and stable: a `version`, an `engine` name, and an `artifacts` map keyed by platform id (`osx-aarch64`, `linux-x64`, `win-x64`), each entry carrying `url`, `sha256`, `size`, `signed`, and `launcher`.
 
 At runtime `EngineInstaller` (`src/main/java/com/grahambartley/synthesis/engine/EngineInstaller.java`) reads the bundled manifest via `getResourceAsStream`, resolves the entry for the current OS/arch, downloads that bundle from its `url`, verifies the `sha256` against the manifest, and extracts it under `~/.runelite/tts-dialogue/engines/<engine>-<version>/`. On macOS it then clears the `com.apple.quarantine` extended attribute on the extracted files so Gatekeeper does not block an unsigned engine. The plugin runs the extracted launcher as the external `--stdio` process and reuses it on later runs.
 
@@ -76,7 +75,7 @@ The same installer also resolves a second engine through `zonos-engine-manifest.
 
 Releases are **never automatic**. Cut one in this order:
 
-1. **Dispatch `engine-release.yml`** from the Actions tab ("Engine Release" -> "Run workflow"), supplying the `version` tag and the `prerelease` flag. It builds and validates all four Kokoro bundles, signs them if secrets are present, publishes the GitHub Release, regenerates `engine-manifest.json`, and opens an auto-PR with the updated manifest.
+1. **Dispatch `engine-release.yml`** from the Actions tab ("Engine Release" -> "Run workflow"), supplying the `version` tag and the `prerelease` flag. It builds and validates the three Kokoro bundles, signs them if secrets are present, publishes the GitHub Release, regenerates `engine-manifest.json`, and opens an auto-PR with the updated manifest.
 2. **Merge the manifest auto-PR** so the bundled manifest in the plugin points at the real, published engine bundles (real `url` + `sha256` per platform) instead of the dev placeholders.
 3. **Submit/update the plugin in `runelite/plugin-hub`** at the tagged commit (see issue #31) so the Hub builds the jar from source at that commit and serves it. The jar is published by the Hub, not by this repo.
 4. **Users install from the Hub.** On first use of the local voice, the jar reads the merged manifest, downloads the per-OS engine bundle from the Release, verifies its sha256, and runs it.

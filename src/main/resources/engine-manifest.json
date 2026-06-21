@@ -11,13 +11,6 @@
       "signed": false,
       "launcher": "kokoro-engine"
     },
-    "osx-x64": {
-      "url": "",
-      "sha256": "",
-      "size": 0,
-      "signed": false,
-      "launcher": "kokoro-engine"
-    },
     "linux-x64": {
       "url": "",
       "sha256": "",
