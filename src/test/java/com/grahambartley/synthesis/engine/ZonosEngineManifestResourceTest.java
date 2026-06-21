@@ -30,10 +30,10 @@ public class ZonosEngineManifestResourceTest {
     assertEquals(1, root.get("schemaVersion").getAsInt());
     assertNotNull("version field is required", root.get("version"));
 
+    // The committed copy may be the dev placeholder (0.0.0-dev) or a real release tag
+    // (e.g. zonos-v0.1.0) once the release workflow regenerates it; either is valid.
     String version = root.get("version").getAsString();
-    assertTrue(
-        "dev manifest version must be a 0.x placeholder, was: " + version,
-        version.startsWith("0."));
+    assertTrue("version must not be blank, was: " + version, !version.trim().isEmpty());
 
     JsonObject artifacts = root.getAsJsonObject("artifacts");
     assertNotNull("artifacts object is required", artifacts);
