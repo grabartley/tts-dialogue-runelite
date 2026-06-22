@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "engine": "zonos",
-  "version": "v0.1.1",
+  "version": "v0.1.2",
   "warning": null,
   "artifacts": {
     "osx-aarch64": {
@@ -26,21 +26,21 @@
       "launcher": "zonos-engine"
     },
     "win-x64": {
-      "archive": "zonos-engine-v0.1.1-win-x64.zip",
-      "sha256": "70de23221e74b055ac23894a097b7611962eaa333957b6d905019b689fce98dc",
-      "size": 3041041327,
+      "archive": "zonos-engine-v0.1.2-win-x64.zip",
+      "sha256": "45f994513234b9514a9262e82f645378ae7ef721a42c1f1ab9158afe0f3889f7",
+      "size": 3038603328,
       "signed": false,
       "launcher": "zonos-engine.bat",
       "parts": [
         {
-          "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/zonos-v0.1.1/zonos-engine-v0.1.1-win-x64.zip.part00",
-          "sha256": "9721584285c1e498be6dfb4cf19a91b7903a91bfcea4e65c3f333e32a1ad38dc",
+          "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/zonos-v0.1.2/zonos-engine-v0.1.2-win-x64.zip.part00",
+          "sha256": "42fe548f27f8219bd53016eae687631390ddf63e3c31c31b6ced08a8b9d8abad",
           "size": 1992294400
         },
         {
-          "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/zonos-v0.1.1/zonos-engine-v0.1.1-win-x64.zip.part01",
-          "sha256": "acfb5a386d5a409ca092ec0ffe985c10cb658964489a9a593887e33d29869024",
-          "size": 1048746927
+          "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/zonos-v0.1.2/zonos-engine-v0.1.2-win-x64.zip.part01",
+          "sha256": "0c00f35ca88d3cdca9430a7b5bb15a55c39909111f1163f8069747a594e7ccc4",
+          "size": 1046308928
         }
       ]
     }
