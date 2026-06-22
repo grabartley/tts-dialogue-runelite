@@ -26,6 +26,7 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.RuneLite;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import okhttp3.OkHttpClient;
@@ -39,6 +40,22 @@ public class TTSDialoguePlugin extends Plugin {
 
   /** Tiny backlog so a burst of dialogue ticks never blocks the game thread on enqueue. */
   private static final int QUEUE_CAPACITY = 4;
+
+  /**
+   * The {@code @ConfigGroup} value of {@link TTSDialogueConfig}. {@link ConfigChanged} events for
+   * any other group are ignored.
+   */
+  static final String CONFIG_GROUP = "ttsDialogue";
+
+  /**
+   * Config keys that change which backend is selected or whether it can become available. Changing
+   * any of these at runtime must re-run the active backend's off-thread install/spawn/handshake so
+   * a newly selected GPU/cloud backend warms up instead of pre-emptively falling back to local
+   * Kokoro. {@code voiceBackend} switches the selection; {@code azureKey}/{@code azureRegion} let a
+   * previously-unavailable Cloud selection become available once credentials are entered.
+   */
+  private static final java.util.Set<String> WARM_TRIGGER_KEYS =
+      java.util.Set.of("voiceBackend", "azureKey", "azureRegion");
 
   @Inject private Client client;
 
@@ -265,6 +282,43 @@ public class TTSDialoguePlugin extends Plugin {
       }
       lastSpoken = "";
     }
+  }
+
+  /**
+   * Warms up the newly selected backend off the game thread when a backend-affecting config key
+   * changes at runtime, so switching Voice Backend (or entering Azure credentials) installs /
+   * spawns / handshakes the engine immediately instead of silently falling back to local Kokoro
+   * until the next client restart.
+   *
+   * <p>The decision of <em>whether</em> a given event should warm lives in the pure, unit-testable
+   * {@link #affectsBackendWarmUp} so it can be verified without RuneLite injection. The actual work
+   * runs on the pipeline thread via {@link DialogueAudioService#prewarm}, the same hook {@link
+   * #startUp} uses, so neither the game thread nor the config-dispatch thread blocks. No-ops safely
+   * when the plugin is disabled or mid-shutdown ({@code audioService}/{@code backendProvider}
+   * null). Re-running {@code warmUpActive} is idempotent: each backend's {@code warmUp} guards
+   * itself, so an already-failed backend is not re-attempted within the session.
+   */
+  @Subscribe
+  public void onConfigChanged(ConfigChanged event) {
+    if (!affectsBackendWarmUp(event.getGroup(), event.getKey())) {
+      return;
+    }
+    if (audioService == null || backendProvider == null) {
+      return;
+    }
+    audioService.prewarm(backendProvider::warmUpActive);
+  }
+
+  /**
+   * Pure decision logic for {@link #onConfigChanged}: returns {@code true} only when a changed
+   * config entry belongs to this plugin's group ({@link #CONFIG_GROUP}) and its key affects backend
+   * selection or availability ({@link #WARM_TRIGGER_KEYS}). Factored out so the warm-up trigger is
+   * testable without RuneLite injection. Never throws; tolerates {@code null} group/key.
+   */
+  static boolean affectsBackendWarmUp(String group, String key) {
+    // key != null first: WARM_TRIGGER_KEYS is an immutable Set.of(...), whose contains(null)
+    // throws.
+    return CONFIG_GROUP.equals(group) && key != null && WARM_TRIGGER_KEYS.contains(key);
   }
 
   @Provides
