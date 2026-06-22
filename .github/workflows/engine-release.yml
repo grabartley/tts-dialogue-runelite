@@ -222,7 +222,12 @@ jobs:
           mkdir -p "$OUT"
           BUNDLE="kokoro-engine-${{ inputs.version }}-${{ matrix.platform }}"
           if [ "${{ matrix.archive }}" = "zip" ]; then
-            ( cd "$IMG/.." && 7z a -tzip "$GITHUB_WORKSPACE/$OUT/$BUNDLE.zip" "engine-image/*" >/dev/null )
+            # Archive the image CONTENTS at the bundle root (cd into the image, add "*"), so the
+            # layout matches the tar.gz branch below (-C "$IMG" .). Adding "engine-image/*" from the
+            # parent instead nests everything under an engine-image/ wrapper dir, which lands the
+            # launcher at installDir/engine-image/kokoro-engine.bat and makes EngineInstaller report
+            # the launcher as missing on Windows (the macOS/Linux tar.gz bundles were unaffected).
+            ( cd "$IMG" && 7z a -tzip "$GITHUB_WORKSPACE/$OUT/$BUNDLE.zip" "*" >/dev/null )
             FILE="$OUT/$BUNDLE.zip"
           else
             tar -czf "$OUT/$BUNDLE.tar.gz" -C "$IMG" .

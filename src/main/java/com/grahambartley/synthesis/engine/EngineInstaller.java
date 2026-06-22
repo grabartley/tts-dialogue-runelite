@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -186,13 +187,13 @@ public class EngineInstaller {
     }
 
     Path installDir = enginesRoot.resolve(engine + "-" + version);
-    Path launcher = installDir.resolve(launcherName);
 
     try {
-      if (Files.isRegularFile(launcher)) {
-        log.debug("External engine already installed at {}", launcher);
-        makeExecutable(launcher);
-        return new Installed(launcher, engine, version);
+      Path existing = resolveLauncher(installDir, launcherName);
+      if (existing != null) {
+        log.debug("External engine already installed at {}", existing);
+        makeExecutable(existing);
+        return new Installed(existing, engine, version);
       }
 
       Files.createDirectories(installDir);
@@ -214,7 +215,8 @@ public class EngineInstaller {
         Files.deleteIfExists(archive);
       }
 
-      if (!Files.isRegularFile(launcher)) {
+      Path launcher = resolveLauncher(installDir, launcherName);
+      if (launcher == null) {
         log.warn(
             "Engine bundle extracted but launcher '{}' is missing under {}",
             launcherName,
@@ -230,6 +232,31 @@ public class EngineInstaller {
     } catch (IOException e) {
       log.warn("Failed to install external engine for {}: {}", platform, e.getMessage());
       return null;
+    }
+  }
+
+  /**
+   * Resolves the engine launcher inside an extracted bundle. Prefers the launcher at the install
+   * root (the tar.gz layout the macOS/Linux bundles use), and otherwise searches a shallow subtree
+   * for it. The Windows {@code .zip} bundle nests its whole tree under a single wrapper directory
+   * ({@code engine-image/}), so its launcher lands one level down; finding it there lets the
+   * already-published bundle work without a re-release. The launcher resolves its own siblings
+   * ({@code runtime/}, {@code lib/}, {@code model/}) relative to its own location, so running it
+   * from the nested directory is correct. Returns {@code null} when no launcher file is present.
+   */
+  private static Path resolveLauncher(Path installDir, String launcherName) throws IOException {
+    Path atRoot = installDir.resolve(launcherName);
+    if (Files.isRegularFile(atRoot)) {
+      return atRoot;
+    }
+    if (!Files.isDirectory(installDir)) {
+      return null;
+    }
+    try (Stream<Path> tree = Files.walk(installDir, 4)) {
+      return tree.filter(Files::isRegularFile)
+          .filter(p -> p.getFileName().toString().equals(launcherName))
+          .findFirst()
+          .orElse(null);
     }
   }
 

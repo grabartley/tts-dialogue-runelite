@@ -7,6 +7,7 @@ import com.grahambartley.synthesis.SynthesisRequest;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,10 @@ public final class DialogueAudioService {
   private final BackendProvider backends;
   private final AudioOutput output;
   private final Executor executor;
+  // Engine install/model-load runs here, NOT on the single synthesis thread, so a long bundle
+  // download (notably the multi-part Zonos engine) cannot block dialogue playback through an
+  // already-warm backend.
+  private final Executor warmExecutor;
   private final LruCache<CacheKey, Pcm> cache;
   private final DiskAudioCache diskCache;
   private final IntSupplier volume;
@@ -53,11 +58,19 @@ public final class DialogueAudioService {
       int cacheSize,
       int queueCapacity,
       IntSupplier volume) {
-    this(backends, output, diskCache, buildExecutor(queueCapacity), cacheSize, volume);
+    this(
+        backends,
+        output,
+        diskCache,
+        buildExecutor(queueCapacity),
+        buildWarmExecutor(),
+        cacheSize,
+        volume);
   }
 
   /**
    * Test seam: lets callers inject an inline executor and disk cache so behavior is deterministic.
+   * The same executor backs warm-up so tests stay single-threaded and deterministic.
    */
   DialogueAudioService(
       BackendProvider backends,
@@ -66,17 +79,33 @@ public final class DialogueAudioService {
       Executor executor,
       int cacheSize,
       IntSupplier volume) {
+    this(backends, output, diskCache, executor, executor, cacheSize, volume);
+  }
+
+  private DialogueAudioService(
+      BackendProvider backends,
+      AudioOutput output,
+      DiskAudioCache diskCache,
+      Executor executor,
+      Executor warmExecutor,
+      int cacheSize,
+      IntSupplier volume) {
     this.backends = backends;
     this.output = output;
     this.diskCache = diskCache;
     this.executor = executor;
+    this.warmExecutor = warmExecutor;
     this.cache = new LruCache<>(cacheSize);
     this.volume = volume;
   }
 
-  /** Runs a one-off warm-up task (typically the model load) on the pipeline thread. */
+  /**
+   * Runs a one-off warm-up task (engine install/model load) on the dedicated warm-up thread, kept
+   * separate from the single synthesis thread so a long engine download (notably the multi-part
+   * Zonos bundle) never blocks dialogue playback through an already-warm backend.
+   */
   public void prewarm(Runnable warm) {
-    submit(warm);
+    warmExecutor.execute(warm);
   }
 
   /**
@@ -111,16 +140,26 @@ public final class DialogueAudioService {
   public void close() {
     epoch.incrementAndGet();
     output.stop();
-    if (executor instanceof ExecutorService es) {
+    shutdown(executor);
+    // In production the warm-up executor is a distinct instance; the test seam reuses the synthesis
+    // executor, so only shut it down once.
+    if (warmExecutor != executor) {
+      shutdown(warmExecutor);
+    }
+    output.close();
+  }
+
+  private static void shutdown(Executor exec) {
+    if (exec instanceof ExecutorService es) {
       es.shutdownNow();
       try {
-        // Give an in-flight synth a brief window to unwind so a plugin reload does not orphan it.
+        // Give an in-flight synth/warm-up a brief window to unwind so a plugin reload does not
+        // orphan it.
         es.awaitTermination(2, TimeUnit.SECONDS);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
     }
-    output.close();
   }
 
   private void run(long mine, SynthesisBackend backend, SynthesisRequest request, CacheKey key) {
@@ -193,6 +232,26 @@ public final class DialogueAudioService {
         (r, exec) -> {
           log.debug("Dialogue audio queue saturated; dropping oldest queued line");
           new ThreadPoolExecutor.DiscardOldestPolicy().rejectedExecution(r, exec);
+        });
+  }
+
+  /**
+   * A single-thread executor dedicated to engine warm-up (install/download/model load). Separate
+   * from the synthesis executor so a multi-minute engine download cannot stall dialogue playback;
+   * its queue is unbounded because warm-up tasks are few (one per backend) and must never be
+   * dropped under synthesis backpressure.
+   */
+  private static ExecutorService buildWarmExecutor() {
+    return new ThreadPoolExecutor(
+        1,
+        1,
+        0L,
+        TimeUnit.MILLISECONDS,
+        new LinkedBlockingQueue<>(),
+        r -> {
+          Thread t = new Thread(r, "dialogue-warm");
+          t.setDaemon(true);
+          return t;
         });
   }
 

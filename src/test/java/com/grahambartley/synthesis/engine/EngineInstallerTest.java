@@ -147,6 +147,42 @@ public class EngineInstallerTest {
     assertEquals(first.launcher(), second.launcher());
   }
 
+  @Test
+  public void installResolvesLauncherNestedUnderWrapperDirectory() throws Exception {
+    // The published Windows .zip bundle nests its whole tree under a single engine-image/ wrapper
+    // directory, so the launcher extracts to installDir/engine-image/<launcher> rather than
+    // installDir/<launcher>. The installer must still resolve it (and find its runtime siblings)
+    // without the bundle being re-published. Reproduces the Windows "launcher ... is missing"
+    // failure where the macOS/Linux tar.gz bundles (flat at root) were unaffected.
+    byte[] zipBytes = buildNestedBundleZip("engine-image", "kokoro-engine", "kokoro-engine.bat");
+    String sha = sha256HexOf(zipBytes);
+    String url = serve("/kokoro-nested.zip", zipBytes);
+
+    Path enginesRoot = tmp.newFolder("engines").toPath();
+    String platform = EngineInstaller.currentPlatformId();
+    String launcherName = platform.startsWith("win") ? "kokoro-engine.bat" : "kokoro-engine";
+    EngineInstaller installer =
+        installerWithManifest(enginesRoot, manifest(platform, url, sha, launcherName));
+
+    EngineInstaller.Installed installed = installer.install();
+    assertNotNull("install must resolve a launcher nested under a wrapper dir", installed);
+    assertEquals(launcherName, installed.launcher().getFileName().toString());
+    assertTrue(Files.isRegularFile(installed.launcher()));
+    // The launcher resolves its runtime relative to its own directory, so the siblings must sit
+    // next to the resolved (nested) launcher for it to actually run.
+    assertTrue(
+        "launcher siblings must sit next to the resolved launcher",
+        Files.isRegularFile(installed.launcher().getParent().resolve("lib/engine.jar")));
+
+    // Idempotent even when nested: a second install reuses the extracted bundle (server stopped so
+    // a re-download would fail) and returns the same nested launcher.
+    server.stop(0);
+    server = null;
+    EngineInstaller.Installed second = installer.install();
+    assertNotNull("second install should reuse the nested bundle", second);
+    assertEquals(installed.launcher(), second.launcher());
+  }
+
   // --- full install of a .tar.gz bundle (osx-aarch64 / linux-x64)
   // -------------------------------
 
@@ -462,6 +498,25 @@ public class EngineInstallerTest {
         zos.closeEntry();
       }
       zos.putNextEntry(new ZipEntry("lib/engine.jar"));
+      zos.write(new byte[] {9, 8, 7});
+      zos.closeEntry();
+    }
+    return bos.toByteArray();
+  }
+
+  /**
+   * Like {@link #buildBundleZip} but nests the whole tree under a single wrapper directory, as the
+   * published Windows .zip bundle does (everything under {@code engine-image/}).
+   */
+  private byte[] buildNestedBundleZip(String wrapperDir, String... launchers) throws IOException {
+    java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+    try (ZipOutputStream zos = new ZipOutputStream(bos)) {
+      for (String name : launchers) {
+        zos.putNextEntry(new ZipEntry(wrapperDir + "/" + name));
+        zos.write("launcher".getBytes(StandardCharsets.UTF_8));
+        zos.closeEntry();
+      }
+      zos.putNextEntry(new ZipEntry(wrapperDir + "/lib/engine.jar"));
       zos.write(new byte[] {9, 8, 7});
       zos.closeEntry();
     }
