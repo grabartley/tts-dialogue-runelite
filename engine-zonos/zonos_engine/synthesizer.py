@@ -115,9 +115,15 @@ class ZonosSynthesizer(Synthesizer):
     """The real Zonos-v0.1 backend. torch + Zonos are imported lazily so importing this module is
     cheap and torch-free.
 
+    torch is imported EXACTLY ONCE per process via :meth:`_import_torch`, and that single cached
+    module object is reused by the GPU probe, the model loader, and synthesis. This is deliberate: in
+    the frozen PyInstaller build, importing torch a second time (or under a duplicated path) raises
+    CPython's ``cannot load module more than once per process`` (issue #77), which previously made
+    the GPU probe report no usable GPU.
+
     Lifecycle: construct cheaply, then call :meth:`load` (or let the first :meth:`synthesize` load
-    it). Loading imports torch and the Zonos package, selects the CUDA device, loads the model, and
-    pre-loads the bundled reference-voice bank into speaker embeddings.
+    it). Loading imports torch (once) and the Zonos package, selects the CUDA device, loads the
+    model, and pre-loads the bundled reference-voice bank into speaker embeddings.
     """
 
     def __init__(self, bundle_root: str, model_id: str = "Zyphra/Zonos-v0.1-transformer"):
@@ -131,18 +137,38 @@ class ZonosSynthesizer(Synthesizer):
         self._cuda = None
         self._gpu_detail = ""
 
+    # -- torch import ----------------------------------------------------------------------------
+
+    def _import_torch(self):
+        """Import torch EXACTLY ONCE per process and reuse the cached module object everywhere.
+
+        This is the single place in the engine that runs ``import torch``. The GPU probe, model
+        loader, and synthesis path all obtain torch through here, so torch's compiled C-extension is
+        initialized once and never under a second module identity.
+
+        Why this matters: in the frozen PyInstaller build, re-importing torch (or importing it under
+        a duplicated path) triggers CPython's ``cannot load module more than once per process`` when
+        the native extension's module-init runs a second time. The Zonos package also imports torch
+        as a side effect; reusing this one cached module object keeps everything pointing at the same
+        already-initialized extension (issue #77)."""
+        if self._torch is None:
+            import torch  # noqa: WPS433 - the ONE intentional torch import for the whole process
+
+            self._torch = torch
+        return self._torch
+
     # -- GPU probe -------------------------------------------------------------------------------
 
     def cuda_available(self) -> bool:
-        """True only when a usable CUDA GPU is present. Imports torch lazily; any failure (no torch,
-        no driver, no device) is treated as "no GPU" rather than an error, so the handshake can
-        still answer ``gpu=false`` cleanly and the plugin falls back to Kokoro."""
+        """True only when a usable CUDA GPU is present. Obtains torch via the single cached import
+        (:meth:`_import_torch`); any failure (no torch, no driver, no device) is treated as "no GPU"
+        rather than an error, so the handshake can still answer ``gpu=false`` cleanly and the plugin
+        falls back to Kokoro. This probe never re-imports torch."""
         if self._cuda is not None:
             return self._cuda
         try:
-            import torch  # noqa: WPS433 (intentional lazy import)
+            torch = self._import_torch()
 
-            self._torch = torch
             available = bool(torch.cuda.is_available()) and torch.cuda.device_count() > 0
             if available:
                 name = torch.cuda.get_device_name(0)
@@ -175,10 +201,10 @@ class ZonosSynthesizer(Synthesizer):
             raise RuntimeError(
                 "Zonos requires a usable CUDA GPU; none detected ({})".format(self.gpu_detail())
             )
-        import torch  # noqa: WPS433
+        # Reuse the single cached torch module (cuda_available already imported it); never re-import.
+        self._import_torch()
         from zonos.model import Zonos  # type: ignore  # noqa: WPS433
 
-        self._torch = torch
         self._device = "cuda"
         self._model = Zonos.from_pretrained(self._model_id, device=self._device)
         # Report the model's real output rate if it exposes one, else the known DAC rate.

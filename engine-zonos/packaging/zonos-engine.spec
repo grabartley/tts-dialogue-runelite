@@ -27,6 +27,15 @@ ENTRY = os.path.join(HERE, "zonos_engine_cli.py")
 
 # Collect the data/metadata torch + zonos + phonemizer need at runtime. These hidden imports and
 # collected packages are what make the frozen exe actually self-contained.
+#
+# IMPORTANT (issue #77): torch/torchaudio are NOT in hiddenimports and are NOT passed to collect_all
+# below. PyInstaller ships dedicated hooks for torch and torchaudio that already collect their
+# compiled C-extensions (.pyd/.so) and the bundled CUDA runtime libs exactly once. Listing torch in
+# hiddenimports AND running collect_all("torch") on top of those hooks bundles torch's native
+# extension under two resolvable paths; at runtime CPython then raises "cannot load module more than
+# once per process" the second time the extension's module-init runs, which made the GPU probe
+# report no usable GPU on a real NVIDIA box. torch is still pulled in transitively (zonos and the
+# synthesizer import it), so its hook fires and its binaries travel with the exe -- just once.
 hiddenimports = [
     "zonos_engine",
     "zonos_engine.protocol",
@@ -36,24 +45,33 @@ hiddenimports = [
     "zonos",
     "zonos.model",
     "zonos.conditioning",
-    "torch",
-    "torchaudio",
     "phonemizer",
 ]
 
-# torch ships CUDA runtime .dll/.so inside its wheel; PyInstaller's torch hook collects them. We add
-# explicit collection of torch/torchaudio/zonos data files so weights/configs travel with the exe.
 datas = []
 binaries = []
 
 try:
-    from PyInstaller.utils.hooks import collect_all
+    from PyInstaller.utils.hooks import collect_all, collect_data_files, copy_metadata
 
-    for pkg in ("torch", "torchaudio", "zonos", "phonemizer"):
+    # zonos + phonemizer: collect everything (code, data, binaries) -- these have no dedicated hook
+    # that would duplicate their contents, so collect_all is safe and needed for self-containment.
+    for pkg in ("zonos", "phonemizer"):
         d, b, h = collect_all(pkg)
         datas += d
         binaries += b
         hiddenimports += h
+
+    # torch/torchaudio: take ONLY non-binary data files + dist metadata, never their binaries. The
+    # built-in torch/torchaudio hooks own the compiled extensions + CUDA runtime; duplicating those
+    # is exactly what triggered the double-load (issue #77). collect_data_files(...) returns data
+    # (e.g. version files, configs) without the .pyd/.so the hook already collects.
+    for pkg in ("torch", "torchaudio"):
+        datas += collect_data_files(pkg)
+        try:
+            datas += copy_metadata(pkg)
+        except Exception:  # pragma: no cover - metadata is optional
+            pass
 except Exception:  # pragma: no cover - only exercised inside the build env
     # collect_all is unavailable outside a PyInstaller run; the spec is still importable for linting.
     pass
