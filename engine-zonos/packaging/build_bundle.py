@@ -168,12 +168,12 @@ def zip_bundle(root: str, out_zip: str) -> None:
     """Zip the assembled tree so the launcher sits at the archive root (matches EngineInstaller)."""
     os.makedirs(os.path.dirname(out_zip), exist_ok=True)
     base = os.path.dirname(root)
-    # Store (no compression): the bundle is dominated by the torch CUDA DLLs and the safetensors
-    # weights, which are already near-incompressible (a DEFLATE pass shrinks the ~2.97 GB tree by a
-    # fraction of a percent), so deflating just burns a long single-threaded CPU pass for ~zero size
-    # gain. ZIP_STORED is far faster to create here and faster for EngineInstaller to extract on the
-    # user's machine. allowZip64 stays on for the >4 GiB total / many-entry tree.
-    with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_STORED, allowZip64=True) as zf:
+    # Deflate at the fastest level (compresslevel=1). The bundle measurably compresses (the tree
+    # deflates ~31%: ~4.3 GB stored -> ~2.97 GB at default level, i.e. one fewer 1900 MiB part to
+    # download), so storing it uncompressed is the wrong trade for a once-per-user download. Level 1
+    # captures nearly all of that size win at a small fraction of the default level's CPU, so the
+    # build stays fast while the download stays small. allowZip64 for the multi-GiB, many-entry tree.
+    with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED, allowZip64=True, compresslevel=1) as zf:
         for dirpath, _dirs, files in os.walk(root):
             for name in files:
                 full = os.path.join(dirpath, name)
