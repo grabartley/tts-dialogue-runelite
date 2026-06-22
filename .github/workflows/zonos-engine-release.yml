@@ -227,7 +227,16 @@ jobs:
           set -euo pipefail
           TAG="zonos-${{ inputs.version }}"
           if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release exists, refreshing assets"
+            echo "Release exists; deleting stale bundle assets before re-upload"
+            # --clobber only REPLACES same-named files. If a previous build produced more parts than
+            # this one (e.g. an uncompressed bundle split into 3 parts vs a compressed one into 2),
+            # the extra partNN + sidecars survive as orphans and corrupt reassembly (the combined
+            # sha no longer matches part00..partN). Delete every existing bundle asset first so the
+            # release ends up with exactly this build's parts.
+            gh release view "$TAG" --json assets --jq '.assets[].name | select(test("\\.zip"))' \
+              | while IFS= read -r a; do
+                  [ -n "$a" ] && gh release delete-asset "$TAG" "$a" --yes || true
+                done
           else
             gh release create "$TAG" \
               --title "Zonos GPU engine ${{ inputs.version }}" \
