@@ -179,6 +179,15 @@ class ZonosSynthesizer(Synthesizer):
         except Exception as exc:  # noqa: BLE001 - any failure means "no usable GPU"
             self._gpu_detail = "torch/CUDA unavailable: {}".format(exc)
             self._cuda = False
+            # Dump the FULL traceback to stderr so a GPU-box --selftest run shows the exact import
+            # chain that failed (the short detail above hid which module double-loaded). This is how
+            # we diagnose without a local CUDA box; only reached on failure.
+            import sys
+            import traceback
+
+            print("=== ZONOS GPU PROBE FAILED (full traceback) ===", file=sys.stderr)
+            traceback.print_exc()
+            sys.stderr.flush()
         return self._cuda
 
     def gpu_detail(self) -> str:
