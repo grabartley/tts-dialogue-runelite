@@ -27,6 +27,11 @@ final class StdioProtocol {
 
   static final String FORMAT = "f32le";
 
+  /**
+   * Sentinel for an absent/unspecified explicit speaker id: fall back to the race/gender matrix.
+   */
+  static final int NO_SPEAKER_ID = -1;
+
   private static final Gson GSON = new Gson();
 
   private StdioProtocol() {}
@@ -58,7 +63,14 @@ final class StdioProtocol {
         root.has("speed") && !root.get("speed").isJsonNull()
             ? root.get("speed").getAsFloat()
             : 1.0f;
-    return new Request(text, player, race, gender, speed);
+    // Optional explicit Kokoro speaker id (per-NPC voice variety, issue #78). Absent or negative
+    // means "not specified": speakerId() then falls back to the race/gender matrix, so an older
+    // plugin that never sends this field keeps the exact pre-#78 behaviour.
+    int explicitSpeakerId =
+        root.has("speakerId") && !root.get("speakerId").isJsonNull()
+            ? root.get("speakerId").getAsInt()
+            : NO_SPEAKER_ID;
+    return new Request(text, player, race, gender, speed, explicitSpeakerId);
   }
 
   /** Writes the header line then the raw PCM frame to {@code out}, flushing once complete. */
@@ -102,15 +114,38 @@ final class StdioProtocol {
     final String gender;
     final float speed;
 
+    /** Explicit per-NPC speaker id from the wire, or {@link #NO_SPEAKER_ID} when not specified. */
+    final int explicitSpeakerId;
+
     Request(String text, boolean player, String race, String gender, float speed) {
+      this(text, player, race, gender, speed, NO_SPEAKER_ID);
+    }
+
+    Request(
+        String text,
+        boolean player,
+        String race,
+        String gender,
+        float speed,
+        int explicitSpeakerId) {
       this.text = text;
       this.player = player;
       this.race = race;
       this.gender = gender;
       this.speed = speed;
+      this.explicitSpeakerId = explicitSpeakerId;
     }
 
+    /**
+     * The Kokoro speaker id to synthesize with. The plugin's explicit per-NPC choice wins when
+     * present (issue #78); otherwise this falls back to the shared race/gender {@link
+     * SpeakerMatrix} exactly as before, so a plugin that never sends {@code speakerId} is
+     * unaffected.
+     */
     int speakerId() {
+      if (explicitSpeakerId >= 0) {
+        return explicitSpeakerId;
+      }
       return SpeakerMatrix.speakerId(player, race, gender);
     }
   }

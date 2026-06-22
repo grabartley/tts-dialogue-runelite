@@ -2,9 +2,11 @@ package com.grahambartley;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.grahambartley.VoiceManager.NPCGender;
+import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.VoiceManager.VoiceProfile;
 import com.grahambartley.synthesis.VoiceSpec;
 import java.util.HashSet;
@@ -115,13 +117,21 @@ public class VoiceManagerTest {
   }
 
   @Test
-  public void undetectedNpcWithFallbacksResolvesToHumanVoice() {
+  public void undetectedNpcWithFallbacksResolvesToHumanMaleBaseline() {
     VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
-    // No client, so the NPC can't be found and detection falls back.
+    // No client, so the NPC can't be found and detection falls back to the Human Male baseline.
     assertEquals(VoiceProfile.HUMAN_MALE, manager.getVoiceForNPC("Hans"));
     VoiceSpec spec = manager.resolveVoice("npc", "Hans");
-    assertEquals("npc:HUMAN:MALE", spec.key());
-    assertEquals(VoiceProfile.HUMAN_MALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
+    // Still a human-male spec, but per-NPC variety (issue #78) stamps a stable male-pool speaker
+    // keyed off the name (no composition id without a client), so the speaker is gender-correct and
+    // the cache key carries it.
+    assertEquals(NPCRace.HUMAN, spec.race());
+    assertEquals(NPCGender.MALE, spec.gender());
+    assertTrue("fallback NPC still gets a per-NPC speaker", spec.hasExplicitKokoroSpeakerId());
+    assertTrue(
+        "chosen speaker must be from the male pool",
+        contains(VoiceManager.MALE_SPEAKER_POOL, manager.kokoroSpeakerId(spec)));
+    assertTrue("cache key carries the chosen speaker", spec.key().startsWith("npc:HUMAN:MALE#"));
   }
 
   @Test
@@ -164,7 +174,9 @@ public class VoiceManagerTest {
   }
 
   @Test
-  public void buildNpcTraceShowsWorldHitTableSourceAndFinalVoice() {
+  public void buildNpcTraceShowsWorldHitTableSourceAndChosenSpeaker() {
+    // The chosen speaker (am_onyx, id 17) is a male-pool voice distinct from the Goblin Male
+    // baseline, proving the trace logs the actual per-NPC speaker, not just the baseline id.
     String trace =
         VoiceManager.buildNpcTrace(
             "Goblin",
@@ -172,22 +184,149 @@ public class VoiceManagerTest {
             VoiceManager.NPCRace.GOBLIN,
             NPCGender.MALE,
             "table-hit",
-            VoiceProfile.GOBLIN_MALE);
+            VoiceProfile.GOBLIN_MALE,
+            17);
     assertTrue(trace, trace.contains("npc='Goblin'"));
     assertTrue(trace, trace.contains("world=HIT(id=101)"));
     assertTrue(trace, trace.contains("source=table-hit"));
     assertTrue(trace, trace.contains("voice=Goblin Male"));
-    assertTrue(trace, trace.contains("speakerId=" + VoiceProfile.GOBLIN_MALE.getSpeakerId()));
+    // The actual chosen Kokoro speaker id + its friendly name are surfaced for QA.
+    assertTrue(trace, trace.contains("speakerId=17"));
+    assertTrue(trace, trace.contains("am_onyx"));
   }
 
   @Test
   public void buildNpcTraceShowsWorldMissForUntabledNpc() {
     String trace =
         VoiceManager.buildNpcTrace(
-            "Hans", null, null, NPCGender.UNKNOWN, "not-in-world", VoiceProfile.HUMAN_MALE);
+            "Hans",
+            null,
+            null,
+            NPCGender.UNKNOWN,
+            "not-in-world",
+            VoiceProfile.HUMAN_MALE,
+            VoiceProfile.HUMAN_MALE.getSpeakerId());
     assertTrue(trace, trace.contains("world=MISS"));
     assertTrue(trace, trace.contains("race=UNKNOWN"));
     assertTrue(trace, trace.contains("voice=Human Male"));
+  }
+
+  // ---- Per-NPC voice variety (issue #78) ----
+
+  @Test
+  public void genderPoolsAreNonEmptyDisjointAndGenderCorrect() {
+    assertTrue("male pool should not be empty", VoiceManager.MALE_SPEAKER_POOL.length > 0);
+    assertTrue("female pool should not be empty", VoiceManager.FEMALE_SPEAKER_POOL.length > 0);
+    // Every male-pool id is a male VoiceProfile (am_/bm_); every female-pool id a female (af_/bf_).
+    for (int id : VoiceManager.MALE_SPEAKER_POOL) {
+      assertEquals(
+          "male pool id " + id + " must name a male voice", NPCGender.MALE, genderOfSpeaker(id));
+    }
+    for (int id : VoiceManager.FEMALE_SPEAKER_POOL) {
+      assertEquals(
+          "female pool id " + id + " must name a female voice",
+          NPCGender.FEMALE,
+          genderOfSpeaker(id));
+    }
+    // The pools never overlap, so a male NPC can never collide with a female voice and vice versa.
+    for (int m : VoiceManager.MALE_SPEAKER_POOL) {
+      assertFalse("pools must be disjoint", contains(VoiceManager.FEMALE_SPEAKER_POOL, m));
+    }
+    // Player-only voices (am_michael=16, af_heart=3) must not leak into the NPC pools.
+    assertFalse(contains(VoiceManager.MALE_SPEAKER_POOL, VoiceProfile.PLAYER_MALE.getSpeakerId()));
+    assertFalse(
+        contains(VoiceManager.FEMALE_SPEAKER_POOL, VoiceProfile.PLAYER_FEMALE.getSpeakerId()));
+  }
+
+  @Test
+  public void differentNpcIdsOfSameRaceGenderGetDifferentSpeakers() {
+    // Two human-male NPCs with different composition ids must not collapse to one voice. The pool
+    // is sorted, so two ids landing in different slots prove variety. Ids chosen to differ mod
+    // pool.
+    int poolSize = VoiceManager.MALE_SPEAKER_POOL.length;
+    int idA = 1001;
+    int idB = 1001 + 1; // adjacent ids land in adjacent (distinct) slots for any pool size > 1.
+    int a = VoiceManager.pickNpcSpeakerId(VoiceProfile.HUMAN_MALE, idA, "Guard");
+    int b = VoiceManager.pickNpcSpeakerId(VoiceProfile.HUMAN_MALE, idB, "Guard");
+    assertTrue("pool must offer variety", poolSize > 1);
+    assertNotEquals("different NPC ids must get different speakers", a, b);
+    // Both are still gender-correct male voices.
+    assertEquals(NPCGender.MALE, genderOfSpeaker(a));
+    assertEquals(NPCGender.MALE, genderOfSpeaker(b));
+  }
+
+  @Test
+  public void perNpcSpeakerIsStableAcrossCalls() {
+    int first = VoiceManager.pickNpcSpeakerId(VoiceProfile.HUMAN_MALE, 4242, "Guard");
+    for (int i = 0; i < 5; i++) {
+      assertEquals(
+          "same NPC must always resolve to the same speaker",
+          first,
+          VoiceManager.pickNpcSpeakerId(VoiceProfile.HUMAN_MALE, 4242, "Guard"));
+    }
+  }
+
+  @Test
+  public void perNpcSelectionKeysOnNameWhenNoCompositionId() {
+    // Without a composition id the normalised name is the key, so two differently named NPCs can
+    // still diverge while the same name is stable.
+    int hans = VoiceManager.pickNpcSpeakerId(VoiceProfile.HUMAN_MALE, null, "Hans");
+    int hansAgain =
+        VoiceManager.pickNpcSpeakerId(VoiceProfile.HUMAN_MALE, null, "<col=ff0000>Hans</col>");
+    assertEquals("normalised name keys identically", hans, hansAgain);
+    assertEquals(NPCGender.MALE, genderOfSpeaker(hans));
+  }
+
+  @Test
+  public void femaleNpcOnlyEverGetsFemaleSpeaker() {
+    for (int id = 0; id < 200; id++) {
+      int chosen = VoiceManager.pickNpcSpeakerId(VoiceProfile.HUMAN_FEMALE, id, "Woman");
+      assertEquals(
+          "female NPC id " + id + " must map to a female voice",
+          NPCGender.FEMALE,
+          genderOfSpeaker(chosen));
+    }
+  }
+
+  @Test
+  public void playerPathIgnoresPerNpcSpeakerAndIsUnchanged() {
+    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
+    VoiceSpec spec = manager.resolveVoice("player", "ignored-name");
+    assertTrue(spec.player());
+    // No per-NPC speaker is ever stamped on the player; it maps to the configured player voice.
+    assertFalse(
+        "player spec carries no explicit per-NPC speaker", spec.hasExplicitKokoroSpeakerId());
+    assertEquals("player:MALE", spec.key());
+    assertEquals(VoiceProfile.PLAYER_MALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
+  }
+
+  @Test
+  public void explicitSpeakerOnSpecWinsInKokoroSpeakerId() {
+    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
+    // An NPC spec stamped with an explicit speaker is honored verbatim, not recomputed from race.
+    VoiceSpec spec = VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE, 17);
+    assertEquals(17, manager.kokoroSpeakerId(spec));
+    // A bare spec still falls back to the race/gender matrix.
+    VoiceSpec bare = VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE);
+    assertEquals(VoiceProfile.HUMAN_MALE.getSpeakerId(), manager.kokoroSpeakerId(bare));
+  }
+
+  private static NPCGender genderOfSpeaker(int speakerId) {
+    for (VoiceProfile profile : VoiceProfile.values()) {
+      if (profile.getSpeakerId() == speakerId) {
+        return profile.getGender();
+      }
+    }
+    return NPCGender.UNKNOWN;
+  }
+
+  private static boolean contains(int[] pool, int value) {
+    for (int v : pool) {
+      if (v == value) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Test

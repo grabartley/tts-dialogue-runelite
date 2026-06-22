@@ -123,6 +123,37 @@ public class VoiceManager {
     }
   }
 
+  /**
+   * Gender-appropriate Kokoro speaker pools for per-NPC voice variety (issue #78). Built once from
+   * the {@link VoiceProfile} bank so they can only ever contain gender-correct, in-range English
+   * voices: the male pool is every distinct {@code am_}/{@code bm_} NPC speaker, the female pool
+   * every distinct {@code af_}/{@code bf_} NPC speaker. Player-only voices are excluded so an NPC
+   * never borrows the player's voice. Each pool is sorted ascending for a stable, deterministic
+   * index so a given NPC always hashes to the same slot across runs.
+   */
+  static final int[] MALE_SPEAKER_POOL = buildSpeakerPool(NPCGender.MALE);
+
+  static final int[] FEMALE_SPEAKER_POOL = buildSpeakerPool(NPCGender.FEMALE);
+
+  private static int[] buildSpeakerPool(NPCGender gender) {
+    java.util.TreeSet<Integer> ids = new java.util.TreeSet<>();
+    for (VoiceProfile profile : VoiceProfile.values()) {
+      // Skip the player voices: NPC variety must never reach for the player's speaker.
+      if (profile == VoiceProfile.PLAYER_MALE || profile == VoiceProfile.PLAYER_FEMALE) {
+        continue;
+      }
+      if (profile.getGender() == gender) {
+        ids.add(profile.getSpeakerId());
+      }
+    }
+    int[] pool = new int[ids.size()];
+    int i = 0;
+    for (int id : ids) {
+      pool[i++] = id;
+    }
+    return pool;
+  }
+
   private final TTSDialogueConfig config;
   private final Client client;
   private final NPCDemographicAnalyzer demographicAnalyzer;
@@ -146,9 +177,16 @@ public class VoiceManager {
       }
       return VoiceSpec.player(playerGender());
     }
-    VoiceProfile profile =
-        config.enableRaceBasedVoices() ? getVoiceForNPC(npcName) : getDefaultNPCVoice();
-    return profileToSpec(profile);
+    if (!config.enableRaceBasedVoices()) {
+      // Automatic voices off: every NPC uses the single default voice, no per-NPC variety.
+      VoiceProfile profile = getDefaultNPCVoice();
+      return VoiceSpec.npc(profile.getRace(), profile.getGender());
+    }
+    NpcVoice resolved = resolveNpcVoice(npcName);
+    // Stamp the per-NPC Kokoro speaker (issue #78) onto the spec so it rides the wire and the cache
+    // key, giving same-race/gender NPCs distinct but stable voices.
+    return VoiceSpec.npc(
+        resolved.profile.getRace(), resolved.profile.getGender(), resolved.speakerId);
   }
 
   /**
@@ -166,7 +204,40 @@ public class VoiceManager {
           ? VoiceProfile.PLAYER_FEMALE.getSpeakerId()
           : VoiceProfile.PLAYER_MALE.getSpeakerId();
     }
+    // An NPC that was stamped with a per-NPC speaker (issue #78) keeps it; otherwise fall back to
+    // the race/gender baseline so callers that built a bare spec still get a valid voice.
+    if (voice.hasExplicitKokoroSpeakerId()) {
+      return voice.kokoroSpeakerId();
+    }
     return getVoiceForRaceAndGender(voice.race(), voice.gender()).getSpeakerId();
+  }
+
+  /**
+   * Picks a stable, gender-correct Kokoro speaker for a specific NPC (issue #78). Two NPCs of the
+   * same race+gender no longer collapse to the single matrix voice (e.g. every human male = {@code
+   * am_fenrir}): they are spread across the gender-appropriate {@link #MALE_SPEAKER_POOL} / {@link
+   * #FEMALE_SPEAKER_POOL} by hashing a per-NPC key into the pool index.
+   *
+   * <p>Keying rule (documented contract): the NPC's composition id is preferred (the same NPC type
+   * always hashes the same way, regardless of how its name was presented); when no id is available
+   * the normalised name is the fallback key. The pool index is {@code Math.floorMod(hash, size)} so
+   * it is non-negative and deterministic. Selection is therefore stable across calls and runs.
+   *
+   * <p>The baseline race/gender {@code VoiceProfile} is the anchor for gender (the pool is built
+   * from gender-correct voices only), so a male NPC can only ever map to a male voice and a female
+   * NPC to a female voice. When the pool is empty or the gender is unknown this returns the
+   * baseline {@code raceGenderBaseline} speaker id unchanged, preserving pre-#78 behaviour.
+   */
+  static int pickNpcSpeakerId(VoiceProfile raceGenderBaseline, Integer npcId, String npcName) {
+    int[] pool =
+        raceGenderBaseline.getGender() == NPCGender.MALE
+            ? MALE_SPEAKER_POOL
+            : raceGenderBaseline.getGender() == NPCGender.FEMALE ? FEMALE_SPEAKER_POOL : null;
+    if (pool == null || pool.length == 0) {
+      return raceGenderBaseline.getSpeakerId();
+    }
+    int hash = npcId != null ? Integer.hashCode(npcId) : normalizeName(npcName).hashCode();
+    return pool[Math.floorMod(hash, pool.length)];
   }
 
   /** Gender implied by the configured player voice profile. */
@@ -174,72 +245,107 @@ public class VoiceManager {
     return config.playerVoice().getGender();
   }
 
-  /** Turns a resolved NPC {@link VoiceProfile} back into its race/gender {@link VoiceSpec}. */
-  private static VoiceSpec profileToSpec(VoiceProfile profile) {
-    return VoiceSpec.npc(profile.getRace(), profile.getGender());
+  /**
+   * The baseline race/gender {@link VoiceProfile} for an NPC plus the per-NPC Kokoro speaker chosen
+   * from the gender pool. The profile fixes race/gender (and hence gender-correctness); the speaker
+   * id is the actual voice that gets synthesized.
+   */
+  private static final class NpcVoice {
+    final VoiceProfile profile;
+    final int speakerId;
+
+    NpcVoice(VoiceProfile profile, int speakerId) {
+      this.profile = profile;
+      this.speakerId = speakerId;
+    }
   }
 
-  /** Determines the appropriate voice for an NPC based on their race and gender. */
+  /**
+   * Determines the baseline race/gender {@link VoiceProfile} for an NPC. Retained as the public,
+   * test-facing accessor; {@link #resolveNpcVoice} layers the per-NPC speaker on top.
+   */
   public VoiceProfile getVoiceForNPC(String npcName) {
+    return resolveNpcVoice(npcName).profile;
+  }
+
+  /**
+   * Resolves an NPC to its baseline race/gender {@link VoiceProfile} and a stable, gender-correct
+   * per-NPC Kokoro speaker id (issue #78). Emits the debug trace once with the actual chosen
+   * speaker so QA can see distinct NPCs getting distinct ids.
+   */
+  private NpcVoice resolveNpcVoice(String npcName) {
     if (npcName == null || npcName.isEmpty()) {
-      VoiceProfile voice = getFallbackVoice(NPCGender.UNKNOWN);
-      traceNpc(npcName, null, null, NPCGender.UNKNOWN, "blank-name", voice);
-      return voice;
+      return tracedNpcVoice(
+          npcName,
+          null,
+          null,
+          NPCGender.UNKNOWN,
+          "blank-name",
+          getFallbackVoice(NPCGender.UNKNOWN));
     }
 
     NPC npc = findNPCByName(npcName);
     if (npc == null) {
-      VoiceProfile voice = getFallbackVoice(NPCGender.UNKNOWN);
-      traceNpc(npcName, null, null, NPCGender.UNKNOWN, "not-in-world", voice);
-      return voice;
+      return tracedNpcVoice(
+          npcName,
+          null,
+          null,
+          NPCGender.UNKNOWN,
+          "not-in-world",
+          getFallbackVoice(NPCGender.UNKNOWN));
     }
 
     NPCAttributes attributes = demographicAnalyzer.analyzeNPC(npc);
     if (attributes == null) {
-      VoiceProfile voice = getFallbackVoice(NPCGender.UNKNOWN);
-      traceNpc(npcName, npc.getId(), null, NPCGender.UNKNOWN, "analysis-failed", voice);
-      return voice;
+      return tracedNpcVoice(
+          npcName,
+          npc.getId(),
+          null,
+          NPCGender.UNKNOWN,
+          "analysis-failed",
+          getFallbackVoice(NPCGender.UNKNOWN));
     }
 
     NPCRace race = convertToNPCRace(attributes.getRace());
     NPCGender gender = convertToNPCGender(attributes.getGender());
-    boolean tableHit = "StaticTable".equals(attributes.getSource());
+    String source = "StaticTable".equals(attributes.getSource()) ? "table-hit" : "table-miss";
 
     // An unrecognised race falls back rather than silently borrowing the human voice, so the
     // fallback toggle stays meaningful.
-    if (race == NPCRace.UNKNOWN) {
-      VoiceProfile voice = getFallbackVoice(gender);
-      traceNpc(npcName, npc.getId(), race, gender, tableHit ? "table-hit" : "table-miss", voice);
-      return voice;
-    }
-
-    VoiceProfile voice = getVoiceForRaceAndGender(race, gender);
-    traceNpc(npcName, npc.getId(), race, gender, tableHit ? "table-hit" : "table-miss", voice);
-    return voice;
+    VoiceProfile baseline =
+        race == NPCRace.UNKNOWN ? getFallbackVoice(gender) : getVoiceForRaceAndGender(race, gender);
+    return tracedNpcVoice(npcName, npc.getId(), race, gender, source, baseline);
   }
 
   /**
-   * Emits a single INFO trace per dialogue line when Debug Mode is on, silent otherwise. The line
-   * exposes the whole resolution path (world hit/id, table hit/miss, resolved race/gender + source,
-   * final voice + Kokoro speaker id) so a user can pinpoint exactly where a voice came from in
-   * their normal client log, with no {@code --debug} flag.
+   * Picks the per-NPC speaker from {@code baseline}'s gender pool, emits the trace, and packages
+   * the result. The composition id keys the choice when present so the same NPC type always voices
+   * the same way; otherwise the normalised name is the key.
    */
-  private void traceNpc(
+  private NpcVoice tracedNpcVoice(
       String npcName,
       Integer npcId,
       NPCRace race,
       NPCGender gender,
       String source,
-      VoiceProfile voice) {
-    if (config == null || !config.debugMode()) {
-      return;
+      VoiceProfile baseline) {
+    int speakerId = pickNpcSpeakerId(baseline, npcId, npcName);
+    if (config != null && config.debugMode()) {
+      log.info(buildNpcTrace(npcName, npcId, race, gender, source, baseline, speakerId));
     }
-    log.info(buildNpcTrace(npcName, npcId, race, gender, source, voice));
+    return new NpcVoice(baseline, speakerId);
   }
 
   /**
    * Builds the NPC voice-resolution trace string. Factored out (and package-private) so it is
    * unit-testable without a live client or logger.
+   *
+   * <p>The line exposes the whole resolution path (world hit/id, table hit/miss, resolved
+   * race/gender + source, baseline race/gender voice) and, crucially for per-NPC variety (issue
+   * #78), the <em>actual chosen</em> Kokoro speaker id/name. The chosen speaker can differ from the
+   * baseline profile's own id (two NPCs of the same race/gender are spread across the gender pool),
+   * so this logs both: {@code voice=<baseline category>} for the race/gender bucket and {@code
+   * speaker=<name>(speakerId=<id>)} for the voice that will actually be synthesized.
    */
   static String buildNpcTrace(
       String npcName,
@@ -247,17 +353,33 @@ public class VoiceManager {
       NPCRace race,
       NPCGender gender,
       String source,
-      VoiceProfile voice) {
+      VoiceProfile voice,
+      int chosenSpeakerId) {
     return String.format(
-        "[TTS voice] npc='%s' world=%s race=%s gender=%s source=%s -> voice=%s (%s, speakerId=%d)",
+        "[TTS voice] npc='%s' world=%s race=%s gender=%s source=%s -> voice=%s speaker=%s(speakerId=%d)",
         npcName,
         npcId == null ? "MISS" : "HIT(id=" + npcId + ")",
         race == null ? "UNKNOWN" : race,
         gender,
         source,
         voice.getDisplayName(),
-        voice.getKokoroVoice(),
-        voice.getSpeakerId());
+        kokoroVoiceName(chosenSpeakerId),
+        chosenSpeakerId);
+  }
+
+  /**
+   * The {@code kokoro-multi-lang-v1_0} voice name for a speaker id, looked up from the {@link
+   * VoiceProfile} bank so the trace reads a friendly name (e.g. {@code am_onyx}) for the chosen
+   * per-NPC voice. Unknown ids (outside the mapped bank) fall back to a bare {@code "id=<n>"}
+   * label.
+   */
+  static String kokoroVoiceName(int speakerId) {
+    for (VoiceProfile profile : VoiceProfile.values()) {
+      if (profile.getSpeakerId() == speakerId) {
+        return profile.getKokoroVoice();
+      }
+    }
+    return "id=" + speakerId;
   }
 
   /** Builds the player voice-resolution trace string. Package-private for unit testing. */
