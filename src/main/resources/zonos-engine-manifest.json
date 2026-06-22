@@ -28,7 +28,7 @@
     "win-x64": {
       "archive": "zonos-engine-v0.1.1-win-x64.zip",
       "sha256": "70de23221e74b055ac23894a097b7611962eaa333957b6d905019b689fce98dc",
-      "size": 3392006222,
+      "size": 3041041327,
       "signed": false,
       "launcher": "zonos-engine.bat",
       "parts": [
@@ -41,11 +41,6 @@
           "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/zonos-v0.1.1/zonos-engine-v0.1.1-win-x64.zip.part01",
           "sha256": "acfb5a386d5a409ca092ec0ffe985c10cb658964489a9a593887e33d29869024",
           "size": 1048746927
-        },
-        {
-          "url": "https://github.com/grabartley/tts-dialogue-runelite/releases/download/zonos-v0.1.1/zonos-engine-v0.1.1-win-x64.zip.part02",
-          "sha256": "f4c498563609d563db505ec154301ad8dc1603ba1d4a859fa7e18060aa4ac066",
-          "size": 350964895
         }
       ]
     }
