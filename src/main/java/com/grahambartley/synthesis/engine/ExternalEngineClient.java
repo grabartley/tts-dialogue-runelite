@@ -289,6 +289,15 @@ public final class ExternalEngineClient {
     JsonObject root = new JsonObject();
     root.addProperty("text", request.text());
     root.add("voice", voice);
+    // Per-NPC voice variety (issue #78): when the plugin picked an explicit Kokoro speaker for this
+    // NPC, send it so the engine voices that exact speaker instead of recomputing
+    // one-per-race/gender
+    // from its matrix. Omitted entirely when absent, so the line is byte-for-byte the pre-#78
+    // request
+    // and an engine that ignores the field still falls back to its matrix.
+    if (spec.hasExplicitKokoroSpeakerId()) {
+      root.addProperty("speakerId", spec.kokoroSpeakerId());
+    }
     // Emotion is sent for protocol completeness; Kokoro ignores it (neutral-only by design).
     root.addProperty("emotion", request.emotion().name());
     root.addProperty("speed", 1.0f);

@@ -1,6 +1,7 @@
 package com.grahambartley.synthesis.engine;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -132,6 +133,28 @@ public class ExternalEngineClientTest {
     assertEquals("FEMALE", voice.get("gender").getAsString());
     assertEquals("NEUTRAL", root.get("emotion").getAsString());
     assertEquals(1.0f, root.get("speed").getAsFloat(), 0.0001f);
+  }
+
+  @Test
+  public void encodeRequestOmitsSpeakerIdWhenSpecHasNone() {
+    // A bare race/gender spec (no per-NPC speaker) must keep the line byte-for-byte the pre-#78
+    // request so old/other engines are unaffected.
+    JsonObject root =
+        GSON.fromJson(ExternalEngineClient.encodeRequest(request(), GSON), JsonObject.class);
+    assertFalse(root.has("speakerId"));
+  }
+
+  @Test
+  public void encodeRequestCarriesSpeakerIdWhenSpecHasOne() {
+    // Per-NPC voice variety (issue #78): a spec stamped with a speaker id sends it on the wire so
+    // the engine voices that exact speaker.
+    SynthesisRequest req =
+        new SynthesisRequest(
+            "Hello there.", VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE, 17), Emotion.NEUTRAL);
+    JsonObject root =
+        GSON.fromJson(ExternalEngineClient.encodeRequest(req, GSON), JsonObject.class);
+    assertTrue(root.has("speakerId"));
+    assertEquals(17, root.get("speakerId").getAsInt());
   }
 
   @Test

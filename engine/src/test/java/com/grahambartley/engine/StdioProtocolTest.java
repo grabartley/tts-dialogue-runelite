@@ -89,4 +89,33 @@ public class StdioProtocolTest {
             "{\"text\":\"x\",\"voice\":{\"race\":\"BANANA\",\"gender\":\"MALE\",\"player\":false}}");
     assertEquals(14, req.speakerId()); // human male fallback
   }
+
+  @Test
+  public void explicitSpeakerIdIsHonoredOverTheMatrix() {
+    // Per-NPC voice variety (issue #78): the plugin sends an explicit speakerId so two human-male
+    // NPCs no longer both collapse to am_fenrir (14). The engine voices the exact id sent.
+    Request req =
+        StdioProtocol.decodeRequest(
+            "{\"text\":\"hi\",\"voice\":{\"race\":\"HUMAN\",\"gender\":\"MALE\",\"player\":false},\"speakerId\":17}");
+    assertEquals(17, req.speakerId());
+  }
+
+  @Test
+  public void absentSpeakerIdFallsBackToTheMatrix() {
+    // Backward compatibility: an older plugin that never sends speakerId keeps the matrix voice.
+    Request req =
+        StdioProtocol.decodeRequest(
+            "{\"text\":\"hi\",\"voice\":{\"race\":\"HUMAN\",\"gender\":\"MALE\",\"player\":false}}");
+    assertEquals(StdioProtocol.NO_SPEAKER_ID, req.explicitSpeakerId);
+    assertEquals(14, req.speakerId()); // human male matrix fallback
+  }
+
+  @Test
+  public void negativeSpeakerIdIsTreatedAsAbsent() {
+    // A negative explicit id is a non-choice and must not be voiced; the matrix wins.
+    Request req =
+        StdioProtocol.decodeRequest(
+            "{\"text\":\"hi\",\"voice\":{\"race\":\"ELF\",\"gender\":\"FEMALE\",\"player\":false},\"speakerId\":-1}");
+    assertEquals(21, req.speakerId()); // elf female matrix value
+  }
 }
