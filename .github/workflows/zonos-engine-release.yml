@@ -263,8 +263,11 @@ jobs:
           git add src/main/resources/zonos-engine-manifest.json
           git commit -m "chore: update zonos-engine-manifest.json for ${{ inputs.version }}"
           # ALWAYS push the branch first (needs only contents: write); the refreshed manifest is
-          # then never lost even if PR creation is blocked.
-          git push --force-with-lease origin "$BRANCH"
+          # then never lost even if PR creation is blocked. Plain --force (not --force-with-lease):
+          # this branch is workflow-owned and disposable, and a prior release run for the same
+          # version leaves a stale remote ref the fresh checkout has no lease for, so a lease push
+          # would reject with "(stale info)". We always want the latest build's manifest to win.
+          git push --force origin "$BRANCH"
           # Opening the PR additionally needs pull-requests: write AND the repo setting "Allow
           # GitHub Actions to create and approve pull requests". If that setting is disabled the
           # create still fails, so fall back to a clear maintainer instruction rather than dropping
