@@ -8,9 +8,12 @@ only to RUN the resulting bundle's real synthesis.
 
 What it does, in order:
 
-1. Create a clean build venv and install the runtime deps (``packaging/requirements.txt``), pulling
-   the **PyTorch CUDA wheels** from the cu124 index so the bundle carries its own CUDA runtime. The
-   end user then needs only an NVIDIA driver: no CUDA toolkit, no system Python.
+1. Create a clean build venv with **uv** (Python 3.12, the newest CPython with a torch 2.4.1 cu124
+   wheel) and install the runtime deps (``packaging/requirements.txt``) with ``uv pip install``,
+   pulling the **PyTorch CUDA wheels** from the cu124 index so the bundle carries its own CUDA
+   runtime. uv resolves/installs in parallel from a shared cache, so this is much faster than pip
+   while producing identical contents. The end user then needs only an NVIDIA driver: no CUDA
+   toolkit, no system Python.
 2. Install Zonos-v0.1 from its upstream git repo at the pinned ref.
 3. Fetch the Zonos-v0.1 weights into ``model/`` (so the bundle works fully offline) and assert the
    reference-voice bank under ``voices/`` is complete for every id the plugin's ``ZonosVoiceMap``
@@ -71,20 +74,32 @@ def venv_python(venv_dir: str) -> str:
 
 
 def build_venv(venv_dir: str, torch_index: str, zonos_ref: str) -> str:
-    """Create the build venv and install runtime deps + Zonos. Returns the venv python path."""
-    run([sys.executable, "-m", "venv", venv_dir])
+    """Create the build venv and install runtime deps + Zonos with uv. Returns the venv python path.
+
+    uv (the Astral installer/resolver) replaces ``python -m venv`` + ``pip``: it resolves and installs
+    in parallel from a shared on-disk cache, which is markedly faster than serial pip for the multi-GB
+    torch CUDA wheels. The packages, versions, and index URLs are byte-for-byte identical to the pip
+    path; ``uv pip install`` reads the same ``requirements.txt`` and honours the same extra index, so
+    the resulting bundle contents are unchanged -- only the install is faster.
+
+    Python 3.12 is pinned because torch 2.4.1 + cu124 only ships wheels for cp38..cp312 (no cp313/14
+    wheel exists); ``uv venv --python 3.12`` makes the interpreter explicit so the build never silently
+    picks a newer Python with no matching torch wheel.
+    """
+    run(["uv", "venv", venv_dir, "--python", "3.12"])
     py = venv_python(venv_dir)
-    run([py, "-m", "pip", "install", "--upgrade", "pip", "wheel", "setuptools"])
-    # Install torch CUDA first from the CUDA index so the bundle carries CUDA runtime libs.
+    # Install torch CUDA + the rest of requirements from the CUDA index so the bundle carries CUDA
+    # runtime libs. --python targets the venv we just created; uv resolves the whole set in parallel.
     run(
         [
-            py, "-m", "pip", "install",
+            "uv", "pip", "install",
+            "--python", py,
             "--extra-index-url", torch_index,
             "-r", os.path.join(HERE, "requirements.txt"),
         ]
     )
-    # Zonos is not on PyPI; install it from git at the pinned ref.
-    run([py, "-m", "pip", "install", "{}@{}".format(ZONOS_GIT, zonos_ref)])
+    # Zonos is not on PyPI; install it from git at the pinned ref into the same venv.
+    run(["uv", "pip", "install", "--python", py, "{}@{}".format(ZONOS_GIT, zonos_ref)])
     return py
 
 
