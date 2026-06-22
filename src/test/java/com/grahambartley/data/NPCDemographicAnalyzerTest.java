@@ -32,21 +32,52 @@ public class NPCDemographicAnalyzerTest {
 
   @Test
   public void knownNpcsResolveToCorrectRaceAndGender() {
-    assertAttributes(1, "Human", "Male"); // Man
-    assertAttributes(2, "Human", "Female"); // Woman
-    assertAttributes(101, "Goblin", "Male"); // Goblin
+    // Real RuneLite/OSRS cache ids (the same ids the live client reports and the
+    // generator sources from), spanning each distinctive race bucket.
+    assertAttributes(385, "Human", "Male"); // Man
+    assertAttributes(1119, "Human", "Female"); // Woman
+    assertAttributes(655, "Goblin", "Male"); // Goblin
     assertAttributes(70, "Undead", "Male"); // Skeleton
-    assertAttributes(216, "Dwarf", "Male"); // Thurgo
-    assertAttributes(2293, "Elf", "Female"); // Arwen
+    assertAttributes(85, "Undead", "Male"); // Ghost
+    assertAttributes(4733, "Dwarf", "Male"); // Thurgo
     assertAttributes(142, "Demon", "Male"); // Demon
-    assertAttributes(419, "Wizard", "Male"); // Wise Old Man
+    assertAttributes(7746, "Wizard", "Male"); // Wizard Mizgog
+  }
+
+  @Test
+  public void dialogueNpcsResolveToCorrectGenderAndRace() {
+    // High-traffic peaceful dialogue NPCs (the acceptance-criteria sample) must
+    // now be present with the correct gender so male and female townsfolk get
+    // distinct voices on the Kokoro backend, instead of collapsing to the
+    // human-male default. Ids are real cache ids verified against the osrs data.
+    assertAttributes(3105, "Human", "Male"); // Hans
+    assertAttributes(306, "Human", "Male"); // Lumbridge Guide
+    assertAttributes(225, "Human", "Male"); // Cook
+    assertAttributes(2812, "Human", "Male"); // Father Aereck
+    assertAttributes(5037, "Human", "Male"); // Romeo
+    assertAttributes(5035, "Human", "Female"); // Juliet
+    assertAttributes(4284, "Human", "Female"); // Aggie
+    assertAttributes(3561, "Human", "Female"); // Veronica
+    assertAttributes(1305, "Human", "Female"); // Hairdresser
+    assertAttributes(11868, "Human", "Female"); // Aris (Gypsy)
+    assertAttributes(3481, "Undead", "Male"); // Count Draynor
+    assertAttributes(3893, "Dwarf", "Male"); // Doric
+    assertAttributes(766, "Human", "Male"); // Banker
+  }
+
+  @Test
+  public void femaleNamedTownsfolkResolveFemaleWithoutAnOverride() {
+    // Names with no female title still resolve Female via the curated first-name
+    // lexicon in the generator, so townsfolk like these don't default to male.
+    assertAttributes(7284, "Human", "Female"); // Gertrude
+    assertAttributes(3214, "Human", "Female"); // Cassie
   }
 
   @Test
   public void knownEntriesAreMarkedAsTableSourced() {
-    NPCAttributes goblin = analyzer.lookup(101, "Goblin");
+    NPCAttributes goblin = analyzer.lookup(655, "Goblin");
     assertEquals("StaticTable", goblin.getSource());
-    assertEquals(101, goblin.getNpcId());
+    assertEquals(655, goblin.getNpcId());
   }
 
   @Test
