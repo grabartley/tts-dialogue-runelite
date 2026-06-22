@@ -100,7 +100,7 @@ tasks.register('engineImage', Sync) {
 		from configurations.runtimeClasspath
 	}
 	into('licenses') {
-		from "${rootDir}/engine/licenses"
+		from "${rootDir}/engine-kokoro/licenses"
 	}
-	from "${rootDir}/engine/launcher"
+	from "${rootDir}/engine-kokoro/launcher"
 }

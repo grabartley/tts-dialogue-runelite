@@ -3,7 +3,7 @@ name: CI/CD
 # Build + test ONLY. This is the PR gate: it compiles the plugin and the external engine and runs
 # the full test suite (plugin tests + engine --stdio framing/manifest conformance). It deliberately
 # does NOT build engine bundles, sign, notarize, or publish anything: that is the manual
-# engine-release workflow, triggered only via workflow_dispatch. The workflow_dispatch trigger here
+# kokoro-engine-release workflow, triggered only via workflow_dispatch. The workflow_dispatch trigger here
 # is just a manual re-run of the same build+test gate, never a release.
 on:
   pull_request:

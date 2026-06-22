@@ -9,7 +9,7 @@ The project ships two separate artifacts on two separate channels.
 | Artifact | What it is | Built/tested by | Published by |
 |----------|------------|-----------------|--------------|
 | **Plugin jar** | Tiny, pure-JVM RuneLite plugin. Ships with no engine binary and no voice model. | `.github/workflows/cicd.yml` on every PR | The **RuneLite Plugin Hub**, which builds it from source at a tagged commit. This repo does not self-publish the jar. |
-| **Engine bundles** | Self-contained per-OS engine processes (jlink runtime + native libs + model + licenses). | `.github/workflows/engine-release.yml` (also compiled in `cicd.yml`) | This repo's **GitHub Releases**, via the manual `engine-release.yml` workflow. |
+| **Engine bundles** | Self-contained per-OS engine processes (jlink runtime + native libs + model + licenses). | `.github/workflows/kokoro-engine-release.yml` (also compiled in `cicd.yml`) | This repo's **GitHub Releases**, via the manual `kokoro-engine-release.yml` workflow. |
 
 The jar is what a user installs from the Hub. The engine bundle is what the jar downloads at runtime. They are versioned and released independently, and the manifest below is the contract that binds a given jar build to a specific published engine release.
 
@@ -17,10 +17,10 @@ There are **two** engine families behind the same transport, each with its own b
 
 | Engine | Backend | Runtime | Bundle contents | Built by | Manifest |
 |--------|---------|---------|-----------------|----------|----------|
-| **Kokoro** (CPU) | `local-kokoro` (default `LOCAL`) | jlink JVM + sherpa-onnx native libs (ONNX) | engine jars, native libs, jlink runtime, Kokoro model, licenses | `engine-release.yml` (`engine/` Gradle module) | `engine-manifest.json` |
+| **Kokoro** (CPU) | `local-kokoro` (default `LOCAL`) | jlink JVM + sherpa-onnx native libs (ONNX) | engine jars, native libs, jlink runtime, Kokoro model, licenses | `kokoro-engine-release.yml` (`engine-kokoro/` Gradle module) | `engine-manifest.json` |
 | **Zonos** (GPU) | `local-zonos` (`LOCAL_GPU`) | embedded Python + PyTorch CUDA wheels (PyTorch model) | PyInstaller-frozen Python runtime, torch CUDA wheels (bundled CUDA runtime), Zonos package + weights, reference-voice bank, licenses | `zonos-engine-release.yml` (`engine-zonos/` Python dir) | `zonos-engine-manifest.json` |
 
-Both speak the identical `--stdio` wire protocol (`ExternalEngineClient` drives either), so the plugin transport is shared. They differ only in language/runtime: Kokoro is a JVM engine in the `engine/` Gradle subproject; Zonos is a standalone Python engine in the top-level `engine-zonos/` directory, which is deliberately **outside** the Gradle build (not in `settings.gradle`, not a source set), so `./gradlew build` never compiles or is affected by it.
+Both speak the identical `--stdio` wire protocol (`ExternalEngineClient` drives either), so the plugin transport is shared. They differ only in language/runtime: Kokoro is a JVM engine in the `engine-kokoro/` Gradle subproject; Zonos is a standalone Python engine in the top-level `engine-zonos/` directory, which is deliberately **outside** the Gradle build (not in `settings.gradle`, not a source set), so `./gradlew build` never compiles or is affected by it.
 
 ## CI vs release
 
@@ -29,11 +29,11 @@ These are two distinct workflows with non-overlapping responsibilities.
 ### `cicd.yml` — the PR gate (build + test only)
 
 - Triggers: `on: pull_request` (to `main`) and `workflow_dispatch` (a manual re-run of the same gate, never a release).
-- Validates the Gradle wrapper, runs `./gradlew spotlessCheck`, then `./gradlew build`, which compiles the plugin **and** the `:engine` module and runs the full test suite. That includes the engine's `--stdio` framing/manifest conformance tests (`EngineConformanceTest`).
+- Validates the Gradle wrapper, runs `./gradlew spotlessCheck`, then `./gradlew build`, which compiles the plugin **and** the `:engine-kokoro` module and runs the full test suite. That includes the engine's `--stdio` framing/manifest conformance tests (`EngineConformanceTest`).
 - Publishes the JUnit report and uploads the built plugin jar as a CI artifact.
 - It deliberately **never** builds the cross-platform engine bundles, signs, notarizes, or publishes anything.
 
-### `engine-release.yml` — the manual release (build bundles + sign + publish)
+### `kokoro-engine-release.yml` — the manual release (build bundles + sign + publish)
 
 - Trigger: `on: workflow_dispatch` **only**. There is intentionally no `push`/tag trigger. Inputs are a `version` tag string (e.g. `v1.0.0`) and a `prerelease` boolean flag (defaults to `true`).
 - A matrix `build` job produces the three Kokoro bundles, each on a runner matching its OS/arch so the jlink runtime and native libs are native to the target:
@@ -47,7 +47,7 @@ These are two distinct workflows with non-overlapping responsibilities.
   Each bundle carries the engine application jar, the per-target sherpa-onnx native libraries, a self-contained `jlink` Java runtime (so end users need no JDK), the Kokoro model (`kokoro-multi-lang-v1_0`, downloaded from the sherpa-onnx model release and normalized to a `model/` dir), and the Apache-2.0 attribution files under `licenses/`.
 - Per-target validation runs before any signing: the `--stdio` conformance test runs on the Linux bundle (`EngineConformanceTest`, asserting the full frame round-trips on a real built engine), and every target runs a native `--selftest` (synthesize a fixed phrase, report sample rate + sample count). Self-test runs before signing so a self-test failure fast-fails cheaply and a signed bundle always implies "passed self-test".
 - Optional, secret-gated code-signing/notarization (see the table below). With no secrets the bundles ship **unsigned** and the workflow still completes.
-- Each bundle is sha256'd. A `publish` job gathers all targets, regenerates `engine-manifest.json` via `engine/scripts/generate_manifest.py`, publishes (or refreshes) a GitHub Release under the version tag with the bundles + their `.sha256` files, and opens an auto-PR to commit the refreshed manifest into the plugin resources.
+- Each bundle is sha256'd. A `publish` job gathers all targets, regenerates `engine-manifest.json` via `engine-kokoro/scripts/generate_manifest.py`, publishes (or refreshes) a GitHub Release under the version tag with the bundles + their `.sha256` files, and opens an auto-PR to commit the refreshed manifest into the plugin resources.
 - The workflow is re-runnable: re-running for the same tag refreshes that release's assets.
 
 ### `zonos-engine-release.yml` — the manual Zonos GPU release (self-contained bundle)
@@ -83,7 +83,7 @@ The same installer also resolves a second engine through `zonos-engine-manifest.
 
 Releases are **never automatic**. Cut one in this order:
 
-1. **Dispatch `engine-release.yml`** from the Actions tab ("Engine Release" -> "Run workflow"), supplying the `version` tag and the `prerelease` flag. It builds and validates the three Kokoro bundles, signs them if secrets are present, publishes the GitHub Release, regenerates `engine-manifest.json`, and opens an auto-PR with the updated manifest.
+1. **Dispatch `kokoro-engine-release.yml`** from the Actions tab ("Kokoro Engine Release" -> "Run workflow"), supplying the `version` tag and the `prerelease` flag. It builds and validates the three Kokoro bundles, signs them if secrets are present, publishes the GitHub Release, regenerates `engine-manifest.json`, and opens an auto-PR with the updated manifest.
 2. **Merge the manifest auto-PR** so the bundled manifest in the plugin points at the real, published engine bundles (real `url` + `sha256` per platform) instead of the dev placeholders.
 3. **Submit/update the plugin in `runelite/plugin-hub`** at the tagged commit (see issue #31) so the Hub builds the jar from source at that commit and serves it. The jar is published by the Hub, not by this repo.
 4. **Users install from the Hub.** On first use of the local voice, the jar reads the merged manifest, downloads the per-OS engine bundle from the Release, verifies its sha256, and runs it.
@@ -92,7 +92,7 @@ Releases are **never automatic**. Cut one in this order:
 
 Cutting a Zonos GPU engine release follows the same shape as Kokoro, on its own workflow:
 
-1. **(Optional, CI does this automatically) Generate the reference-voice bank.** The clips are generated from the Kokoro CPU engine, not staged by hand: the release workflow builds the Kokoro engine image, downloads the model, and runs `engine-zonos/scripts/generate_reference_voices.py` to populate `engine-zonos/voices/` before packaging. To produce the bank locally instead, build the Kokoro image (`./gradlew :engine:engineImage`), stage the `kokoro-multi-lang-v1_0` model into `engine/build/engine-image/model/`, then run `python engine-zonos/scripts/generate_reference_voices.py --engine-launcher engine/build/engine-image/kokoro-engine`. `build_bundle.py` asserts the bank is complete and fails the build otherwise. The clips are gitignored generated assets (Kokoro-generated, Apache-2.0; see `engine-zonos/voices/ATTRIBUTION.md`).
+1. **(Optional, CI does this automatically) Generate the reference-voice bank.** The clips are generated from the Kokoro CPU engine, not staged by hand: the release workflow builds the Kokoro engine image, downloads the model, and runs `engine-zonos/scripts/generate_reference_voices.py` to populate `engine-zonos/voices/` before packaging. To produce the bank locally instead, build the Kokoro image (`./gradlew :engine-kokoro:engineImage`), stage the `kokoro-multi-lang-v1_0` model into `engine-kokoro/build/engine-image/model/`, then run `python engine-zonos/scripts/generate_reference_voices.py --engine-launcher engine-kokoro/build/engine-image/kokoro-engine`. `build_bundle.py` asserts the bank is complete and fails the build otherwise. The clips are gitignored generated assets (Kokoro-generated, Apache-2.0; see `engine-zonos/voices/ATTRIBUTION.md`).
 2. **Dispatch `zonos-engine-release.yml`** from the Actions tab ("Zonos Engine Release" -> "Run workflow"), supplying the `version` tag (and optionally pinning `zonos_ref`). It builds the Kokoro engine and generates the reference-voice bank, then builds the `win-x64` Zonos bundle on a standard Windows runner (no GPU), sha256s the reassembled `.zip`, splits it into sub-2 GiB `…zip.partNN` parts (each sha256'd), publishes the GitHub Release under the `zonos-<version>` tag with all parts + checksums, regenerates `zonos-engine-manifest.json` with the `parts` shape, and opens an auto-PR with the updated manifest.
 3. **Validate the bundle on a GPU box** (the standalone runbook below) before merging the manifest, since CI cannot run real synthesis.
 4. **Merge the manifest auto-PR** so the plugin's `zonos-engine-manifest.json` points at the real `win-x64` bundle (real `parts` list + combined `sha256`) instead of the dev placeholder. That flips the `LOCAL_GPU` backend from "unavailable, falls back to Kokoro" to "downloads, reassembles, and runs the real Zonos bundle."
@@ -137,11 +137,11 @@ Windows SmartScreen may warn on an unsigned bundle; choose **More info -> Run an
 
 ## Versioning
 
-The plugin and engine versions are **decoupled**. The manifest is the contract between them: a given plugin build points at exactly one engine release through the bundled manifest. When the engine or its `--stdio` protocol changes, bump the engine version, re-run `engine-release.yml`, merge the new manifest, and re-tag the plugin commit submitted to the Hub. A plugin-only change that does not touch the protocol can ship against the existing engine release without cutting a new one.
+The plugin and engine versions are **decoupled**. The manifest is the contract between them: a given plugin build points at exactly one engine release through the bundled manifest. When the engine or its `--stdio` protocol changes, bump the engine version, re-run `kokoro-engine-release.yml`, merge the new manifest, and re-tag the plugin commit submitted to the Hub. A plugin-only change that does not touch the protocol can ship against the existing engine release without cutting a new one.
 
 ## Current status / gaps
 
 State as of now, so the runbook is not read as already-done:
 
-- **No engine Release exists yet.** `engine-release.yml` has not been run, so there is no published GitHub Release and the bundled `engine-manifest.json` still ships the dev placeholder (empty `url`/`sha256`). The installer correctly treats that as "no engine to install." Step 1 of the runbook is the first thing that produces a real engine.
+- **No engine Release exists yet.** `kokoro-engine-release.yml` has not been run, so there is no published GitHub Release and the bundled `engine-manifest.json` still ships the dev placeholder (empty `url`/`sha256`). The installer correctly treats that as "no engine to install." Step 1 of the runbook is the first thing that produces a real engine.
 - **A `win-x64` Zonos release exists (`zonos-v0.1.0`); macOS/Linux remain unbuilt.** The Zonos GPU engine (`engine-zonos/`), its self-contained bundle packaging (`packaging/build_bundle.py` + `zonos-engine.spec`), its manual `zonos-engine-release.yml` workflow, and the reference-voice bank generator (`engine-zonos/scripts/generate_reference_voices.py`, which synthesizes the clips from the Kokoro CPU engine) are all implemented and the wire protocol is framing-validated. The reference-voice bank is reproducible locally on a CPU and the release workflow generates it from Kokoro before packaging. The `zonos-v0.1.0` release publishes the real `win-x64` split bundle (combined `sha256` `bda8811…`, two `…zip.partNN` parts), and `zonos-engine-manifest.json` now carries that bundle, so on Windows/NVIDIA the `LOCAL_GPU` backend downloads, reassembles, and runs the real Zonos engine. The macOS/Linux slots stay empty placeholders (Zonos is NVIDIA-only for v1), so on those platforms the backend stays unavailable and selecting it falls back to the local Kokoro voice.

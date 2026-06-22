@@ -1,4 +1,4 @@
-name: Engine Release
+name: Kokoro Engine Release
 
 # MANUAL ONLY. This pipeline builds, signs (when secrets are present), checksums, and publishes the
 # cross-platform Kokoro engine bundles to a GitHub Release. It is never triggered automatically:
@@ -59,13 +59,13 @@ jobs:
 
       - name: Stage engine image (jars + native libs + licenses)
         shell: bash
-        run: ./gradlew :engine:engineImage -PtargetPlatform="${{ matrix.platform }}" -PengineVersion="${{ inputs.version }}"
+        run: ./gradlew :engine-kokoro:engineImage -PtargetPlatform="${{ matrix.platform }}" -PengineVersion="${{ inputs.version }}"
 
       - name: Download and extract the Kokoro model
         shell: bash
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/${MODEL_NAME}.tar.bz2"
           echo "Downloading model bundle (~349 MB) from $URL"
           curl -fL --retry 3 -o model.tar.bz2 "$URL"
@@ -81,7 +81,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           # Minimal runtime carrying the JDK modules the engine + sherpa-onnx need at run time, so
           # end users need no JDK installed.
           jlink \
@@ -97,8 +97,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          export KOKORO_MODEL_DIR="$PWD/engine/build/engine-image/model"
-          ./gradlew :engine:test --tests 'com.grahambartley.engine.EngineConformanceTest'
+          export KOKORO_MODEL_DIR="$PWD/engine-kokoro/build/engine-image/model"
+          ./gradlew :engine-kokoro:test --tests 'com.grahambartley.engine.EngineConformanceTest'
 
       # Run the native --selftest BEFORE any signing/notarization so a self-test failure is cheap
       # and fast-fails the job: a signed/notarized bundle then always implies "passed self-test".
@@ -106,7 +106,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           if [ "${{ matrix.platform }}" = "win-x64" ]; then
             # cmd.exe can't take a forward-slash relative path (it parses `/build` as a switch), so
             # resolve the launcher to an absolute Windows path with cygpath before handing it to cmd.
@@ -130,7 +130,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           KEYCHAIN="$RUNNER_TEMP/engine-signing.keychain-db"
           security create-keychain -p actions "$KEYCHAIN"
           security set-keychain-settings -lut 21600 "$KEYCHAIN"
@@ -157,7 +157,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           # Notarize a zip of the (already codesigned) image. Stapling applies to app bundles; for a
           # plain directory bundle the notarization ticket plus quarantine clear is the path.
           ditto -c -k --keepParent "$IMG" "$RUNNER_TEMP/notarize.zip"
@@ -172,7 +172,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           if [ -f "$IMG/signed" ]; then
             MSG="macOS signing: applied (codesigned + notarized)"
           elif [ -f "$RUNNER_TEMP/codesigned" ]; then
@@ -191,7 +191,7 @@ jobs:
           WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
         shell: pwsh
         run: |
-          $img = "engine/build/engine-image"
+          $img = "engine-kokoro/build/engine-image"
           [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\cert.pfx", [Convert]::FromBase64String($env:WINDOWS_CERT_PFX))
           $targets = Get-ChildItem -Path $img -Recurse -Include *.exe,*.dll
           foreach ($t in $targets) {
@@ -204,7 +204,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           if [ -f "$IMG/signed" ]; then
             MSG="Windows signing: applied (signtool)"
           else
@@ -217,7 +217,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           OUT="dist/${{ matrix.platform }}"
           mkdir -p "$OUT"
           BUNDLE="kokoro-engine-${{ inputs.version }}-${{ matrix.platform }}"
@@ -284,7 +284,7 @@ jobs:
       - name: Generate engine-manifest.json
         shell: bash
         run: |
-          python3 engine/scripts/generate_manifest.py \
+          python3 engine-kokoro/scripts/generate_manifest.py \
             --version "${{ inputs.version }}" \
             --repo "${{ github.repository }}" \
             --artifacts-dir release-artifacts \

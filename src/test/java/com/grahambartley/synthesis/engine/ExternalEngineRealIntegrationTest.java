@@ -18,11 +18,11 @@ import org.junit.Test;
 
 /**
  * End-to-end round-trip against the REAL locally-built engine image, spawning the actual {@code
- * --stdio} process. It is gated on the presence of {@code engine/build/engine-image} (and a usable
- * model), so CI and dev machines without a built engine skip it cleanly via JUnit {@code assume}
- * instead of failing. This is the only test that proves the spawn -> request -> PCM path against
- * the production engine; the framing logic itself is covered without a real process by {@link
- * ExternalEngineClientTest}.
+ * --stdio} process. It is gated on the presence of {@code engine-kokoro/build/engine-image} (and a
+ * usable model), so CI and dev machines without a built engine skip it cleanly via JUnit {@code
+ * assume} instead of failing. This is the only test that proves the spawn -> request -> PCM path
+ * against the production engine; the framing logic itself is covered without a real process by
+ * {@link ExternalEngineClientTest}.
  *
  * <p>Model resolution: the engine reads {@code KOKORO_MODEL_DIR} or a {@code model/} dir beside the
  * image. Set {@code KOKORO_MODEL_DIR} (it is inherited by the spawned child) to point at an
@@ -34,11 +34,12 @@ public class ExternalEngineRealIntegrationTest {
     String os = System.getProperty("os.name", "").toLowerCase();
     String name = os.contains("win") ? "kokoro-engine.bat" : "kokoro-engine";
     // Resolve from the repo root regardless of the test's working dir.
-    Path candidate = Paths.get("engine", "build", "engine-image", name).toAbsolutePath();
+    Path candidate = Paths.get("engine-kokoro", "build", "engine-image", name).toAbsolutePath();
     if (Files.isRegularFile(candidate)) {
       return candidate;
     }
-    return Paths.get("..", "..", "..", "engine", "build", "engine-image", name).toAbsolutePath();
+    return Paths.get("..", "..", "..", "engine-kokoro", "build", "engine-image", name)
+        .toAbsolutePath();
   }
 
   private static boolean modelResolvable() {
@@ -55,7 +56,7 @@ public class ExternalEngineRealIntegrationTest {
   public void realEngineRoundTripProducesPcm() {
     Path launcher = launcher();
     assumeTrue(
-        "engine image not built (run :engine:engineImage) - skipping real round-trip",
+        "engine image not built (run :engine-kokoro:engineImage) - skipping real round-trip",
         Files.isRegularFile(launcher));
     assumeTrue(
         "no Kokoro model resolvable (set KOKORO_MODEL_DIR) - skipping real round-trip",

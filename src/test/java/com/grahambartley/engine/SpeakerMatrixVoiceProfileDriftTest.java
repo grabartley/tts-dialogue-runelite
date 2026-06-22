@@ -16,7 +16,7 @@ import org.junit.Test;
  * two copies ever diverge, the same NPC would get a different voice depending on whether synthesis
  * runs in-process (plugin) or through the external engine. This test loads BOTH classes directly
  * (the engine subproject is on the plugin test classpath via {@code testImplementation
- * project(':engine')}, and {@code VoiceProfile} resolves through {@code testImplementation
+ * project(':engine-kokoro')}, and {@code VoiceProfile} resolves through {@code testImplementation
  * net.runelite:client}) and asserts every mapping is identical, so the duplication can never
  * silently drift.
  *

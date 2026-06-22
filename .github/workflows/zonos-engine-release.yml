@@ -101,7 +101,7 @@ jobs:
           set -euo pipefail
           # The Zonos reference clips are generated from the Kokoro CPU engine, so build its image
           # here. This needs no GPU and runs on the same windows-latest runner that packages Zonos.
-          ./gradlew :engine:engineImage -PtargetPlatform=${{ matrix.kokoro_platform }}
+          ./gradlew :engine-kokoro:engineImage -PtargetPlatform=${{ matrix.kokoro_platform }}
 
       - name: Download and extract the Kokoro model
         shell: bash
@@ -109,7 +109,7 @@ jobs:
           MODEL_NAME: kokoro-multi-lang-v1_0
         run: |
           set -euo pipefail
-          IMG="engine/build/engine-image"
+          IMG="engine-kokoro/build/engine-image"
           URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/${MODEL_NAME}.tar.bz2"
           echo "Downloading Kokoro model bundle (~349 MB) from $URL"
           curl -fL --retry 3 -o model.tar.bz2 "$URL"
@@ -127,7 +127,7 @@ jobs:
           # Drive the Kokoro engine to synthesize one <id>.wav per Zonos voice id (same race/gender
           # /player as the matching Kokoro speaker), populating engine-zonos/voices/ before packaging.
           # build_bundle.py then asserts the bank is complete; a release needs no manual clip staging.
-          LAUNCHER="engine/build/engine-image/${{ matrix.kokoro_launcher }}"
+          LAUNCHER="engine-kokoro/build/engine-image/${{ matrix.kokoro_launcher }}"
           if [ "${{ matrix.platform }}" != "win-x64" ]; then chmod +x "$LAUNCHER"; fi
           python engine-zonos/scripts/generate_reference_voices.py --engine-launcher "$LAUNCHER"
           ls -la engine-zonos/voices/

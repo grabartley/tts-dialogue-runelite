@@ -149,7 +149,7 @@ Run the `com.grahambartley.TTSDialoguePluginTest` class with these VM options:
 -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED
 ```
 
-You can run it directly from your IDE (such as IntelliJ) or configure it in `build.gradle` for CLI use. The repo also ships the standalone TTS engine under `engine/`, built and published to GitHub Releases by a manual workflow and resolved at runtime through the bundled `engine-manifest.json`. For how the jar and engine fit together and the engine release runbook (cutting a release, signing secrets, macOS Gatekeeper fallback), see [docs/engine-pipeline.md](docs/engine-pipeline.md).
+You can run it directly from your IDE (such as IntelliJ) or configure it in `build.gradle` for CLI use. The repo also ships the standalone TTS engine under `engine-kokoro/`, built and published to GitHub Releases by a manual workflow and resolved at runtime through the bundled `engine-manifest.json`. For how the jar and engine fit together and the engine release runbook (cutting a release, signing secrets, macOS Gatekeeper fallback), see [docs/engine-pipeline.md](docs/engine-pipeline.md).
 
 ## Tech Stack
 

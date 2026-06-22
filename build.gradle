@@ -41,7 +41,7 @@ dependencies {
 	// plugin's VoiceManager.VoiceProfile. The engine's own sherpa-onnx runtime deps are excluded so
 	// they never leak into the plugin's testRuntimeClasspath (and thus the shadow jar): SpeakerMatrix
 	// is a pure mapping class with no sherpa imports, so the drift test needs none of them.
-	testImplementation(project(':engine')) {
+	testImplementation(project(':engine-kokoro')) {
 		transitive = false
 	}
 }
