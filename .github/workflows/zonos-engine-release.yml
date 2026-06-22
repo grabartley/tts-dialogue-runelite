@@ -61,6 +61,11 @@ jobs:
           #   kokoro_platform: linux-x64
           #   kokoro_launcher: kokoro-engine
     runs-on: ${{ matrix.os }}
+    # Pin pip's download cache to a workspace path so the cache step below can save/restore it; the
+    # build_bundle.py pip subprocess inherits this env, so the multi-GB torch CUDA wheels are fetched
+    # once and reused on every re-run.
+    env:
+      PIP_CACHE_DIR: ${{ github.workspace }}/.pip-cache
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -69,6 +74,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Cache pip wheels (torch CUDA)
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.pip-cache
+          # The big, slow download is the CUDA-indexed torch/torchaudio wheels; key on the torch
+          # index and the pinned requirements so a re-run with the same deps skips re-downloading
+          # ~2.5 GB of wheels. Falls back to any prior pip cache for partial reuse.
+          key: ${{ runner.os }}-zonos-pip-${{ inputs.torch_index }}-${{ hashFiles('engine-zonos/packaging/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-zonos-pip-
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4

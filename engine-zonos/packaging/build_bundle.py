@@ -42,6 +42,7 @@ import os
 import shutil
 import subprocess
 import sys
+import threading
 import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -167,7 +168,12 @@ def zip_bundle(root: str, out_zip: str) -> None:
     """Zip the assembled tree so the launcher sits at the archive root (matches EngineInstaller)."""
     os.makedirs(os.path.dirname(out_zip), exist_ok=True)
     base = os.path.dirname(root)
-    with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED) as zf:
+    # Store (no compression): the bundle is dominated by the torch CUDA DLLs and the safetensors
+    # weights, which are already near-incompressible (a DEFLATE pass shrinks the ~2.97 GB tree by a
+    # fraction of a percent), so deflating just burns a long single-threaded CPU pass for ~zero size
+    # gain. ZIP_STORED is far faster to create here and faster for EngineInstaller to extract on the
+    # user's machine. allowZip64 stays on for the >4 GiB total / many-entry tree.
+    with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_STORED, allowZip64=True) as zf:
         for dirpath, _dirs, files in os.walk(root):
             for name in files:
                 full = os.path.join(dirpath, name)
@@ -210,10 +216,29 @@ def main() -> int:
 
     py = build_venv(venv_dir, args.torch_index, args.zonos_ref)
 
+    # The weight download (network-bound, ~1.6 GB into model/) and the PyInstaller freeze (CPU/disk
+    # into runtime/) touch disjoint outputs, so overlap them: kick the snapshot download off on a
+    # background thread and let it run while PyInstaller freezes, then join before assembling. Any
+    # error in the download is re-raised on the main thread so the build still fails loudly.
+    weights_error = []
+    weights_thread = None
     if not args.skip_weights:
-        fetch_weights(py, model_dir, args.model_id)
+
+        def _fetch_weights():
+            try:
+                fetch_weights(py, model_dir, args.model_id)
+            except BaseException as exc:  # noqa: BLE001 - surfaced on the main thread below
+                weights_error.append(exc)
+
+        weights_thread = threading.Thread(target=_fetch_weights, name="fetch-weights")
+        weights_thread.start()
 
     runtime_src = run_pyinstaller(py, work_dir, pyi_dist)
+
+    if weights_thread is not None:
+        weights_thread.join()
+        if weights_error:
+            raise weights_error[0]
 
     root = assemble_tree(args.platform, args.version, runtime_src, staging,
                          include_weights=not args.skip_weights)
