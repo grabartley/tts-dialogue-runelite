@@ -41,9 +41,17 @@ Each per-platform input dir contains EITHER a single ``.zip`` (single-file) OR a
 used). For a split bundle the combined ``<archive>.zip.sha256`` is also present (the sha256 of the
 reassembled archive). A ``signed`` marker file => ``"signed": true``.
 
+``--version`` drives the bundle FILENAMES (e.g. ``zonos-engine-v0.1.0-win-x64.zip``) and the
+manifest ``version`` field. ``--release-tag`` is the GitHub Release tag the assets are published
+under and is used ONLY for the ``releases/download/<tag>/`` segment of each download URL. The Zonos
+release is published under ``zonos-<version>`` (e.g. ``zonos-v0.1.0``), which differs from the bare
+filename version, so the two must be passed separately. ``--release-tag`` defaults to ``--version``
+when omitted so existing local invocations keep working.
+
 Usage:
   generate_zonos_manifest.py \
     --version v0.1.0 \
+    --release-tag zonos-v0.1.0 \
     --repo grabartley/tts-dialogue-runelite \
     --artifacts-dir ./release-artifacts \
     --out ./src/main/resources/zonos-engine-manifest.json
@@ -81,8 +89,8 @@ def read_sha256(path):
         return f.read().strip().split()[0]
 
 
-def url_for(repo, version, name):
-    return "https://github.com/{}/releases/download/{}/{}".format(repo, version, name)
+def url_for(repo, release_tag, name):
+    return "https://github.com/{}/releases/download/{}/{}".format(repo, release_tag, name)
 
 
 def find_parts(platform_dir):
@@ -110,7 +118,7 @@ def find_bundle(platform_dir):
     raise FileNotFoundError("No bundle file found in {}".format(platform_dir))
 
 
-def split_entry(platform, platform_dir, repo, version, parts, signed):
+def split_entry(platform, platform_dir, repo, release_tag, parts, signed):
     """Build a split platform entry from the ordered parts plus the combined archive sha256.
 
     ``parts`` is the list returned by :func:`find_parts`. The archive name is taken from the first
@@ -127,7 +135,7 @@ def split_entry(platform, platform_dir, repo, version, parts, signed):
         total_size += size
         part_entries.append(
             {
-                "url": url_for(repo, version, name),
+                "url": url_for(repo, release_tag, name),
                 "sha256": read_sha256(part_path + ".sha256"),
                 "size": size,
             }
@@ -144,11 +152,21 @@ def split_entry(platform, platform_dir, repo, version, parts, signed):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", required=True)
+    ap.add_argument("--version", required=True, help="bundle filename version, e.g. v0.1.0")
+    ap.add_argument(
+        "--release-tag",
+        default=None,
+        help=(
+            "GitHub Release tag the assets are published under (used only for the "
+            "releases/download/<tag>/ URL segment); defaults to --version when omitted"
+        ),
+    )
     ap.add_argument("--repo", required=True, help="owner/name for the Releases download URL")
     ap.add_argument("--artifacts-dir", required=True)
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
+
+    release_tag = args.release_tag if args.release_tag else args.version
 
     artifacts = {}
     built = 0
@@ -164,12 +182,12 @@ def main():
             # Split bundle (issue #60): the .zip exceeded the 2 GiB asset cap and was uploaded as
             # ordered .partNN files. Emit the parts list + combined archive sha256.
             artifacts[platform] = split_entry(
-                platform, pdir, args.repo, args.version, parts, signed
+                platform, pdir, args.repo, release_tag, parts, signed
             )
         else:
             bundle_name, bundle_path = find_bundle(pdir)
             artifacts[platform] = {
-                "url": url_for(args.repo, args.version, bundle_name),
+                "url": url_for(args.repo, release_tag, bundle_name),
                 "sha256": read_sha256(bundle_path + ".sha256"),
                 "size": os.path.getsize(bundle_path),
                 "signed": signed,

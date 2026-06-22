@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.InputStream;
@@ -15,8 +16,9 @@ import org.junit.Test;
  * Guards the {@code zonos-engine-manifest.json} resource: a separate engine artifact from Kokoro,
  * resolved through the same {@link EngineInstaller} by passing {@link
  * EngineInstaller#ZONOS_MANIFEST_RESOURCE}. It mirrors the #36 manifest shape with {@code engine:
- * "zonos"}, and the committed copy is the dev placeholder (empty urls/sha) because no Zonos GPU
- * engine is published yet, so install degrades to "unavailable" rather than crashing.
+ * "zonos"}. The committed copy carries the published {@code zonos-v0.1.0} win-x64 split bundle,
+ * while the macOS/Linux slots stay empty placeholders (Zonos is NVIDIA/win-x64 only for v1) so
+ * install degrades to "unavailable" rather than crashing there.
  */
 public class ZonosEngineManifestResourceTest {
 
@@ -52,6 +54,36 @@ public class ZonosEngineManifestResourceTest {
       String launcher = entry.get("launcher").getAsString();
       String expected = platform.startsWith("win") ? "zonos-engine.bat" : "zonos-engine";
       assertEquals("launcher mismatch for " + platform, expected, launcher);
+    }
+  }
+
+  /**
+   * Regression guard for #73: the published Zonos release lives under tag {@code zonos-v0.1.0}, not
+   * the bare {@code v0.1.0} (which is the Kokoro release tag). If a populated win-x64 split entry
+   * is committed, every part URL must point at the {@code releases/download/zonos-<version>/}
+   * segment, otherwise the engine download 404s. Skipped when the committed copy is still the dev
+   * placeholder.
+   */
+  @Test
+  public void winX64PartUrlsUseTaggedReleaseSegment() throws Exception {
+    JsonObject artifacts = load().getAsJsonObject("artifacts");
+    JsonObject winX64 = artifacts.getAsJsonObject("win-x64");
+    if (!winX64.has("parts")) {
+      return; // dev placeholder: nothing populated to guard yet
+    }
+
+    String version =
+        winX64.get("archive").getAsString().split("-win-x64")[0].replace("zonos-engine-", "");
+    JsonArray parts = winX64.getAsJsonArray("parts");
+    assertTrue("win-x64 split entry must list at least one part", parts.size() > 0);
+    for (int i = 0; i < parts.size(); i++) {
+      String url = parts.get(i).getAsJsonObject().get("url").getAsString();
+      assertTrue(
+          "part " + i + " url must use the zonos-" + version + " release tag segment, was: " + url,
+          url.contains("/releases/download/zonos-" + version + "/"));
+      assertTrue(
+          "part " + i + " url must not use the bare-version release tag, was: " + url,
+          !url.contains("/releases/download/" + version + "/"));
     }
   }
 
