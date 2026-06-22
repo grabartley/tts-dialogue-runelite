@@ -1,0 +1,111 @@
+name: Zonos Frozen-Import Smoke Test
+
+# CHEAP guard for the frozen Zonos engine's torch/numpy import path.
+#
+# The frozen engine once reported no GPU with
+# `torch/CUDA unavailable: cannot load module more than once per process` -- numpy 2.4+'s guard,
+# tripped because PyInstaller's bootstrap removes numpy in cleanup_loaded_modules and torch then
+# re-imports it (issue #77). The fix is pinning numpy<2.4 in engine-zonos/packaging/requirements.txt.
+#
+# A full release build (zonos-engine-release.yml) is ~50 min and ~2.9 GB, far too expensive to use as
+# the feedback loop for that one-line pin. This job reproduces ONLY the import path that broke: it
+# PyInstaller-freezes a tiny `import torch` + cuda-probe script (packaging/smoke_import.py via
+# packaging/smoke-import.spec, mirroring the real spec's torch collection) and RUNS the frozen exe.
+# It installs NO zonos, downloads NO weights, builds NO bundle. windows-latest, no GPU: the
+# double-load surfaces at import (before any CUDA call), so a GPU is not needed to reproduce it.
+#
+# PASS = the frozen exe imports torch cleanly (cuda is_available() may be False on the runner, which
+# is fine). FAIL = the exe crashes or its output contains the double-load string.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - engine-zonos/packaging/requirements.txt
+      - engine-zonos/packaging/zonos-engine.spec
+      - engine-zonos/packaging/smoke_import.py
+      - engine-zonos/packaging/smoke-import.spec
+      - engine-zonos/zonos_engine/synthesizer.py
+      - .github/workflows/zonos-smoke-test.yml
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Frozen torch/numpy import (win-x64, no GPU)
+    # Windows + frozen specific: this is where the double-load surfaced, so reproduce it there.
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # torch 2.4.1 + cu124 only ships cp38..cp312 wheels, so the frozen interpreter must be 3.12.
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-suffix: zonos-smoke
+          cache-dependency-glob: engine-zonos/packaging/requirements.txt
+
+      - name: Create venv + install minimal frozen-import deps
+        shell: bash
+        run: |
+          set -euo pipefail
+          # ONLY the deps needed to reproduce the frozen double-load: torch (cu124, carries numpy as a
+          # dep but we pin it explicitly to match the bundle), numpy<2.4 (the fix under test), and
+          # pyinstaller (to freeze). NOT zonos, NOT torchaudio, NOT weights -- that is the whole point
+          # of this job being cheap. Versions mirror engine-zonos/packaging/requirements.txt.
+          uv venv .smoke-venv --python 3.12
+          uv pip install --python .smoke-venv \
+            --extra-index-url https://download.pytorch.org/whl/cu124 \
+            "torch==2.4.1" "numpy<2.4" "pyinstaller==6.10.0"
+
+      - name: Show resolved torch + numpy versions (unfrozen)
+        shell: bash
+        run: |
+          set -euo pipefail
+          .smoke-venv/Scripts/python -c "import numpy, torch; print('numpy', numpy.__version__); print('torch', torch.__version__)"
+
+      - name: PyInstaller-freeze the import probe
+        shell: bash
+        working-directory: engine-zonos
+        run: |
+          set -euo pipefail
+          # Invoke from engine-zonos so the spec's os.getcwd()-relative entry (packaging/smoke_import.py)
+          # resolves exactly like the real build invokes zonos-engine.spec.
+          ../.smoke-venv/Scripts/python -m PyInstaller \
+            --noconfirm --clean \
+            --distpath build/smoke-dist \
+            --workpath build/smoke-work \
+            packaging/smoke-import.spec
+
+      - name: Run the frozen import probe and check for the double-load
+        shell: bash
+        working-directory: engine-zonos
+        run: |
+          set -euo pipefail
+          EXE="build/smoke-dist/smoke-import/smoke-import.exe"
+          test -f "$EXE" || { echo "::error::frozen smoke exe not found at $EXE"; exit 1; }
+          # ALWAYS capture and echo the full output so a failure shows the traceback. Do not let a
+          # non-zero exit abort before we have printed it.
+          set +e
+          OUT=$("$EXE" 2>&1)
+          CODE=$?
+          set -e
+          echo "===== frozen smoke-import output (exit=$CODE) ====="
+          echo "$OUT"
+          echo "=================================================="
+          if echo "$OUT" | grep -q "cannot load module more than once per process"; then
+            echo "::error::FROZEN IMPORT FAILED: numpy double-load detected. numpy<2.4 pin did NOT fix the frozen torch import."
+            exit 1
+          fi
+          if [ "$CODE" -ne 0 ]; then
+            echo "::error::frozen smoke-import exited non-zero ($CODE) without the double-load string; see output above."
+            exit 1
+          fi
+          echo "PASS: frozen import torch + cuda probe succeeded with numpy<2.4."
