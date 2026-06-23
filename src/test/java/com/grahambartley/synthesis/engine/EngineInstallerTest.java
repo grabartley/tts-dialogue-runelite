@@ -77,9 +77,8 @@ public class EngineInstallerTest {
     assertTrue(
         EngineInstaller.isTarGz(
             "https://example.com/releases/v0.1.0/kokoro-engine-v0.1.0-linux-x64.tar.gz"));
-    assertTrue(
-        "a zip (win-x64, Zonos split) must NOT be tar.gz", !EngineInstaller.isTarGz("x.zip"));
-    assertTrue(!EngineInstaller.isTarGz("zonos-engine-v0.1.0-win-x64.zip"));
+    assertTrue("a zip (win-x64) must NOT be tar.gz", !EngineInstaller.isTarGz("x.zip"));
+    assertTrue(!EngineInstaller.isTarGz("kokoro-engine-v0.1.0-win-x64.zip"));
     assertTrue(!EngineInstaller.isTarGz(""));
     assertTrue(!EngineInstaller.isTarGz(null));
   }
@@ -216,107 +215,6 @@ public class EngineInstallerTest {
     assertEquals("kokoro", installed.engine());
   }
 
-  // --- split (multi-part) install
-  // -----------------------------------------------------------------
-
-  @Test
-  public void splitInstallDownloadsReassemblesVerifiesAndExtracts() throws Exception {
-    // A real bundle zip, split into ordered byte ranges, each served at its own URL. The installer
-    // must download every part, verify each part's sha256, concatenate IN ORDER, verify the
-    // combined
-    // sha256, then extract via the existing path.
-    byte[] zipBytes = buildBundleZip("zonos-engine", "zonos-engine.bat");
-    String combinedSha = sha256HexOf(zipBytes);
-    byte[][] chunks = splitInto(zipBytes, 3);
-
-    server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-    StringBuilder partsJson = new StringBuilder("[");
-    for (int i = 0; i < chunks.length; i++) {
-      String path = "/part" + i;
-      registerStaticBody(path, chunks[i]);
-      if (i > 0) {
-        partsJson.append(',');
-      }
-      partsJson
-          .append("{\"url\":\"")
-          .append(baseUrl())
-          .append(path)
-          .append("\",\"sha256\":\"")
-          .append(sha256HexOf(chunks[i]))
-          .append("\",\"size\":")
-          .append(chunks[i].length)
-          .append('}');
-    }
-    partsJson.append(']');
-    server.start();
-
-    Path enginesRoot = tmp.newFolder("engines").toPath();
-    String platform = EngineInstaller.currentPlatformId();
-    String launcherName = platform.startsWith("win") ? "zonos-engine.bat" : "zonos-engine";
-    EngineInstaller installer =
-        installerWithManifest(
-            enginesRoot, splitManifest(platform, partsJson.toString(), combinedSha, launcherName));
-
-    EngineInstaller.Installed installed = installer.install();
-    assertNotNull("split install should resolve a launcher", installed);
-    assertEquals(launcherName, installed.launcher().getFileName().toString());
-    assertTrue(Files.isRegularFile(installed.launcher()));
-    assertEquals("zonos", installed.engine());
-    // No part temp files left behind in the engines root.
-    try (java.util.stream.Stream<Path> stale =
-        Files.list(enginesRoot).filter(p -> p.getFileName().toString().contains(".part"))) {
-      assertEquals("part temp files must be cleaned up", 0, stale.count());
-    }
-  }
-
-  @Test
-  public void splitInstallWithCorruptPartFailsGracefully() throws Exception {
-    byte[] zipBytes = buildBundleZip();
-    String combinedSha = sha256HexOf(zipBytes);
-    byte[][] chunks = splitInto(zipBytes, 3);
-
-    server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-    StringBuilder partsJson = new StringBuilder("[");
-    for (int i = 0; i < chunks.length; i++) {
-      String path = "/part" + i;
-      registerStaticBody(path, chunks[i]);
-      if (i > 0) {
-        partsJson.append(',');
-      }
-      // Advertise a WRONG sha256 for the middle part: its per-part verify must fail.
-      String advertised = i == 1 ? "deadbeef".repeat(8) : sha256HexOf(chunks[i]);
-      partsJson
-          .append("{\"url\":\"")
-          .append(baseUrl())
-          .append(path)
-          .append("\",\"sha256\":\"")
-          .append(advertised)
-          .append("\",\"size\":")
-          .append(chunks[i].length)
-          .append('}');
-    }
-    partsJson.append(']');
-    server.start();
-
-    Path enginesRoot = tmp.newFolder("engines").toPath();
-    String platform = EngineInstaller.currentPlatformId();
-    String launcherName = platform.startsWith("win") ? "zonos-engine.bat" : "zonos-engine";
-    EngineInstaller installer =
-        installerWithManifest(
-            enginesRoot, splitManifest(platform, partsJson.toString(), combinedSha, launcherName));
-
-    assertNull("a corrupt part must yield null, not a crash", installer.install());
-    // No half-extracted launcher and no stray part files.
-    Path installDir = enginesRoot.resolve("zonos-0.0.0-dev");
-    assertTrue(
-        "no launcher should be installed on failure",
-        !Files.exists(installDir.resolve(launcherName)));
-    try (java.util.stream.Stream<Path> stale =
-        Files.list(enginesRoot).filter(p -> p.getFileName().toString().contains(".part"))) {
-      assertEquals("no part temp files should remain on failure", 0, stale.count());
-    }
-  }
-
   @Test
   public void shaMismatchFailsGracefully() throws Exception {
     byte[] zipBytes = buildBundleZip();
@@ -374,22 +272,6 @@ public class EngineInstallerTest {
     }
   }
 
-  @Test
-  public void bundledZonosDevManifestResourceYieldsNull() {
-    // The committed /zonos-engine-manifest.json resource has empty urls -> no installable engine,
-    // resolved through the same installer via the Zonos manifest-resource constructor.
-    Path enginesRoot;
-    try {
-      enginesRoot = tmp.newFolder("engines-zonos").toPath();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    EngineInstaller installer =
-        new EngineInstaller(
-            new OkHttpClient(), gson, enginesRoot, EngineInstaller.ZONOS_MANIFEST_RESOURCE);
-    assertNull("dev Zonos manifest resource must degrade to no-engine", installer.install());
-  }
-
   // --- helpers -----------------------------------------------------------------------------------
 
   /**
@@ -417,49 +299,6 @@ public class EngineInstallerTest {
         + "\",\"launcher\":\""
         + launcher
         + "\"}}}";
-  }
-
-  /** A split (Zonos) manifest: a {@code parts} array + combined sha256 for the reassembled zip. */
-  private String splitManifest(
-      String platform, String partsJson, String combinedSha, String launcher) {
-    return "{\"schemaVersion\":1,\"engine\":\"zonos\",\"version\":\"0.0.0-dev\",\"artifacts\":{\""
-        + platform
-        + "\":{\"archive\":\"zonos.zip\",\"sha256\":\""
-        + combinedSha
-        + "\",\"launcher\":\""
-        + launcher
-        + "\",\"parts\":"
-        + partsJson
-        + "}}}";
-  }
-
-  /** Splits {@code data} into {@code n} contiguous chunks (last absorbs the remainder). */
-  private static byte[][] splitInto(byte[] data, int n) {
-    byte[][] chunks = new byte[n][];
-    int base = data.length / n;
-    int offset = 0;
-    for (int i = 0; i < n; i++) {
-      int len = (i == n - 1) ? data.length - offset : base;
-      chunks[i] = java.util.Arrays.copyOfRange(data, offset, offset + len);
-      offset += len;
-    }
-    return chunks;
-  }
-
-  /** Registers a fixed-body GET handler on the current (not-yet-started) {@link #server}. */
-  private void registerStaticBody(String path, byte[] body) {
-    server.createContext(
-        path,
-        exchange -> {
-          exchange.sendResponseHeaders(200, body.length);
-          try (OutputStream os = exchange.getResponseBody()) {
-            os.write(body);
-          }
-        });
-  }
-
-  private String baseUrl() {
-    return "http://127.0.0.1:" + server.getAddress().getPort();
   }
 
   /**

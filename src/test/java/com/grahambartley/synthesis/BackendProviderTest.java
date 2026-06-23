@@ -155,31 +155,6 @@ public class BackendProviderTest {
   }
 
   @Test
-  public void availabilityNoticeFiresOncePerBackendWhenCyclingUnavailableBackends() {
-    TestConfig config = new TestConfig();
-    StubBackend kokoro =
-        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend azure = new StubBackend("cloud-azure", false, EnumSet.allOf(Emotion.class));
-    StubBackend zonos = new StubBackend("local-zonos", false, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, azure, zonos);
-
-    int[] notices = {0};
-    provider.setAvailabilityNotice(msg -> notices[0]++);
-
-    // Cycle CLOUD -> LOCAL_GPU -> CLOUD. Each distinct unavailable backend should warn exactly
-    // once,
-    // and returning to a previously warned backend must not re-fire.
-    config.backend = VoiceBackend.CLOUD;
-    provider.active();
-    config.backend = VoiceBackend.LOCAL_GPU;
-    provider.active();
-    config.backend = VoiceBackend.CLOUD;
-    provider.active();
-
-    assertEquals("each unavailable backend warns at most once per session", 2, notices[0]);
-  }
-
-  @Test
   public void selectedAndFallbackBothUnavailableStillReturnsKokoroWithoutThrowing() {
     TestConfig config = new TestConfig();
     config.backend = VoiceBackend.CLOUD;
@@ -196,53 +171,17 @@ public class BackendProviderTest {
   }
 
   @Test
-  public void localGpuRoutesToZonosWhenAvailable() {
+  public void cloudFullEmotionSetIsNotDowngraded() {
     TestConfig config = new TestConfig();
-    config.backend = VoiceBackend.LOCAL_GPU;
+    config.backend = VoiceBackend.CLOUD;
     StubBackend kokoro =
         new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend zonos = new StubBackend("local-zonos", true, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, zonos);
-
-    assertEquals(
-        "LOCAL_GPU selects local-zonos when it is available",
-        "local-zonos",
-        provider.active().id());
-  }
-
-  @Test
-  public void localGpuFallsBackToKokoroWithNoticeWhenZonosUnavailable() {
-    TestConfig config = new TestConfig();
-    config.backend = VoiceBackend.LOCAL_GPU;
-    StubBackend kokoro =
-        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    // No GPU / dev manifest / engine not installed -> Zonos reports unavailable.
-    StubBackend zonos = new StubBackend("local-zonos", false, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, zonos);
-
-    int[] notices = {0};
-    provider.setAvailabilityNotice(msg -> notices[0]++);
-
-    assertEquals(
-        "LOCAL_GPU with Zonos unavailable falls back to local Kokoro",
-        BackendProvider.LOCAL_KOKORO_ID,
-        provider.active().id());
-    provider.active();
-    assertEquals("the GPU fallback notice fires exactly once", 1, notices[0]);
-  }
-
-  @Test
-  public void zonosFullEmotionSetIsNotDowngraded() {
-    TestConfig config = new TestConfig();
-    config.backend = VoiceBackend.LOCAL_GPU;
-    StubBackend kokoro =
-        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend zonos = new StubBackend("local-zonos", true, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, zonos);
+    StubBackend azure = new StubBackend("cloud-azure", true, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, azure);
 
     provider.synthesize(req(Emotion.SCARED));
 
-    assertEquals("Zonos supports the full set, so no downgrade", Emotion.SCARED, zonos.lastEmotion);
+    assertEquals("Cloud supports the full set, so no downgrade", Emotion.SCARED, azure.lastEmotion);
   }
 
   @Test

@@ -31,10 +31,10 @@ repo; copy it into the fork and fill in the commit.
 
 - The repository is public.
 - A `LICENSE` exists at the repo root (this repo ships MIT).
-- The Kokoro and Zonos engine release bundles are published to GitHub Releases and the
-  committed `engine-manifest.json` / `zonos-engine-manifest.json` point at real,
-  sha256-verified download URLs. Until those releases are cut, the local backends cannot
-  install at runtime, so do not submit before the engine pipeline (epic #34) ships them.
+- The Kokoro engine release bundle is published to GitHub Releases and the committed
+  `engine-manifest.json` points at real, sha256-verified download URLs. Until that release is
+  cut, the local backend cannot install at runtime, so do not submit before the engine pipeline
+  (epic #34) ships it.
 - `runelite-plugin.properties` is non-placeholder (no `Example` / `Nobody` /
   `An example greeter plugin`, which the packager rejects).
 - The plugin jar builds clean: no native libraries, no model, well under the 10 MiB
@@ -115,5 +115,5 @@ fresh branch off `upstream/master` and open another small PR.
 
 ## Out of scope for this runbook
 
-Cutting and signing the Kokoro and Zonos engine release bundles (epic #34) is a separate
+Cutting and signing the Kokoro engine release bundle (epic #34) is a separate
 operational step that must complete first. This runbook covers only the Hub listing.

@@ -79,8 +79,6 @@ public final class BackendProvider {
   /** Maps the config selection to a backend id. */
   private static String backendIdFor(VoiceBackend selection) {
     switch (selection) {
-      case LOCAL_GPU:
-        return "local-zonos";
       case CLOUD:
         return "cloud-azure";
       case LOCAL:

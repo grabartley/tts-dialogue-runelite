@@ -43,8 +43,7 @@ public final class DialogueAudioService {
   private final AudioOutput output;
   private final Executor executor;
   // Engine install/model-load runs here, NOT on the single synthesis thread, so a long bundle
-  // download (notably the multi-part Zonos engine) cannot block dialogue playback through an
-  // already-warm backend.
+  // download cannot block dialogue playback through an already-warm backend.
   private final Executor warmExecutor;
   private final LruCache<CacheKey, Pcm> cache;
   private final DiskAudioCache diskCache;
@@ -101,8 +100,8 @@ public final class DialogueAudioService {
 
   /**
    * Runs a one-off warm-up task (engine install/model load) on the dedicated warm-up thread, kept
-   * separate from the single synthesis thread so a long engine download (notably the multi-part
-   * Zonos bundle) never blocks dialogue playback through an already-warm backend.
+   * separate from the single synthesis thread so a long engine download never blocks dialogue
+   * playback through an already-warm backend.
    */
   public void prewarm(Runnable warm) {
     warmExecutor.execute(warm);
@@ -122,8 +121,8 @@ public final class DialogueAudioService {
     // even if the user switches backend before this line reaches the pipeline thread.
     SynthesisBackend backend = backends.active();
     SynthesisRequest effective = BackendProvider.downgradeFor(backend, request);
-    // Fold any backend-specific render variant (e.g. a Zonos custom player reference clip) into the
-    // voice key so audio cloned from a user clip never collides with the default-voice cache entry.
+    // Fold any backend-specific render variant (e.g. a selectable cloud model/voice) into the voice
+    // key so two renderings of the same line never collide in the cache.
     String variant = backend.cacheVariant(effective);
     String voiceKey =
         variant.isEmpty() ? effective.voice().key() : effective.voice().key() + "|" + variant;

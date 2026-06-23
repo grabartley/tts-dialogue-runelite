@@ -1,12 +1,10 @@
 package com.grahambartley.synthesis.engine;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,9 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -43,38 +39,27 @@ import okhttp3.ResponseBody;
  * macOS it clears the {@code com.apple.quarantine} xattr on the extracted files so Gatekeeper does
  * not block an unsigned/non-notarized binary.
  *
- * <p>A platform entry is one of two shapes, distinguished by the presence of a {@code parts} array
- * (issue #60). A single-file entry carries {@code url}/{@code sha256} and is downloaded, verified,
- * and extracted directly (Kokoro, and any Zonos bundle under GitHub's 2 GiB asset cap). A split
- * entry carries an ordered {@code parts} list (each {@code url}/{@code sha256}/{@code size}) plus a
- * combined {@code sha256} of the reassembled archive (the ~2.97 GB Zonos bundle, which exceeds the
- * cap): each part is downloaded and verified, concatenated in order into the final {@code .zip},
- * the combined sha256 is verified, and the same extraction path runs. The single-file path is
- * unchanged.
+ * <p>A platform entry carries {@code url}/{@code sha256}/{@code launcher}: the artifact is
+ * downloaded, verified against its sha256, and extracted directly.
  *
  * <p>It is idempotent: a bundle already extracted with a present launcher is reused without a
  * re-download. The dev manifest ships empty urls/sha256 (a real release has not been published
  * yet); that case is treated as "no installable engine" and surfaces as {@link #install()}
  * returning {@code null}, never a crash. A platform with no manifest entry at all (e.g. Intel Mac,
  * which resolves to {@code osx-x64} but ships no bundle) is likewise treated as "no installable
- * engine" -> {@code null}, not an error. Any missing/short/corrupt part or hash mismatch fails
- * cleanly to {@code null} (backend unavailable) with no partial install. All of this is blocking
- * I/O and is expected to run off the game thread (the pipeline executor, via the backend's {@code
- * warmUp}).
+ * engine" -> {@code null}, not an error. Any download failure or hash mismatch fails cleanly to
+ * {@code null} (backend unavailable) with no partial install. All of this is blocking I/O and is
+ * expected to run off the game thread (the pipeline executor, via the backend's {@code warmUp}).
  */
 @Slf4j
 public class EngineInstaller {
 
-  /** The Kokoro engine manifest, the default for the bare three-arg constructor. */
+  /** The Kokoro engine manifest resource on the classpath. */
   public static final String KOKORO_MANIFEST_RESOURCE = "/engine-manifest.json";
-
-  /** The Zonos engine manifest, a separate artifact resolved through the same installer. */
-  public static final String ZONOS_MANIFEST_RESOURCE = "/zonos-engine-manifest.json";
 
   private final OkHttpClient httpClient;
   private final Gson gson;
   private final Path enginesRoot;
-  private final String manifestResource;
 
   /** Result of a successful install: the resolved launcher path and the engine/version it backs. */
   public static final class Installed {
@@ -107,23 +92,9 @@ public class EngineInstaller {
    * @param enginesRoot base dir, typically {@code ~/.runelite/tts-dialogue/engines}
    */
   public EngineInstaller(OkHttpClient httpClient, Gson gson, Path enginesRoot) {
-    this(httpClient, gson, enginesRoot, KOKORO_MANIFEST_RESOURCE);
-  }
-
-  /**
-   * Same installer, pointed at a specific engine manifest resource so a second engine (Zonos) can
-   * be resolved through the identical download/verify/extract path without a second installer
-   * class.
-   *
-   * @param manifestResource classpath resource, e.g. {@link #KOKORO_MANIFEST_RESOURCE} or {@link
-   *     #ZONOS_MANIFEST_RESOURCE}
-   */
-  public EngineInstaller(
-      OkHttpClient httpClient, Gson gson, Path enginesRoot, String manifestResource) {
     this.httpClient = httpClient;
     this.gson = gson;
     this.enginesRoot = enginesRoot;
-    this.manifestResource = manifestResource;
   }
 
   /**
@@ -157,26 +128,15 @@ public class EngineInstaller {
     }
     JsonObject entry = artifacts.getAsJsonObject(platform);
     String launcherName = optString(entry, "launcher", null);
-    JsonArray parts =
-        entry.has("parts") && entry.get("parts").isJsonArray()
-            ? entry.getAsJsonArray("parts")
-            : null;
-    boolean split = parts != null && parts.size() > 0;
-
-    // A split entry carries the combined sha256 (of the reassembled archive); a single-file entry
-    // carries the artifact url + sha256. The launcher is required either way.
     String url = optString(entry, "url", "");
     String sha256 = optString(entry, "sha256", "");
 
-    // The archive format is inferred from the artifact filename: a single-file entry's url, or a
-    // split entry's `archive` field name (the parts have no usable extension). The engine release
-    // pipeline packages win-x64 as a .zip and osx-aarch64/linux-x64 as a .tar.gz, so this must
-    // dispatch to the right extractor (see #66: extracting a tar.gz as a zip silently extracts
-    // nothing).
-    String archiveName = split ? optString(entry, "archive", "") : url;
-    boolean tarGz = isTarGz(archiveName);
+    // The archive format is inferred from the artifact url filename. The engine release pipeline
+    // packages win-x64 as a .zip and osx-aarch64/linux-x64 as a .tar.gz, so this must dispatch to
+    // the right extractor (see #66: extracting a tar.gz as a zip silently extracts nothing).
+    boolean tarGz = isTarGz(url);
 
-    if (launcherName == null || sha256.isEmpty() || (!split && url.isEmpty())) {
+    if (launcherName == null || sha256.isEmpty() || url.isEmpty()) {
       // Dev manifest placeholder: no release published yet. Not an error, just "nothing to
       // install".
       log.info(
@@ -200,11 +160,7 @@ public class EngineInstaller {
       Path archive =
           Files.createTempFile(enginesRoot, engine + "-" + version, tarGz ? ".tar.gz" : ".zip");
       try {
-        if (split) {
-          assembleParts(parts, archive);
-        } else {
-          download(url, archive);
-        }
+        download(url, archive);
         verifySha256(archive, sha256);
         if (tarGz) {
           extractTarGz(archive, installDir);
@@ -266,9 +222,9 @@ public class EngineInstaller {
    * committed dev resource.
    */
   protected JsonObject readManifest() {
-    try (InputStream in = EngineInstaller.class.getResourceAsStream(manifestResource)) {
+    try (InputStream in = EngineInstaller.class.getResourceAsStream(KOKORO_MANIFEST_RESOURCE)) {
       if (in == null) {
-        log.warn("engine manifest resource {} not found on classpath", manifestResource);
+        log.warn("engine manifest resource {} not found on classpath", KOKORO_MANIFEST_RESOURCE);
         return null;
       }
       try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
@@ -297,57 +253,6 @@ public class EngineInstaller {
       }
     }
     log.info("Engine bundle download complete");
-  }
-
-  /**
-   * Downloads each split part via the injected client, verifies its sha256, and concatenates the
-   * parts IN ORDER into {@code archive} (streamed, so the ~2.97 GB reassembled bundle never sits in
-   * memory). Each part is fetched to a sibling temp file, hash-checked, appended, then deleted, so
-   * a failure mid-way leaves no large stray files. Any missing field, failed download, or per-part
-   * hash mismatch throws {@link IOException}; the caller turns that into a clean {@code null}
-   * (backend unavailable) and deletes the partial archive. The combined sha256 is verified by the
-   * caller after assembly.
-   */
-  private void assembleParts(JsonArray parts, Path archive) throws IOException {
-    log.info("Downloading external engine bundle in {} part(s) (one time)", parts.size());
-    List<Path> tempParts = new ArrayList<>();
-    // The archive temp file was just created (empty); newOutputStream truncates by default.
-    try (OutputStream out = Files.newOutputStream(archive)) {
-      for (int i = 0; i < parts.size(); i++) {
-        if (!parts.get(i).isJsonObject()) {
-          throw new IOException("malformed engine manifest part at index " + i);
-        }
-        JsonObject part = parts.get(i).getAsJsonObject();
-        String partUrl = optString(part, "url", "");
-        String partSha = optString(part, "sha256", "");
-        if (partUrl.isEmpty() || partSha.isEmpty()) {
-          throw new IOException("engine manifest part " + i + " is missing url/sha256");
-        }
-        Path partFile = Files.createTempFile(enginesRoot, archive.getFileName() + ".part" + i, "");
-        tempParts.add(partFile);
-        download(partUrl, partFile);
-        verifySha256(partFile, partSha);
-        try (InputStream in = Files.newInputStream(partFile)) {
-          byte[] buffer = new byte[64 * 1024];
-          int read;
-          while ((read = in.read(buffer)) != -1) {
-            out.write(buffer, 0, read);
-          }
-        }
-        Files.deleteIfExists(partFile);
-        tempParts.remove(partFile);
-      }
-    } finally {
-      // Best-effort cleanup of any part temp file left behind by a mid-assembly failure.
-      for (Path p : tempParts) {
-        try {
-          Files.deleteIfExists(p);
-        } catch (IOException ignored) {
-          // leave it; the OS temp sweep will reclaim it
-        }
-      }
-    }
-    log.info("Engine bundle reassembled from {} part(s)", parts.size());
   }
 
   /** Verifies the file's sha256 hex digest against the expected value (case-insensitive). */

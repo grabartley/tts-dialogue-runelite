@@ -9,7 +9,7 @@
 
 **Gielinor, out loud.** This plugin voices in-game dialogue in real time, giving NPCs and your own character distinct AI voices so every conversation actually speaks to you.
 
-Out of the box it runs entirely on your machine: no accounts, no cloud calls, no per-line API bills. NPCs and the player each get a voice picked by race and gender, the line's mood is read from the speaker's chat-head expression, and repeated dialogue replays instantly from a local cache. If you want spoken emotion, two opt-in emotional backends are available, one fully offline and one cloud, and you choose between them in the config.
+Out of the box it runs entirely on your machine: no accounts, no cloud calls, no per-line API bills. NPCs and the player each get a voice picked by race and gender, the line's mood is read from the speaker's chat-head expression, and repeated dialogue replays instantly from a local cache. If you want spoken emotion, an opt-in cloud backend is available, and you choose it in the config.
 
 > Powered by [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) via [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx).
 
@@ -19,25 +19,18 @@ Install from the **RuneLite Plugin Hub**: open RuneLite, click the wrench (Confi
 
 ## Backends
 
-The plugin routes every line through one synthesis backend, chosen by the **Voice Backend** config. The default is the offline local voice; the two emotional backends are opt-in. When a selected backend is unavailable, dialogue falls back to the local voice with a one-time notice and keeps speaking.
+The plugin routes every line through one synthesis backend, chosen by the **Voice Backend** config. The default is the offline local voice; the cloud emotional backend is opt-in. When a selected backend is unavailable, dialogue falls back to the local voice with a one-time notice and keeps speaking.
 
 | Backend | Config value | Where it runs | Emotion | Offline | Setup |
 |---------|--------------|---------------|---------|---------|-------|
 | **Local (Kokoro)** | `Local` (default) | external CPU engine the plugin installs | Neutral | Yes | one-time engine + model download |
-| **Local GPU (Zonos)** | `Local (GPU)` | external GPU engine the plugin installs | Full set, emotion vectors | Yes | supported CUDA GPU + heavier one-time engine download |
 | **Cloud (Azure)** | `Cloud` | Microsoft Azure Neural TTS over HTTPS | Full set, SSML styles | No | your own Azure key + region |
 
-See [docs/backends.md](docs/backends.md) for the full comparison, the Zonos emotion-vector presets, and the Azure style map.
+See [docs/backends.md](docs/backends.md) for the full comparison and the Azure style map.
 
 ### Local (Kokoro), the default
 
 A real neural voice that runs on your CPU, fully offline. Nothing about a dialogue line leaves your machine. The plugin manages the engine for you: it downloads the right build for your OS on first use, runs it as a separate background process, and keeps it warm across lines. Delivery is neutral by design, so the local default stays clean neural output, and it is the universal fallback whenever another backend cannot run.
-
-### Local GPU (Zonos)
-
-An offline emotional voice for machines with a supported CUDA GPU. It runs as its own external engine alongside the local voice and renders each line's detected emotion by conditioning on a per-emotion emotion vector, the only path that gives you spoken emotion while keeping everything on your machine. It needs a heavier one-time engine download than the CPU engine, and a usable GPU; when no GPU is present or the engine is unavailable, dialogue falls back to the local voice.
-
-Because Zonos clones a voice from a short reference clip, this backend can clone your character's voice from a recording you provide. Point the **Player Voice Clip** setting at a clean few-second `.wav` file and the player's dialogue is synthesized in that cloned voice. The clip is validated locally (it must exist, be a readable WAV, and be a sane length); an empty, missing, or unsupported file falls back to the default player voice with a one-time notice. The override applies only to the Local (GPU) backend and only to the player voice: NPC lines and the Local and Cloud backends ignore it. The clip stays entirely on your machine and is never uploaded.
 
 ### Cloud (Azure)
 
@@ -47,7 +40,7 @@ An opt-in cloud voice with the strongest emotion and near-zero setup beyond supp
 
 ## Emotion
 
-Each new dialogue line's emotion is read from the speaker's chat-head expression animation, the NPC head for NPC lines and the player head for player lines, and mapped to one of five emotions (Neutral, Happy, Sad, Angry, Scared). The resolved emotion rides in every synthesis request and is rendered by the active backend: Azure as SSML styles, Zonos as emotion vectors. The default local Kokoro voice speaks every line neutrally, so emotion becomes audible once you select an emotional backend. Detection is controlled by the **Enable Emotion** toggle, which is on by default; when it is off, every line is voiced as Neutral.
+Each new dialogue line's emotion is read from the speaker's chat-head expression animation, the NPC head for NPC lines and the player head for player lines, and mapped to one of five emotions (Neutral, Happy, Sad, Angry, Scared). The resolved emotion rides in every synthesis request and is rendered by the active backend (Azure renders it as an SSML style). The default local Kokoro voice speaks every line neutrally, so emotion becomes audible once you select the Cloud backend. Detection is controlled by the **Enable Emotion** toggle, which is on by default; when it is off, every line is voiced as Neutral.
 
 The mapping is derived from the documented RuneScape chathead expression animation enum, a named set spanning ids **9760-9862**, with every documented expression mapped to the nearest of the five emotions. Any animation id not present in the table, and `-1` (no animation or a stale head), resolves to Neutral, so an unseen expression or a non-human head (trolls, ogres, children, monsters often emit ids outside the documented set) is a safe no-op. Five expressions do not map cleanly onto the five emotions and are mapped to the nearest one: `9800` MANIC_FACE -> Angry, `9812` LOOK_DOWN -> Sad, `9816` WHAT_THE -> Neutral, `9820` WHAT_THE_TWO -> Neutral, and `9824` EYES_WIDE -> Scared.
 
@@ -114,13 +107,12 @@ Synthesis and playback run off the game thread, so the client stays responsive e
 
 | Setting | Default | What it does |
 |---------|---------|--------------|
-| **Voice Backend** | `Local` | Selects the synthesis engine: `Local` (offline neutral Kokoro), `Local (GPU)` (offline emotional Zonos, needs a CUDA GPU), or `Cloud` (Azure). |
+| **Voice Backend** | `Local` | Selects the synthesis engine: `Local` (offline neutral Kokoro) or `Cloud` (Azure). |
 | **Enable Emotion** | `On` | Carries the emotion detected from the speaker's chat-head animation through to synthesis. Audible only on an emotional backend. |
 | **Persistent Audio Cache** | `On` | Saves synthesized dialogue to disk so repeated lines play instantly across sessions and cloud backends are not re-billed. |
 | **Dialogue Volume** | `100` | Volume of the spoken dialogue (0 to 100). |
 | **Enable Automatic NPC Voices** | `On` | Picks a voice per NPC from the race and gender table. When off, every NPC uses the default Human voice. |
 | **Player Voice** | `Player Male` | The voice used for the player character. |
-| **Player Voice Clip** | empty | Optional path to a local `.wav` to clone your character's voice. Applies only to the Local (GPU) Zonos backend and the player voice; ignored otherwise. Stays on your machine; an invalid or missing file falls back to the default player voice. |
 | **Enable Voice Fallbacks** | `On` | Falls back to a gender-appropriate human voice for NPCs missing from the table. When off, those NPCs use the single default voice. |
 | **Debug Mode** | `Off` | Logs detailed NPC race/gender resolution and the chosen voice per NPC. |
 | **Azure Subscription Key** | empty | Your Azure Speech resource key. Required for the Cloud backend; stored locally and never bundled with the plugin. |
@@ -156,13 +148,12 @@ You can run it directly from your IDE (such as IntelliJ) or configure it in `bui
 - Java
 - Kokoro-82M for the local voice
 - sherpa-onnx for ONNX inference
-- Zonos for the offline emotional voice
 - Microsoft Azure Neural TTS for the cloud voice
 - RuneLite plugin framework
 
 ## Shoutout
 
-Big thanks to [hexgrad](https://huggingface.co/hexgrad/Kokoro-82M) for Kokoro, the [k2-fsa](https://github.com/k2-fsa/sherpa-onnx) team for sherpa-onnx, the [Zyphra](https://github.com/Zyphra/Zonos) team for Zonos, and the RuneLite devs for making plugin development genuinely fun.
+Big thanks to [hexgrad](https://huggingface.co/hexgrad/Kokoro-82M) for Kokoro, the [k2-fsa](https://github.com/k2-fsa/sherpa-onnx) team for sherpa-onnx, and the RuneLite devs for making plugin development genuinely fun.
 
 ## Contribute
 

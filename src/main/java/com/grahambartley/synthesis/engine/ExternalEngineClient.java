@@ -110,116 +110,11 @@ public final class ExternalEngineClient {
   }
 
   /**
-   * Engine self-report from the {@code health} handshake: whether the engine is ready and whether
-   * it found a usable accelerator. The Kokoro engine ignores {@code gpu} (CPU-only); the Zonos
-   * backend gates its availability on it because no reliable JVM-side CUDA probe exists, so the
-   * engine, which has already loaded its runtime, is the right place to detect the GPU and report
-   * it back.
-   */
-  public static final class Health {
-    private final boolean ok;
-    private final boolean gpu;
-    private final String detail;
-
-    public Health(boolean ok, boolean gpu, String detail) {
-      this.ok = ok;
-      this.gpu = gpu;
-      this.detail = detail;
-    }
-
-    public boolean ok() {
-      return ok;
-    }
-
-    public boolean gpu() {
-      return gpu;
-    }
-
-    public String detail() {
-      return detail;
-    }
-  }
-
-  /**
-   * Sends a {@code {"op":"health"}} line and reads one JSON line {@code
-   * {"ok":true,"gpu":true,"detail":"..."}}. Starts the engine first if needed. Returns {@code null}
-   * on any transport failure (process death, malformed reply) so callers treat an
-   * unreachable/unhealthy engine as "not a usable GPU engine" rather than crashing. Must be called
-   * from the single pipeline thread.
-   *
-   * <p>This rides the same stdin/stdout pipe as synthesis; the engine answers a health line with a
-   * single JSON line and no PCM frame, so it never collides with the synthesis framing.
-   */
-  public synchronized Health handshake() {
-    try {
-      start();
-    } catch (IOException e) {
-      log.warn("Could not start external engine for health handshake: {}", e.getMessage());
-      return null;
-    }
-    try {
-      JsonObject op = new JsonObject();
-      op.addProperty("op", "health");
-      String line = gson.toJson(op);
-      toEngine.write(line.getBytes(StandardCharsets.UTF_8));
-      toEngine.write('\n');
-      toEngine.flush();
-
-      String reply = readHeaderLine();
-      if (reply == null) {
-        throw new IOException("engine closed stdout before answering health handshake");
-      }
-      JsonObject obj = gson.fromJson(reply, JsonObject.class);
-      if (obj == null) {
-        throw new IOException("empty health reply");
-      }
-      boolean ok = obj.has("ok") && !obj.get("ok").isJsonNull() && obj.get("ok").getAsBoolean();
-      boolean gpu = obj.has("gpu") && !obj.get("gpu").isJsonNull() && obj.get("gpu").getAsBoolean();
-      String detail =
-          obj.has("detail") && !obj.get("detail").isJsonNull()
-              ? obj.get("detail").getAsString()
-              : "";
-      return new Health(ok, gpu, detail);
-    } catch (IOException | RuntimeException e) {
-      log.warn("External engine health handshake failed ({}); tearing down", e.getMessage());
-      drainStderr();
-      stopQuietly();
-      return null;
-    }
-  }
-
-  /**
    * Synthesizes one request through the engine, returning the decoded {@link Pcm} or {@code null}
    * on failure (engine error line, process death, malformed frame). Restarts the engine first if it
    * has died since the last call. Must be called from the single pipeline thread.
    */
   public synchronized Pcm synthesize(SynthesisRequest request) {
-    return synthesize(request, null);
-  }
-
-  /**
-   * Synthesizes one request, optionally carrying a backend-specific {@code emotionVector} the
-   * engine consumes (Zonos's 8-dim emotion conditioning). The vector is the only addition over the
-   * base {@code --stdio} request; everything else (text/voice/emotion/speed framing, header+PCM
-   * decode, restart-on-death) is the shared transport. Pass {@code null} for engines that take no
-   * vector (Kokoro). Returns the decoded {@link Pcm} or {@code null} on failure. Must be called
-   * from the single pipeline thread.
-   */
-  public synchronized Pcm synthesize(SynthesisRequest request, float[] emotionVector) {
-    return synthesize(request, emotionVector, null);
-  }
-
-  /**
-   * Synthesizes one request, optionally carrying both the {@code emotionVector} (Zonos's 8-dim
-   * emotion conditioning) and a {@code playerReferenceClip} path the Zonos engine clones the player
-   * voice from instead of the bundled reference (issue #50). Both are optional: pass {@code null}
-   * for either and that field is absent from the wire line. {@code playerReferenceClip} is only
-   * ever set by the Zonos backend for player-voice lines, so Kokoro/Azure framing is unchanged.
-   * Returns the decoded {@link Pcm} or {@code null} on failure. Must be called from the single
-   * pipeline thread.
-   */
-  public synchronized Pcm synthesize(
-      SynthesisRequest request, float[] emotionVector, String playerReferenceClip) {
     if (request == null || request.text() == null || request.text().isEmpty()) {
       return null;
     }
@@ -230,7 +125,7 @@ public final class ExternalEngineClient {
       return null;
     }
     try {
-      writeRequest(request, emotionVector, playerReferenceClip);
+      writeRequest(request);
       return readResponse();
     } catch (IOException e) {
       log.warn("External engine request failed ({}); tearing down for restart", e.getMessage());
@@ -241,10 +136,8 @@ public final class ExternalEngineClient {
   }
 
   /** Encodes the request as the protocol JSON line and writes it to the engine's stdin. */
-  private void writeRequest(
-      SynthesisRequest request, float[] emotionVector, String playerReferenceClip)
-      throws IOException {
-    String line = encodeRequest(request, emotionVector, playerReferenceClip, gson);
+  private void writeRequest(SynthesisRequest request) throws IOException {
+    String line = encodeRequest(request, gson);
     toEngine.write(line.getBytes(StandardCharsets.UTF_8));
     toEngine.write('\n');
     toEngine.flush();
@@ -252,34 +145,6 @@ public final class ExternalEngineClient {
 
   /** Builds the one-line JSON request the engine's {@code StdioProtocol} decodes. */
   static String encodeRequest(SynthesisRequest request, Gson gson) {
-    return encodeRequest(request, null, null, gson);
-  }
-
-  /**
-   * Builds the one-line JSON request, optionally including the {@code emotionVector} the Zonos
-   * engine reads for its 8-dim emotion conditioning. When {@code emotionVector} is {@code null} the
-   * line is byte-for-byte the base request, so Kokoro/Azure framing is unchanged.
-   */
-  static String encodeRequest(SynthesisRequest request, float[] emotionVector, Gson gson) {
-    return encodeRequest(request, emotionVector, null, gson);
-  }
-
-  /**
-   * Builds the one-line JSON request, optionally including the {@code emotionVector} (Zonos emotion
-   * conditioning) and a {@code playerReferenceClip} local file path (Zonos custom player voice
-   * cloning, issue #50). A {@code null} field is omitted from the JSON, so:
-   *
-   * <ul>
-   *   <li>both {@code null} → byte-for-byte the base Kokoro/Azure request,
-   *   <li>only the vector set → the standard Zonos request,
-   *   <li>both set → a Zonos player-voice request whose reference clip the engine clones from.
-   * </ul>
-   *
-   * The {@code playerReferenceClip} field is therefore absent for every NPC line and for every
-   * non-Zonos backend.
-   */
-  static String encodeRequest(
-      SynthesisRequest request, float[] emotionVector, String playerReferenceClip, Gson gson) {
     VoiceSpec spec = request.voice();
     JsonObject voice = new JsonObject();
     voice.addProperty("player", spec.player());
@@ -301,16 +166,6 @@ public final class ExternalEngineClient {
     // Emotion is sent for protocol completeness; Kokoro ignores it (neutral-only by design).
     root.addProperty("emotion", request.emotion().name());
     root.addProperty("speed", 1.0f);
-    if (emotionVector != null) {
-      com.google.gson.JsonArray vec = new com.google.gson.JsonArray();
-      for (float v : emotionVector) {
-        vec.add(v);
-      }
-      root.add("emotionVector", vec);
-    }
-    if (playerReferenceClip != null && !playerReferenceClip.isEmpty()) {
-      root.addProperty("playerReferenceClip", playerReferenceClip);
-    }
     return gson.toJson(root);
   }
 

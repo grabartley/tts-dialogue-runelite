@@ -25,14 +25,6 @@ public interface TTSDialogueConfig extends Config {
   String synthesisSection = "synthesis";
 
   @ConfigSection(
-      name = "Local GPU (Zonos)",
-      description =
-          "Settings for the offline emotional Zonos voice backend. These apply only when Voice"
-              + " Backend is Local (GPU); everything here stays on your machine.",
-      position = 3)
-  String localGpuSection = "localGpu";
-
-  @ConfigSection(
       name = "Cloud (Azure)",
       description =
           "Microsoft Azure Neural TTS settings. Used only when Voice Backend is Cloud. Dialogue text"
@@ -42,13 +34,11 @@ public interface TTSDialogueConfig extends Config {
 
   /**
    * Which synthesis backend dialogue routes through. {@code LOCAL} is the offline, neutral-only
-   * Kokoro engine (default); {@code LOCAL_GPU} is the offline emotional Zonos engine (needs a
-   * supported GPU); {@code CLOUD} is Azure. Each non-local option falls back to the local engine
-   * when its backend is unavailable.
+   * Kokoro engine (default); {@code CLOUD} is the emotional cloud backend. Cloud falls back to the
+   * local engine when its backend is unavailable.
    */
   enum VoiceBackend {
     LOCAL,
-    LOCAL_GPU,
     CLOUD
   }
 
@@ -57,8 +47,7 @@ public interface TTSDialogueConfig extends Config {
       name = "Voice Backend",
       description =
           "Which synthesis engine to use. Local is the offline, neutral-only Kokoro voice (default)."
-              + " Local (GPU) is the offline emotional Zonos voice and needs a supported GPU; Cloud"
-              + " is Azure. Options other than Local fall back to Local when their backend is"
+              + " Cloud is the emotional cloud backend. Cloud falls back to Local when its backend is"
               + " unavailable.",
       position = 0,
       section = synthesisSection)
@@ -72,28 +61,11 @@ public interface TTSDialogueConfig extends Config {
       description =
           "Carry the emotion detected from the speaker's chat-head animation through to synthesis."
               + " The default local Kokoro backend is neutral-only, so emotion is only audible on the"
-              + " emotional backends (Local GPU Zonos or Cloud Azure). When off, every line is voiced"
-              + " as Neutral.",
+              + " Cloud backend. When off, every line is voiced as Neutral.",
       position = 1,
       section = synthesisSection)
   default boolean enableEmotion() {
     return true;
-  }
-
-  @ConfigItem(
-      keyName = "playerVoiceClipPath",
-      name = "Player Voice Clip (file path)",
-      description =
-          "Optional path to a local .wav file used to clone YOUR character's voice. Applies only to"
-              + " the Local (GPU) Zonos backend and only to the player voice; it is ignored for the"
-              + " Local and Cloud backends and for every NPC line. Point it at a clean few-second"
-              + " (about 3-10s) WAV recording of the voice you want. The clip stays entirely on your"
-              + " machine and is never uploaded. Leave empty to use the default bundled player"
-              + " voice; an invalid, missing, or unsupported file falls back to that default.",
-      position = 0,
-      section = localGpuSection)
-  default String playerVoiceClipPath() {
-    return "";
   }
 
   @ConfigItem(

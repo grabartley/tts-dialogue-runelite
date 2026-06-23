@@ -15,9 +15,9 @@ import com.grahambartley.VoiceManager;
  * <p>For per-NPC voice variety (issue #78) an NPC spec may additionally carry an explicit {@code
  * kokoroSpeakerId} picked from a gender-appropriate pool, so two NPCs of the same race+gender can
  * speak with different (but stable) voices. The id is Kokoro-specific and purely advisory: backends
- * that map by race/gender (Azure, Zonos) ignore it, and {@link #UNSPECIFIED_SPEAKER_ID} ({@code
- * -1}) means "no explicit choice" so the engine falls back to its race/gender matrix exactly as
- * before.
+ * that map by race/gender (e.g. the cloud backend) ignore it, and {@link #UNSPECIFIED_SPEAKER_ID}
+ * ({@code -1}) means "no explicit choice" so the engine falls back to its race/gender matrix
+ * exactly as before.
  */
 public record VoiceSpec(
     boolean player, VoiceManager.NPCRace race, VoiceManager.NPCGender gender, int kokoroSpeakerId) {

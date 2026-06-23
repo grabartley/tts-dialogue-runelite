@@ -52,7 +52,7 @@ public class TTSDialoguePluginConfigChangeTest {
   public void backendKeyChangeWarmsActiveBackendOnce() throws Exception {
     AtomicInteger warmCalls = new AtomicInteger();
     StubConfig config = new StubConfig();
-    config.backend = VoiceBackend.LOCAL_GPU; // so warmUpActive targets the non-Kokoro backend
+    config.backend = VoiceBackend.CLOUD; // so warmUpActive targets the non-Kokoro backend
     Harness harness = harness(config, warmCalls);
 
     harness.plugin.onConfigChanged(configChanged("ttsDialogue", "voiceBackend"));
@@ -66,7 +66,7 @@ public class TTSDialoguePluginConfigChangeTest {
   public void unrelatedKeyOrGroupDoesNotWarm() throws Exception {
     AtomicInteger warmCalls = new AtomicInteger();
     StubConfig config = new StubConfig();
-    config.backend = VoiceBackend.LOCAL_GPU;
+    config.backend = VoiceBackend.CLOUD;
     Harness harness = harness(config, warmCalls);
 
     harness.plugin.onConfigChanged(configChanged("ttsDialogue", "volume"));
@@ -97,8 +97,8 @@ public class TTSDialoguePluginConfigChangeTest {
   /** Plugin wired with a real DialogueAudioService and BackendProvider over counting stubs. */
   private static Harness harness(StubConfig config, AtomicInteger warmCalls) throws Exception {
     SynthesisBackend kokoro = new StubBackend(BackendProvider.LOCAL_KOKORO_ID, warmCalls);
-    SynthesisBackend zonos = new StubBackend("local-zonos", warmCalls);
-    BackendProvider provider = new BackendProvider(config, kokoro, zonos);
+    SynthesisBackend cloud = new StubBackend("cloud-azure", warmCalls);
+    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
     DialogueAudioService audioService =
         new DialogueAudioService(provider, null, null, 1, 1, () -> 100);
 

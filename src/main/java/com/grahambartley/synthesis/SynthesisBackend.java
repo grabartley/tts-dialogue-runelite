@@ -7,15 +7,13 @@ import java.util.EnumSet;
  * A single text-to-speech engine the plugin can synthesize through.
  *
  * <p>Generalizes the older {@code Synthesizer} seam: every synthesis flow goes through a backend,
- * so local Kokoro, local Zonos, and cloud Azure are interchangeable. {@link BackendProvider} owns
- * selection and the emotion-downgrade rule, so an implementation only has to render the emotions it
+ * so local Kokoro and the cloud backend are interchangeable. {@link BackendProvider} owns selection
+ * and the emotion-downgrade rule, so an implementation only has to render the emotions it
  * advertises in {@link #supportedEmotions()}; it never receives an unsupported emotion.
  */
 public interface SynthesisBackend {
 
-  /**
-   * Stable identifier, e.g. {@code "local-kokoro"}, {@code "local-zonos"}, {@code "cloud-azure"}.
-   */
+  /** Stable identifier, e.g. {@code "local-kokoro"}, {@code "cloud-azure"}. */
   String id();
 
   /** Whether this backend can actually run right now (engine installed, key set, GPU present). */
@@ -32,10 +30,10 @@ public interface SynthesisBackend {
    * the same {@code (voice, emotion, text)} because of backend-specific state outside the request.
    *
    * <p>Default {@code ""}: most backends render a request the same way every time, so the standard
-   * {@code (backendId, voiceKey, emotion, text)} identity is enough. The Zonos backend overrides
-   * this to fold in the identity of a custom player reference clip, so a player line cloned from a
-   * user clip never collides with the default-player-voice cache entry. Must be a stable,
-   * filesystem-safe fragment for a given backend state; return {@code ""} when there is no variant.
+   * {@code (backendId, voiceKey, emotion, text)} identity is enough. A backend whose output depends
+   * on state outside the request (for example a selectable model or voice) overrides this to fold
+   * that state in, so two renderings never collide in the cache. Must be a stable, filesystem-safe
+   * fragment for a given backend state; return {@code ""} when there is no variant.
    */
   default String cacheVariant(SynthesisRequest request) {
     return "";
