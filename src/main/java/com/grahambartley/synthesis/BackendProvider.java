@@ -80,7 +80,7 @@ public final class BackendProvider {
   private static String backendIdFor(VoiceBackend selection) {
     switch (selection) {
       case CLOUD:
-        return "cloud-azure";
+        return OpenRouterTtsBackend.ID;
       case LOCAL:
       default:
         return LOCAL_KOKORO_ID;

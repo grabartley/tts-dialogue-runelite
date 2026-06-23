@@ -2,11 +2,11 @@ package com.grahambartley;
 
 import com.google.gson.Gson;
 import com.google.inject.Provides;
-import com.grahambartley.synthesis.AzureTtsBackend;
 import com.grahambartley.synthesis.BackendProvider;
 import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.ExpressionEmotionTable;
 import com.grahambartley.synthesis.LocalKokoroBackend;
+import com.grahambartley.synthesis.OpenRouterTtsBackend;
 import com.grahambartley.synthesis.SynthesisRequest;
 import com.grahambartley.synthesis.VoiceSpec;
 import com.grahambartley.synthesis.engine.EngineInstaller;
@@ -50,11 +50,12 @@ public class TTSDialoguePlugin extends Plugin {
    * Config keys that change which backend is selected or whether it can become available. Changing
    * any of these at runtime must re-run the active backend's off-thread install/spawn so a newly
    * selected cloud backend warms up instead of pre-emptively falling back to local Kokoro. {@code
-   * voiceBackend} switches the selection; {@code azureKey}/{@code azureRegion} let a
-   * previously-unavailable Cloud selection become available once credentials are entered.
+   * voiceBackend} switches the selection; {@code openRouterApiKey} lets a previously-unavailable
+   * Cloud selection become available once a key is entered, and {@code cloudModel} re-warms the
+   * active backend so a model switch takes effect immediately.
    */
   private static final java.util.Set<String> WARM_TRIGGER_KEYS =
-      java.util.Set.of("voiceBackend", "azureKey", "azureRegion");
+      java.util.Set.of("voiceBackend", "openRouterApiKey", "cloudModel");
 
   @Inject private Client client;
 
@@ -100,14 +101,14 @@ public class TTSDialoguePlugin extends Plugin {
     EngineInstaller installer = new EngineInstaller(okHttpClient, gson, ttsDir.resolve("engines"));
     LocalKokoroBackend localKokoro =
         new LocalKokoroBackend(installer, launcher -> new ExternalEngineClient(launcher, gson));
-    // The cloud Azure backend is registered alongside the local Kokoro fallback and selected when
-    // Voice Backend is Cloud and a key/region are set. It uses the injected OkHttpClient (Hub
-    // rule).
+    // The cloud OpenRouter backend is registered alongside the local Kokoro fallback and selected
+    // when Voice Backend is Cloud and an API key is set. It uses the injected OkHttpClient and Gson
+    // (Hub rule: never new them in plugin code).
     // The provider routes every line, applies the emotion-downgrade rule, and falls back to local
     // Kokoro (with a one-time notice) when the selected backend is unavailable.
-    AzureTtsBackend azureBackend = new AzureTtsBackend(okHttpClient, config);
-    azureBackend.setNotice(this::notifyBackend);
-    backendProvider = new BackendProvider(config, localKokoro, azureBackend);
+    OpenRouterTtsBackend cloudBackend = new OpenRouterTtsBackend(okHttpClient, config, gson);
+    cloudBackend.setNotice(this::notifyBackend);
+    backendProvider = new BackendProvider(config, localKokoro, cloudBackend);
     backendProvider.setAvailabilityNotice(this::notifyBackend);
     // Persistent on-disk cache lives under the same RuneLite dir as the engine; on by default so
     // repeated lines survive restarts and cloud backends are not re-billed. It sits in front of the
@@ -266,7 +267,7 @@ public class TTSDialoguePlugin extends Plugin {
 
   /**
    * Warms up the newly selected backend off the game thread when a backend-affecting config key
-   * changes at runtime, so switching Voice Backend (or entering Azure credentials) installs /
+   * changes at runtime, so switching Voice Backend (or entering an OpenRouter key) installs /
    * spawns / handshakes the engine immediately instead of silently falling back to local Kokoro
    * until the next client restart.
    *

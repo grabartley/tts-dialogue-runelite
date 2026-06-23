@@ -297,7 +297,7 @@ public class DialogueAudioServiceTest {
     // of the cache key, so speaking the same line after switching the config backend must re-synth
     // on the new backend rather than replaying the cached local PCM.
     FakeBackend local = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
-    FakeBackend cloud = new FakeBackend("cloud-azure", EnumSet.allOf(Emotion.class));
+    FakeBackend cloud = new FakeBackend("cloud-openrouter", EnumSet.allOf(Emotion.class));
     TestConfig config = new TestConfig();
     BackendProvider provider = new BackendProvider(config, local, cloud);
     FakeOutput output = new FakeOutput();
@@ -379,10 +379,10 @@ public class DialogueAudioServiceTest {
 
   @Test
   public void crossSessionRepeatCostsTheBackendZeroAdditionalSynthCalls() {
-    // The headline Azure-cost guarantee (#37): a repeated (backendId, voiceKey, emotion, text)
-    // across sessions must never bill the backend again. A fake "Azure" backend counts synth calls.
+    // The headline cloud-cost guarantee (#37): a repeated (backendId, voiceKey, emotion, text)
+    // across sessions must never bill the backend again. A fake cloud backend counts synth calls.
     Path cacheDir = tmp.getRoot().toPath().resolve("cache");
-    FakeBackend azure = new FakeBackend("cloud-azure", EnumSet.allOf(Emotion.class));
+    FakeBackend cloud = new FakeBackend("cloud-openrouter", EnumSet.allOf(Emotion.class));
     SynthesisRequest line =
         req("Have you any quests?", NPCRace.HUMAN, NPCGender.MALE, Emotion.HAPPY);
 
@@ -392,7 +392,7 @@ public class DialogueAudioServiceTest {
     DeferredExecutor exec1 = new DeferredExecutor();
     DialogueAudioService session1 =
         new DialogueAudioService(
-            new BackendProvider(config1, new FakeBackend(EnumSet.of(Emotion.NEUTRAL)), azure),
+            new BackendProvider(config1, new FakeBackend(EnumSet.of(Emotion.NEUTRAL)), cloud),
             new FakeOutput(),
             new DiskAudioCache(cacheDir),
             exec1,
@@ -400,7 +400,7 @@ public class DialogueAudioServiceTest {
             () -> 100);
     session1.speak(line);
     exec1.runAll();
-    int afterFirstSession = azure.requests.size();
+    int afterFirstSession = cloud.requests.size();
     assertEquals("first hearing of the line costs exactly one API call", 1, afterFirstSession);
 
     // Session 2: fresh in-memory cache, same disk dir, same line. Must cost ZERO additional calls.
@@ -409,7 +409,7 @@ public class DialogueAudioServiceTest {
     DeferredExecutor exec2 = new DeferredExecutor();
     DialogueAudioService session2 =
         new DialogueAudioService(
-            new BackendProvider(config2, new FakeBackend(EnumSet.of(Emotion.NEUTRAL)), azure),
+            new BackendProvider(config2, new FakeBackend(EnumSet.of(Emotion.NEUTRAL)), cloud),
             new FakeOutput(),
             new DiskAudioCache(cacheDir),
             exec2,
@@ -421,6 +421,6 @@ public class DialogueAudioServiceTest {
     assertEquals(
         "a repeated line across sessions must not re-bill the cloud backend",
         afterFirstSession,
-        azure.requests.size());
+        cloud.requests.size());
   }
 }

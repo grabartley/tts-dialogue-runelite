@@ -25,34 +25,72 @@ public interface TTSDialogueConfig extends Config {
   String synthesisSection = "synthesis";
 
   @ConfigSection(
-      name = "Cloud (Azure)",
+      name = "Cloud (OpenRouter)",
       description =
-          "Microsoft Azure Neural TTS settings. Used only when Voice Backend is Cloud. Dialogue text"
-              + " and your region leave your machine when this backend is active.",
+          "OpenRouter cloud TTS settings. Used only when Voice Backend is Cloud. Dialogue text leaves"
+              + " your machine and is sent to OpenRouter when this backend is active.",
       position = 4)
-  String cloudAzureSection = "cloudAzure";
+  String cloudOpenRouterSection = "cloudOpenRouter";
 
   /**
-   * Which synthesis backend dialogue routes through. {@code LOCAL} is the offline, neutral-only
-   * Kokoro engine (default); {@code CLOUD} is the emotional cloud backend. Cloud falls back to the
-   * local engine when its backend is unavailable.
+   * Which synthesis backend dialogue routes through. {@code CLOUD} is the OpenRouter cloud backend
+   * (default, cloud-first): it falls back to the local engine and warns once when no API key is
+   * set. {@code LOCAL} is the offline, neutral-only Kokoro engine.
    */
   enum VoiceBackend {
     LOCAL,
     CLOUD
   }
 
+  /**
+   * The OpenRouter speech model the Cloud backend synthesizes through. Each model lives in its own
+   * voice namespace, so every model carries the single default voice this issue ships; the per-NPC
+   * race/gender voice map is layered on in a follow-up. {@code slug} is the OpenRouter model id
+   * sent in the request body. The cheapest emotion-capable model, Gemini 3.1 Flash TTS, is the
+   * default.
+   */
+  enum CloudModel {
+    GEMINI_FLASH_TTS("Gemini 3.1 Flash TTS", "google/gemini-3.1-flash-tts-preview", "Charon"),
+    MAI_VOICE_2("MAI-Voice-2", "microsoft/mai-voice-2", "en-US-Harper:MAI-Voice-2"),
+    GROK_VOICE_TTS("Grok Voice TTS", "x-ai/grok-voice-tts-1.0", "eve");
+
+    private final String label;
+    private final String slug;
+    private final String defaultVoice;
+
+    CloudModel(String label, String slug, String defaultVoice) {
+      this.label = label;
+      this.slug = slug;
+      this.defaultVoice = defaultVoice;
+    }
+
+    /** OpenRouter model id, e.g. {@code google/gemini-3.1-flash-tts-preview}. */
+    public String slug() {
+      return slug;
+    }
+
+    /** The hardcoded default voice for this model, valid in its own voice namespace. */
+    public String defaultVoice() {
+      return defaultVoice;
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
+  }
+
   @ConfigItem(
       keyName = "voiceBackend",
       name = "Voice Backend",
       description =
-          "Which synthesis engine to use. Local is the offline, neutral-only Kokoro voice (default)."
-              + " Cloud is the emotional cloud backend. Cloud falls back to Local when its backend is"
-              + " unavailable.",
+          "Which synthesis engine to use. Cloud is the OpenRouter cloud backend (default): it needs"
+              + " an API key and falls back to the local voice with a one-time notice until you add"
+              + " one. Local is the offline, neutral-only Kokoro voice.",
       position = 0,
       section = synthesisSection)
   default VoiceBackend voiceBackend() {
-    return VoiceBackend.LOCAL;
+    return VoiceBackend.CLOUD;
   }
 
   @ConfigItem(
@@ -60,8 +98,8 @@ public interface TTSDialogueConfig extends Config {
       name = "Enable Emotion",
       description =
           "Carry the emotion detected from the speaker's chat-head animation through to synthesis."
-              + " The default local Kokoro backend is neutral-only, so emotion is only audible on the"
-              + " Cloud backend. When off, every line is voiced as Neutral.",
+              + " Per-model emotion rendering is still being rolled out, so today every line is"
+              + " voiced as Neutral on both backends regardless of this setting.",
       position = 1,
       section = synthesisSection)
   default boolean enableEmotion() {
@@ -69,28 +107,28 @@ public interface TTSDialogueConfig extends Config {
   }
 
   @ConfigItem(
-      keyName = "azureKey",
-      name = "Azure Subscription Key",
+      keyName = "openRouterApiKey",
+      name = "OpenRouter API Key",
       description =
-          "Your Microsoft Azure Speech resource key. Required for the Cloud voice backend. Stored"
-              + " locally and never bundled with the plugin.",
+          "Your OpenRouter API key. Required for the Cloud voice backend. Stored locally and never"
+              + " bundled with the plugin.",
       position = 0,
       secret = true,
-      section = cloudAzureSection)
-  default String azureKey() {
+      section = cloudOpenRouterSection)
+  default String openRouterApiKey() {
     return "";
   }
 
   @ConfigItem(
-      keyName = "azureRegion",
-      name = "Azure Region",
+      keyName = "cloudModel",
+      name = "Cloud Model",
       description =
-          "The region of your Azure Speech resource, e.g. eastus. Required for the Cloud voice"
-              + " backend.",
+          "Which OpenRouter speech model the Cloud backend uses. Gemini 3.1 Flash TTS is the"
+              + " cheapest default; switching models never replays audio cached from another model.",
       position = 1,
-      section = cloudAzureSection)
-  default String azureRegion() {
-    return "";
+      section = cloudOpenRouterSection)
+  default CloudModel cloudModel() {
+    return CloudModel.GEMINI_FLASH_TTS;
   }
 
   @ConfigItem(

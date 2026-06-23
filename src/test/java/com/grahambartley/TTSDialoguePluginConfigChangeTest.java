@@ -28,8 +28,8 @@ public class TTSDialoguePluginConfigChangeTest {
   @Test
   public void affectsBackendWarmUpRecognisesBackendKeys() {
     assertTrue(TTSDialoguePlugin.affectsBackendWarmUp("ttsDialogue", "voiceBackend"));
-    assertTrue(TTSDialoguePlugin.affectsBackendWarmUp("ttsDialogue", "azureKey"));
-    assertTrue(TTSDialoguePlugin.affectsBackendWarmUp("ttsDialogue", "azureRegion"));
+    assertTrue(TTSDialoguePlugin.affectsBackendWarmUp("ttsDialogue", "openRouterApiKey"));
+    assertTrue(TTSDialoguePlugin.affectsBackendWarmUp("ttsDialogue", "cloudModel"));
   }
 
   @Test
@@ -97,7 +97,7 @@ public class TTSDialoguePluginConfigChangeTest {
   /** Plugin wired with a real DialogueAudioService and BackendProvider over counting stubs. */
   private static Harness harness(StubConfig config, AtomicInteger warmCalls) throws Exception {
     SynthesisBackend kokoro = new StubBackend(BackendProvider.LOCAL_KOKORO_ID, warmCalls);
-    SynthesisBackend cloud = new StubBackend("cloud-azure", warmCalls);
+    SynthesisBackend cloud = new StubBackend("cloud-openrouter", warmCalls);
     BackendProvider provider = new BackendProvider(config, kokoro, cloud);
     DialogueAudioService audioService =
         new DialogueAudioService(provider, null, null, 1, 1, () -> 100);

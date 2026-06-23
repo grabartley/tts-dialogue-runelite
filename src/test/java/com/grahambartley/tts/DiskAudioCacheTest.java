@@ -65,11 +65,11 @@ public class DiskAudioCacheTest {
   @Test
   public void differentEmotionDoesNotCollide() {
     DiskAudioCache cache = new DiskAudioCache(cacheDir());
-    cache.put("cloud-azure", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Halt", pcm(24_000, 0.1f));
-    cache.put("cloud-azure", "npc:HUMAN:MALE", Emotion.ANGRY, "Halt", pcm(24_000, 0.9f));
+    cache.put("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Halt", pcm(24_000, 0.1f));
+    cache.put("cloud-openrouter", "npc:HUMAN:MALE", Emotion.ANGRY, "Halt", pcm(24_000, 0.9f));
 
-    Pcm neutral = cache.get("cloud-azure", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Halt");
-    Pcm angry = cache.get("cloud-azure", "npc:HUMAN:MALE", Emotion.ANGRY, "Halt");
+    Pcm neutral = cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Halt");
+    Pcm angry = cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.ANGRY, "Halt");
     assertArrayEquals(new float[] {0.1f}, neutral.getSamples(), 0.0f);
     assertArrayEquals(new float[] {0.9f}, angry.getSamples(), 0.0f);
   }
@@ -78,7 +78,8 @@ public class DiskAudioCacheTest {
   public void differentBackendDoesNotCollide() {
     DiskAudioCache cache = new DiskAudioCache(cacheDir());
     cache.put("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings", pcm(24_000, 0.2f));
-    cache.put("cloud-azure", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings", pcm(24_000, 0.8f));
+    cache.put(
+        "cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings", pcm(24_000, 0.8f));
 
     assertArrayEquals(
         new float[] {0.2f},
@@ -86,7 +87,7 @@ public class DiskAudioCacheTest {
         0.0f);
     assertArrayEquals(
         new float[] {0.8f},
-        cache.get("cloud-azure", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings").getSamples(),
+        cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings").getSamples(),
         0.0f);
   }
 

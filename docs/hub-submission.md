@@ -21,7 +21,7 @@ The split matters:
 | `repository`, `commit` | `plugins/voiced-dialogue` descriptor (plugin-hub fork) | The only required descriptor fields. |
 | `warning`, `authors`, `jarSizeLimitMiB` | `plugins/voiced-dialogue` descriptor (plugin-hub fork) | The packager reads these from the descriptor, not from the properties file. A `warning=` in `runelite-plugin.properties` is an unused prop and never reaches the user; it must go in the descriptor. |
 
-The off-machine-data disclosure (Azure) is therefore carried by the descriptor's
+The off-machine-data disclosure (OpenRouter) is therefore carried by the descriptor's
 `warning=` line, mirroring how the `tts` and NaturalSpeech listings disclose off-machine
 data. A pre-filled descriptor is kept at
 [`docs/plugin-hub-manifest/voiced-dialogue`](plugin-hub-manifest/voiced-dialogue) in this
@@ -71,7 +71,7 @@ placeholder with the sha from Step 1:
 repository=https://github.com/grabartley/tts-dialogue-runelite.git
 commit=<full 40-char sha from `git rev-parse v1.0.0`>
 authors=grabartley
-warning=With the Cloud (Azure) voice backend selected, the dialogue text being spoken and your configured Azure region are sent to Microsoft Azure over HTTPS using your subscription key. The two local backends stay fully offline and send nothing off your machine.
+warning=With the Cloud (OpenRouter) voice backend selected, the dialogue text being spoken is sent to OpenRouter over HTTPS using your API key. The local backend stays fully offline and sends nothing off your machine.
 ```
 
 The descriptor file name **is** the internal plugin name and must be lowercase

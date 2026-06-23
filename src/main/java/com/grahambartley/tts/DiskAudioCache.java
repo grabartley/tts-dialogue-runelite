@@ -22,8 +22,8 @@ import lombok.extern.slf4j.Slf4j;
  *
  * <p>It sits behind the in-memory {@link LruCache} in {@link DialogueAudioService} as the second
  * lookup tier: in-memory LRU → disk → synthesize. Its headline purpose is to keep cloud backends
- * (Azure) from re-billing their free tier for lines a user has already heard; every backend also
- * gets faster replays for free.
+ * (OpenRouter) from re-billing for lines a user has already heard; every backend also gets faster
+ * replays for free.
  *
  * <p>Each entry is keyed on the full identity tuple {@code (backendId, voiceKey, emotion, text)} —
  * the same tuple {@link DialogueAudioService}'s in-memory {@code CacheKey} uses — hashed with

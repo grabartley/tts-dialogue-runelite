@@ -19,28 +19,28 @@ Install from the **RuneLite Plugin Hub**: open RuneLite, click the wrench (Confi
 
 ## Backends
 
-The plugin routes every line through one synthesis backend, chosen by the **Voice Backend** config. The default is the offline local voice; the cloud emotional backend is opt-in. When a selected backend is unavailable, dialogue falls back to the local voice with a one-time notice and keeps speaking.
+The plugin routes every line through one synthesis backend, chosen by the **Voice Backend** config. The default is the cloud backend (cloud-first); it falls back to the offline local voice with a one-time notice until you add an OpenRouter API key, and whenever the cloud backend is otherwise unavailable, so dialogue keeps speaking.
 
 | Backend | Config value | Where it runs | Emotion | Offline | Setup |
 |---------|--------------|---------------|---------|---------|-------|
-| **Local (Kokoro)** | `Local` (default) | external CPU engine the plugin installs | Neutral | Yes | one-time engine + model download |
-| **Cloud (Azure)** | `Cloud` | Microsoft Azure Neural TTS over HTTPS | Full set, SSML styles | No | your own Azure key + region |
+| **Cloud (OpenRouter)** | `Cloud` (default) | OpenRouter speech API over HTTPS | Neutral (per-model emotion rolling out) | No | your own OpenRouter API key |
+| **Local (Kokoro)** | `Local` | external CPU engine the plugin installs | Neutral | Yes | one-time engine + model download |
 
-See [docs/backends.md](docs/backends.md) for the full comparison and the Azure style map.
+See [docs/backends.md](docs/backends.md) for the full comparison.
 
-### Local (Kokoro), the default
+### Cloud (OpenRouter), the default
 
-A real neural voice that runs on your CPU, fully offline. Nothing about a dialogue line leaves your machine. The plugin manages the engine for you: it downloads the right build for your OS on first use, runs it as a separate background process, and keeps it warm across lines. Delivery is neutral by design, so the local default stays clean neural output, and it is the universal fallback whenever another backend cannot run.
+An opt-in cloud voice with near-zero setup beyond supplying a key. Create an OpenRouter API key, paste it into the config, and dialogue routes through OpenRouter's speech API over HTTPS. The **Cloud Model** setting picks which OpenRouter speech model voices each line (Gemini 3.1 Flash TTS by default, the cheapest option). Until a key is set, the plugin logs a one-time notice and uses the free local voice instead.
 
-### Cloud (Azure)
+> **Privacy:** with the Cloud backend active, the dialogue text being spoken is sent to OpenRouter over HTTPS using your API key. The local backend stays fully offline and sends nothing off your machine. The persistent cache means audio you have already heard is replayed from disk rather than re-billed.
 
-An opt-in cloud voice with the strongest emotion and near-zero setup beyond supplying a key. Create a Microsoft Azure Speech resource, then enter its subscription key and region (for example `eastus`) in the config. Azure renders each line's detected emotion as a neural SSML express-as style.
+### Local (Kokoro)
 
-> **Privacy:** with the Cloud backend active, the dialogue text being spoken and your configured Azure region are sent to Microsoft Azure over HTTPS using your subscription key. The two local backends stay fully offline and send nothing off your machine. Azure offers a free tier with a monthly character allowance; the persistent cache means audio you have already heard is replayed from disk rather than re-billed.
+A real neural voice that runs on your CPU, fully offline. Nothing about a dialogue line leaves your machine. The plugin manages the engine for you: it downloads the right build for your OS on first use, runs it as a separate background process, and keeps it warm across lines. Delivery is neutral by design, so the local voice stays clean neural output, and it is the universal fallback whenever the cloud backend cannot run.
 
 ## Emotion
 
-Each new dialogue line's emotion is read from the speaker's chat-head expression animation, the NPC head for NPC lines and the player head for player lines, and mapped to one of five emotions (Neutral, Happy, Sad, Angry, Scared). The resolved emotion rides in every synthesis request and is rendered by the active backend (Azure renders it as an SSML style). The default local Kokoro voice speaks every line neutrally, so emotion becomes audible once you select the Cloud backend. Detection is controlled by the **Enable Emotion** toggle, which is on by default; when it is off, every line is voiced as Neutral.
+Each new dialogue line's emotion is read from the speaker's chat-head expression animation, the NPC head for NPC lines and the player head for player lines, and mapped to one of five emotions (Neutral, Happy, Sad, Angry, Scared). The resolved emotion rides in every synthesis request. Per-model emotion rendering on the cloud backend is still being rolled out, so today every line is voiced as Neutral on both backends; detection runs either way and is ready for emotional rendering once it lands. Detection is controlled by the **Enable Emotion** toggle, which is on by default; when it is off, every line is voiced as Neutral.
 
 The mapping is derived from the documented RuneScape chathead expression animation enum, a named set spanning ids **9760-9862**, with every documented expression mapped to the nearest of the five emotions. Any animation id not present in the table, and `-1` (no animation or a stale head), resolves to Neutral, so an unseen expression or a non-human head (trolls, ogres, children, monsters often emit ids outside the documented set) is a safe no-op. Five expressions do not map cleanly onto the five emotions and are mapped to the nearest one: `9800` MANIC_FACE -> Angry, `9812` LOOK_DOWN -> Sad, `9816` WHAT_THE -> Neutral, `9820` WHAT_THE_TWO -> Neutral, and `9824` EYES_WIDE -> Scared.
 
@@ -107,16 +107,16 @@ Synthesis and playback run off the game thread, so the client stays responsive e
 
 | Setting | Default | What it does |
 |---------|---------|--------------|
-| **Voice Backend** | `Local` | Selects the synthesis engine: `Local` (offline neutral Kokoro) or `Cloud` (Azure). |
-| **Enable Emotion** | `On` | Carries the emotion detected from the speaker's chat-head animation through to synthesis. Audible only on an emotional backend. |
+| **Voice Backend** | `Cloud` | Selects the synthesis engine: `Cloud` (OpenRouter, falls back to local until a key is set) or `Local` (offline neutral Kokoro). |
+| **Enable Emotion** | `On` | Carries the emotion detected from the speaker's chat-head animation through to synthesis. Per-model emotion rendering is still rolling out, so lines are currently Neutral on both backends. |
 | **Persistent Audio Cache** | `On` | Saves synthesized dialogue to disk so repeated lines play instantly across sessions and cloud backends are not re-billed. |
 | **Dialogue Volume** | `100` | Volume of the spoken dialogue (0 to 100). |
 | **Enable Automatic NPC Voices** | `On` | Picks a voice per NPC from the race and gender table. When off, every NPC uses the default Human voice. |
 | **Player Voice** | `Player Male` | The voice used for the player character. |
 | **Enable Voice Fallbacks** | `On` | Falls back to a gender-appropriate human voice for NPCs missing from the table. When off, those NPCs use the single default voice. |
 | **Debug Mode** | `Off` | Logs detailed NPC race/gender resolution and the chosen voice per NPC. |
-| **Azure Subscription Key** | empty | Your Azure Speech resource key. Required for the Cloud backend; stored locally and never bundled with the plugin. |
-| **Azure Region** | empty | The region of your Azure Speech resource (for example `eastus`). Required for the Cloud backend. |
+| **OpenRouter API Key** | empty | Your OpenRouter API key. Required for the Cloud backend; stored locally and never bundled with the plugin. |
+| **Cloud Model** | `Gemini 3.1 Flash TTS` | Which OpenRouter speech model the Cloud backend uses. Switching models never replays audio cached from another model. |
 
 ## Dev Setup
 
@@ -148,7 +148,7 @@ You can run it directly from your IDE (such as IntelliJ) or configure it in `bui
 - Java
 - Kokoro-82M for the local voice
 - sherpa-onnx for ONNX inference
-- Microsoft Azure Neural TTS for the cloud voice
+- OpenRouter speech API for the cloud voice
 - RuneLite plugin framework
 
 ## Shoutout

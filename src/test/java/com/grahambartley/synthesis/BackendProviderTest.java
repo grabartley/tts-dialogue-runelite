@@ -78,8 +78,8 @@ public class BackendProviderTest {
     config.backend = VoiceBackend.CLOUD;
     StubBackend kokoro =
         new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend azure = new StubBackend("cloud-azure", false, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, azure);
+    StubBackend cloud = new StubBackend("cloud-openrouter", false, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
     assertEquals(BackendProvider.LOCAL_KOKORO_ID, provider.active().id());
   }
@@ -90,10 +90,10 @@ public class BackendProviderTest {
     config.backend = VoiceBackend.CLOUD;
     StubBackend kokoro =
         new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend azure = new StubBackend("cloud-azure", true, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, azure);
+    StubBackend cloud = new StubBackend("cloud-openrouter", true, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
-    assertEquals("cloud-azure", provider.active().id());
+    assertEquals("cloud-openrouter", provider.active().id());
   }
 
   @Test
@@ -101,13 +101,15 @@ public class BackendProviderTest {
     TestConfig config = new TestConfig();
     StubBackend kokoro =
         new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend azure = new StubBackend("cloud-azure", true, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, azure);
+    StubBackend cloud = new StubBackend("cloud-openrouter", true, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
     assertEquals(BackendProvider.LOCAL_KOKORO_ID, provider.active().id());
     config.backend = VoiceBackend.CLOUD;
     assertEquals(
-        "switching config selects the new backend live", "cloud-azure", provider.active().id());
+        "switching config selects the new backend live",
+        "cloud-openrouter",
+        provider.active().id());
   }
 
   @Test
@@ -124,16 +126,16 @@ public class BackendProviderTest {
 
   @Test
   public void supportedEmotionIsPassedThroughUnchanged() {
-    StubBackend azure = new StubBackend("cloud-azure", true, EnumSet.allOf(Emotion.class));
+    StubBackend cloud = new StubBackend("cloud-openrouter", true, EnumSet.allOf(Emotion.class));
     StubBackend kokoro =
         new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
     TestConfig config = new TestConfig();
     config.backend = VoiceBackend.CLOUD;
-    BackendProvider provider = new BackendProvider(config, kokoro, azure);
+    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
     provider.synthesize(req(Emotion.ANGRY));
 
-    assertEquals("a supported emotion is preserved", Emotion.ANGRY, azure.lastEmotion);
+    assertEquals("a supported emotion is preserved", Emotion.ANGRY, cloud.lastEmotion);
   }
 
   @Test
@@ -142,8 +144,8 @@ public class BackendProviderTest {
     config.backend = VoiceBackend.CLOUD;
     StubBackend kokoro =
         new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend azure = new StubBackend("cloud-azure", false, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, azure);
+    StubBackend cloud = new StubBackend("cloud-openrouter", false, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
     int[] notices = {0};
     provider.setAvailabilityNotice(msg -> notices[0]++);
@@ -161,8 +163,8 @@ public class BackendProviderTest {
     // The bundled fallback itself failed to load.
     StubBackend kokoro =
         new StubBackend(BackendProvider.LOCAL_KOKORO_ID, false, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend azure = new StubBackend("cloud-azure", false, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, azure);
+    StubBackend cloud = new StubBackend("cloud-openrouter", false, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
     // active() must not throw and must return the local fallback even though it is unavailable; the
     // one-time silent-failure warning is logged as a side effect. Calling twice proves idempotence.
@@ -176,20 +178,20 @@ public class BackendProviderTest {
     config.backend = VoiceBackend.CLOUD;
     StubBackend kokoro =
         new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend azure = new StubBackend("cloud-azure", true, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, azure);
+    StubBackend cloud = new StubBackend("cloud-openrouter", true, EnumSet.allOf(Emotion.class));
+    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
     provider.synthesize(req(Emotion.SCARED));
 
-    assertEquals("Cloud supports the full set, so no downgrade", Emotion.SCARED, azure.lastEmotion);
+    assertEquals("Cloud supports the full set, so no downgrade", Emotion.SCARED, cloud.lastEmotion);
   }
 
   @Test
   public void missingLocalKokoroBackendIsRejected() {
-    StubBackend azure = new StubBackend("cloud-azure", true, EnumSet.allOf(Emotion.class));
+    StubBackend cloud = new StubBackend("cloud-openrouter", true, EnumSet.allOf(Emotion.class));
     boolean threw = false;
     try {
-      new BackendProvider(new TestConfig(), azure);
+      new BackendProvider(new TestConfig(), cloud);
     } catch (IllegalArgumentException e) {
       threw = true;
     }

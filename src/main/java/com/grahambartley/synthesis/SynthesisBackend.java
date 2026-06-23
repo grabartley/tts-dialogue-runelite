@@ -13,7 +13,7 @@ import java.util.EnumSet;
  */
 public interface SynthesisBackend {
 
-  /** Stable identifier, e.g. {@code "local-kokoro"}, {@code "cloud-azure"}. */
+  /** Stable identifier, e.g. {@code "local-kokoro"}, {@code "cloud-openrouter"}. */
   String id();
 
   /** Whether this backend can actually run right now (engine installed, key set, GPU present). */
