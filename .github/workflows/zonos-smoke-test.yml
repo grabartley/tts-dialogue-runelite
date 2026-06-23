@@ -15,7 +15,10 @@ name: Zonos Frozen-Import Smoke Test
 #
 # It uses CPU torch wheels (not the multi-GB cu124 build): the double-init is GPU-independent and
 # CPU wheels exercise the identical PyInstaller `cleanup_loaded_modules` + numpy re-import path, so
-# the smoke stays cheap (single-digit minutes) while remaining faithful to the import bug class.
+# the smoke stays faithful to the import bug class without the GPU runtime. Note it is NOT single-digit
+# minutes: PyInstaller-freezing the full torch graph dominates (~25-35 min on a Windows runner, same as
+# the real bundle's freeze minus the 2.9GB weight download). Still far cheaper than shipping a broken
+# bundle: CPU-only, no weights, and it gates the real build before any download or upload happens.
 #
 # PASS = the frozen exe imports torch + zonos and runs cuda_available() cleanly (a False GPU result
 # on the GPU-less runner is fine). FAIL = the exe crashes, exits non-zero, or its output contains a
@@ -41,7 +44,9 @@ jobs:
     # windows-latest + frozen: this is where the double-load surfaced and the shipped bundle's target,
     # so reproduce it there. No GPU: the double-init surfaces at import, before any CUDA call.
     runs-on: windows-latest
-    timeout-minutes: 25
+    # The full-graph PyInstaller freeze of torch takes ~25-35 min on a Windows runner; 25 was too tight
+    # (the freeze got cancelled mid-run). 50 leaves headroom while still catching a genuine hang.
+    timeout-minutes: 50
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

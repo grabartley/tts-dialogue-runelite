@@ -55,7 +55,9 @@ jobs:
   smoke:
     name: Frozen full-graph import gate (no GPU)
     runs-on: windows-latest
-    timeout-minutes: 25
+    # Full-graph torch freeze runs ~25-35 min on a Windows runner; 50 leaves headroom (25 was too tight
+    # and got cancelled mid-freeze). Still gates the build BEFORE the 2.9GB weight download + upload.
+    timeout-minutes: 50
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
