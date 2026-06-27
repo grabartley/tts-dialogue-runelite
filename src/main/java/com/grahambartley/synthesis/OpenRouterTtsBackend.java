@@ -3,7 +3,6 @@ package com.grahambartley.synthesis;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.grahambartley.TTSDialogueConfig;
-import com.grahambartley.TTSDialogueConfig.CloudModel;
 import com.grahambartley.tts.Pcm;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,10 +26,11 @@ import okhttp3.ResponseBody;
  * mono samples at 24 kHz, decoded by {@link RawPcmDecoder} into {@link Pcm} at its true rate so
  * playback is not pitch-shifted.
  *
- * <p>The active {@link CloudModel} chooses the model slug and, for now, a single hardcoded
- * per-model default voice; the per-NPC voice map is a follow-up. This issue does not render
- * emotion, so the backend advertises {@link Emotion#NEUTRAL} only and {@link BackendProvider}
- * downgrades every line to neutral.
+ * <p>The model is fixed to Gemini 3.1 Flash TTS, the one OpenRouter speech model with both a voice
+ * catalog rich enough to map every race/gender and full emotion support. {@link GeminiVoiceMap}
+ * resolves each {@link VoiceSpec} to a gender-correct Gemini voice, spread per NPC. Emotion
+ * rendering is a follow-up, so the backend advertises {@link Emotion#NEUTRAL} only for now and
+ * {@link BackendProvider} downgrades every line to neutral.
  *
  * <p>It is selected when {@link TTSDialogueConfig#voiceBackend()} is {@code CLOUD} and reports
  * {@link #isAvailable()} only when an API key is set. Every failure path (missing key, non-2xx,
@@ -49,6 +49,12 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   static final String RESPONSE_FORMAT = "pcm";
 
+  /**
+   * The fixed OpenRouter speech model: the only one meeting both the voice-variety and emotion
+   * bars.
+   */
+  static final String MODEL = "google/gemini-3.1-flash-tts-preview";
+
   private static final String PRODUCTION_ENDPOINT = "https://openrouter.ai/api/v1/audio/speech";
   private static final String USER_AGENT = "tts-dialogue-runelite";
   private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json");
@@ -57,6 +63,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   private final TTSDialogueConfig config;
   private final Gson gson;
   private final String endpoint;
+  private final GeminiVoiceMap voiceMap = new GeminiVoiceMap();
 
   /** One-time user notice hook for cloud failures; defaults to a no-op. */
   private Consumer<String> notice = msg -> {};
@@ -102,8 +109,8 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   @Override
   public String cacheVariant(SynthesisRequest request) {
-    CloudModel model = config.cloudModel();
-    return model.slug() + "|" + model.defaultVoice();
+    // The model is fixed, so the only backend-specific render variant is the resolved Gemini voice.
+    return voiceMap.voiceFor(request.voice());
   }
 
   @Override
@@ -113,12 +120,11 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
           "Add an OpenRouter API key for cloud voices; using the free local voice until then.");
       return null;
     }
-    CloudModel model = config.cloudModel();
     String key = config.openRouterApiKey().trim();
-    String voice = model.defaultVoice();
+    String voice = voiceMap.voiceFor(request.voice());
 
     JsonObject payload = new JsonObject();
-    payload.addProperty("model", model.slug());
+    payload.addProperty("model", MODEL);
     payload.addProperty("input", request.text());
     payload.addProperty("voice", voice);
     payload.addProperty("response_format", RESPONSE_FORMAT);

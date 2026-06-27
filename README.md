@@ -23,14 +23,14 @@ The plugin routes every line through one synthesis backend, chosen by the **Voic
 
 | Backend | Config value | Where it runs | Emotion | Offline | Setup |
 |---------|--------------|---------------|---------|---------|-------|
-| **Cloud (OpenRouter)** | `Cloud` (default) | OpenRouter speech API over HTTPS | Neutral (per-model emotion rolling out) | No | your own OpenRouter API key |
+| **Cloud (OpenRouter)** | `Cloud` (default) | Gemini 3.1 Flash TTS via OpenRouter over HTTPS | Neutral (emotion rolling out) | No | your own OpenRouter API key |
 | **Local (Kokoro)** | `Local` | external CPU engine the plugin installs | Neutral | Yes | one-time engine + model download |
 
 See [docs/backends.md](docs/backends.md) for the full comparison.
 
 ### Cloud (OpenRouter), the default
 
-An opt-in cloud voice with near-zero setup beyond supplying a key. Create an OpenRouter API key, paste it into the config, and dialogue routes through OpenRouter's speech API over HTTPS. The **Cloud Model** setting picks which OpenRouter speech model voices each line (Gemini 3.1 Flash TTS by default, the cheapest option). Until a key is set, the plugin logs a one-time notice and uses the free local voice instead.
+An opt-in cloud voice with near-zero setup beyond supplying a key. Create an OpenRouter API key, paste it into the config, and dialogue routes through Google's Gemini 3.1 Flash TTS over HTTPS, with a gender-correct voice picked per NPC by race. Until a key is set, the plugin logs a one-time notice and uses the free local voice instead.
 
 > **Privacy:** with the Cloud backend active, the dialogue text being spoken is sent to OpenRouter over HTTPS using your API key. The local backend stays fully offline and sends nothing off your machine. The persistent cache means audio you have already heard is replayed from disk rather than re-billed.
 
@@ -99,6 +99,8 @@ Each NPC's voice is chosen by race and gender, and the player has a dedicated vo
 
 The Human voices double as the fallback for any NPC missing from the table, and as the default for every NPC when **Automatic NPC Voices** is off. The lookup table is generated offline and can be grown over time; see [docs/npc-voice-tooling.md](docs/npc-voice-tooling.md) for how it is built and how to add or correct entries.
 
+The table above is the local Kokoro voice bank. The Cloud backend maps the same race and gender categories onto Google's Gemini voices, keeping each category gender-correct and spreading NPCs of the same race and gender across a sub-pool so they still sound distinct.
+
 ## Performance
 
 Synthesis and playback run off the game thread, so the client stays responsive even when you mash through dialogue, and skipping a line cancels its audio instantly. Repeated lines are served from a cache keyed on the active backend, voice, emotion, and text: an in-memory layer covers the current session, and a size-bounded persistent on-disk cache under `~/.runelite/tts-dialogue/cache/` replays already-heard lines across client restarts. The disk cache uses least-recently-used eviction, survives corruption safely, and keeps cloud backends from being re-billed for audio you have already generated. It is controlled by the **Persistent Audio Cache** setting.
@@ -116,7 +118,6 @@ Synthesis and playback run off the game thread, so the client stays responsive e
 | **Enable Voice Fallbacks** | `On` | Falls back to a gender-appropriate human voice for NPCs missing from the table. When off, those NPCs use the single default voice. |
 | **Debug Mode** | `Off` | Logs detailed NPC race/gender resolution and the chosen voice per NPC. |
 | **OpenRouter API Key** | empty | Your OpenRouter API key. Required for the Cloud backend; stored locally and never bundled with the plugin. |
-| **Cloud Model** | `Gemini 3.1 Flash TTS` | Which OpenRouter speech model the Cloud backend uses. Switching models never replays audio cached from another model. |
 
 ## Dev Setup
 

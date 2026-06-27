@@ -6,11 +6,11 @@ import com.grahambartley.tts.Pcm;
  * Decodes the headerless audio bytes returned by OpenRouter's {@code response_format: "pcm"} into a
  * {@link Pcm}.
  *
- * <p>Unlike {@link RiffPcmDecoder}, this body carries no RIFF/WAVE header: it is a bare stream of
- * signed 16-bit little-endian mono samples at a sample rate the caller already knows (24 kHz for
- * the OpenRouter speech endpoint, matching the rest of the pipeline). The decoder therefore takes
- * the rate as an argument rather than reading it from a header, and converts each 16-bit sample to
- * a {@code float} in [-1, 1] so {@code AudioPlayer} plays it at native pitch with no resampling.
+ * <p>The body carries no RIFF/WAVE header: it is a bare stream of signed 16-bit little-endian mono
+ * samples at a sample rate the caller already knows (24 kHz for the OpenRouter speech endpoint,
+ * matching the rest of the pipeline). The decoder therefore takes the rate as an argument rather
+ * than reading it from a header, and converts each 16-bit sample to a {@code float} in [-1, 1] so
+ * {@code AudioPlayer} plays it at native pitch with no resampling.
  */
 final class RawPcmDecoder {
 

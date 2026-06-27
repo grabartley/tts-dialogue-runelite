@@ -42,44 +42,6 @@ public interface TTSDialogueConfig extends Config {
     CLOUD
   }
 
-  /**
-   * The OpenRouter speech model the Cloud backend synthesizes through. Each model lives in its own
-   * voice namespace, so every model carries the single default voice this issue ships; the per-NPC
-   * race/gender voice map is layered on in a follow-up. {@code slug} is the OpenRouter model id
-   * sent in the request body. The cheapest emotion-capable model, Gemini 3.1 Flash TTS, is the
-   * default.
-   */
-  enum CloudModel {
-    GEMINI_FLASH_TTS("Gemini 3.1 Flash TTS", "google/gemini-3.1-flash-tts-preview", "Charon"),
-    MAI_VOICE_2("MAI-Voice-2", "microsoft/mai-voice-2", "en-US-Harper:MAI-Voice-2"),
-    GROK_VOICE_TTS("Grok Voice TTS", "x-ai/grok-voice-tts-1.0", "eve");
-
-    private final String label;
-    private final String slug;
-    private final String defaultVoice;
-
-    CloudModel(String label, String slug, String defaultVoice) {
-      this.label = label;
-      this.slug = slug;
-      this.defaultVoice = defaultVoice;
-    }
-
-    /** OpenRouter model id, e.g. {@code google/gemini-3.1-flash-tts-preview}. */
-    public String slug() {
-      return slug;
-    }
-
-    /** The hardcoded default voice for this model, valid in its own voice namespace. */
-    public String defaultVoice() {
-      return defaultVoice;
-    }
-
-    @Override
-    public String toString() {
-      return label;
-    }
-  }
-
   @ConfigItem(
       keyName = "voiceBackend",
       name = "Voice Backend",
@@ -117,18 +79,6 @@ public interface TTSDialogueConfig extends Config {
       section = cloudOpenRouterSection)
   default String openRouterApiKey() {
     return "";
-  }
-
-  @ConfigItem(
-      keyName = "cloudModel",
-      name = "Cloud Model",
-      description =
-          "Which OpenRouter speech model the Cloud backend uses. Gemini 3.1 Flash TTS is the"
-              + " cheapest default; switching models never replays audio cached from another model.",
-      position = 1,
-      section = cloudOpenRouterSection)
-  default CloudModel cloudModel() {
-    return CloudModel.GEMINI_FLASH_TTS;
   }
 
   @ConfigItem(

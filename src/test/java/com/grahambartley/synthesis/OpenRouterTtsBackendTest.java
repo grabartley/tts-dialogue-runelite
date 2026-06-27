@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.grahambartley.TTSDialogueConfig;
-import com.grahambartley.TTSDialogueConfig.CloudModel;
 import com.grahambartley.VoiceManager.NPCGender;
 import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.tts.Pcm;
@@ -29,19 +28,13 @@ import org.junit.Test;
  */
 public class OpenRouterTtsBackendTest {
 
-  /** Config with a settable key/model; everything else uses interface defaults. */
+  /** Config with a settable key; everything else uses interface defaults. */
   private static final class TestConfig implements TTSDialogueConfig {
     String key = "";
-    CloudModel model = CloudModel.GEMINI_FLASH_TTS;
 
     @Override
     public String openRouterApiKey() {
       return key;
-    }
-
-    @Override
-    public CloudModel cloudModel() {
-      return model;
     }
   }
 
@@ -135,37 +128,42 @@ public class OpenRouterTtsBackendTest {
   }
 
   @Test
-  public void modelSelectionDrivesSlugAndDefaultVoice() throws Exception {
+  public void voiceFieldComesFromTheGeminiVoiceMap() throws Exception {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
-    config.model = CloudModel.GROK_VOICE_TTS;
     server.enqueue(
         new MockResponse()
             .setResponseCode(200)
             .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
 
-    backend(config).synthesize(req());
+    SynthesisRequest female =
+        new SynthesisRequest("Hi", VoiceSpec.npc(NPCRace.ELF, NPCGender.FEMALE), Emotion.NEUTRAL);
+    backend(config).synthesize(female);
 
     JsonObject body =
         new JsonParser().parse(server.takeRequest().getBody().readUtf8()).getAsJsonObject();
-    assertEquals("x-ai/grok-voice-tts-1.0", body.get("model").getAsString());
-    assertEquals("eve", body.get("voice").getAsString());
+    assertEquals(
+        "the voice is whatever the map resolves for the spec",
+        new GeminiVoiceMap().voiceFor(female.voice()),
+        body.get("voice").getAsString());
   }
 
   @Test
-  public void cacheVariantFoldsInModelSoSwitchingNeverCollides() {
-    TestConfig config = new TestConfig();
-    OpenRouterTtsBackend backend = backend(config);
+  public void cacheVariantIsTheResolvedVoiceSoDifferentVoicesNeverCollide() {
+    OpenRouterTtsBackend backend = backend(new TestConfig());
 
-    config.model = CloudModel.GEMINI_FLASH_TTS;
-    String gemini = backend.cacheVariant(req());
-    config.model = CloudModel.MAI_VOICE_2;
-    String mai = backend.cacheVariant(req());
+    SynthesisRequest humanMale =
+        new SynthesisRequest("a", VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE), Emotion.NEUTRAL);
+    SynthesisRequest elfFemale =
+        new SynthesisRequest("a", VoiceSpec.npc(NPCRace.ELF, NPCGender.FEMALE), Emotion.NEUTRAL);
 
-    assertTrue(
-        "the variant carries the active model slug",
-        gemini.contains("google/gemini-3.1-flash-tts-preview"));
-    assertFalse("two models produce different variants", gemini.equals(mai));
+    assertEquals(
+        "the variant is the resolved Gemini voice",
+        new GeminiVoiceMap().voiceFor(humanMale.voice()),
+        backend.cacheVariant(humanMale));
+    assertFalse(
+        "two specs that map to different voices never share a variant",
+        backend.cacheVariant(humanMale).equals(backend.cacheVariant(elfFemale)));
   }
 
   @Test

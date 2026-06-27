@@ -29,7 +29,6 @@ public class TTSDialoguePluginConfigChangeTest {
   public void affectsBackendWarmUpRecognisesBackendKeys() {
     assertTrue(TTSDialoguePlugin.affectsBackendWarmUp("ttsDialogue", "voiceBackend"));
     assertTrue(TTSDialoguePlugin.affectsBackendWarmUp("ttsDialogue", "openRouterApiKey"));
-    assertTrue(TTSDialoguePlugin.affectsBackendWarmUp("ttsDialogue", "cloudModel"));
   }
 
   @Test

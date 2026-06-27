@@ -51,11 +51,10 @@ public class TTSDialoguePlugin extends Plugin {
    * any of these at runtime must re-run the active backend's off-thread install/spawn so a newly
    * selected cloud backend warms up instead of pre-emptively falling back to local Kokoro. {@code
    * voiceBackend} switches the selection; {@code openRouterApiKey} lets a previously-unavailable
-   * Cloud selection become available once a key is entered, and {@code cloudModel} re-warms the
-   * active backend so a model switch takes effect immediately.
+   * Cloud selection become available once a key is entered.
    */
   private static final java.util.Set<String> WARM_TRIGGER_KEYS =
-      java.util.Set.of("voiceBackend", "openRouterApiKey", "cloudModel");
+      java.util.Set.of("voiceBackend", "openRouterApiKey");
 
   @Inject private Client client;
 

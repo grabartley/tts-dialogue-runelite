@@ -12,3 +12,7 @@ nbproject/
 .claude/worktrees/
 .claude/tmp/
 .claude/settings.local.json
+
+# Local secrets (never commit)
+*.key
+.openrouter-key
