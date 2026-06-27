@@ -21,12 +21,14 @@ import lombok.extern.slf4j.Slf4j;
  * top-level {@code profiles} key (produced offline by {@code tools/generate_npc_voices.py} from
  * {@code tools/profiles.json}).
  *
- * <p>Resolution is layered, deepest layer wins, and each layer overrides only the fields it
- * specifies: {@code default} (always complete) -> {@code byRace[race]} -> the first {@code
- * byCategory} entry whose keyword word-matches the display name -> {@code byId[npcId]}. So a
- * bespoke per-NPC entry need only carry what is unique (usually a {@code name} and a {@code
- * style}); accent and pace fall through to the category, race, or British default. Every NPC
- * therefore resolves to a complete {@link CharacterProfile}, whether or not it has a bespoke entry.
+ * <p>Resolution <em>combines</em> every matching layer: {@code default} (always complete), {@code
+ * byRace[race]}, <em>every</em> {@code byCategory} entry whose keyword word-matches the display
+ * name, and {@code byId[npcId]}. An NPC can be several things at once (a Fremennik human, a ghost
+ * pirate), so all matches contribute: {@code style} accumulates across the layers, while {@code
+ * name}, {@code accent}, and {@code pace} take the most specific layer that sets them. A bespoke
+ * per-NPC entry therefore need only carry what is unique (usually a {@code name} and a {@code
+ * style}); the rest falls through to the category, race, or British default. Every NPC resolves to
+ * a complete {@link CharacterProfile}, whether or not it has a bespoke entry.
  *
  * <p>The player is resolved separately: the {@code player} layer over the default, with the three
  * configured player fields (accent/style/pace) overriding when non-blank.

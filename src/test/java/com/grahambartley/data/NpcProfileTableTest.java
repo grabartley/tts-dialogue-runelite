@@ -9,7 +9,7 @@ import com.google.gson.JsonParser;
 import com.grahambartley.synthesis.CharacterProfile;
 import org.junit.Test;
 
-/** Layered, sparse resolution: default -> race -> keyword category -> per-NPC id, deepest wins. */
+/** Combining resolution: default + race + every matching keyword category + per-NPC id. */
 public class NpcProfileTableTest {
 
   private static final String JSON =
