@@ -16,36 +16,49 @@ in the primary checkout on `main`).
 There is **no fixed NPC cap**. Cover the whole region. Splitting a region only
 makes sense if a reviewer asks for it.
 
-## 1. Build the candidate list by LEAGUE REGION, not by town
+## 1. Build the candidate list: league region UNION location, deduped
 
-Filter on the wiki `leagueRegion` field for the whole region. **Do not filter by
-town/location names.** Town filtering silently drops everything between the
-towns: the Grand Exchange, Dorgesh-Kaan and other underground cities, the mines,
-the guilds, monasteries, islands (Entrana, Fossil Island), and quest areas. A
-huge share of talked-to NPCs live outside the named towns.
+Select on **two** signals and take the **union, deduped by id**, so nothing
+between or under the towns is missed:
 
-The generator already enumerates and parses every NPC page; reuse its functions
-rather than re-deriving. Enumerate `Template:Infobox NPC` pages, then per page
-read `leagueRegion`, `location`, the `options` line, and the `id` groups:
+1. **By `leagueRegion`** equal to the region (single-region only).
+2. **By `location`** naming a place inside the region. Some NPCs have a blank or
+   multi-region `leagueRegion` but a `location` that is squarely in the region
+   (an underground city, a guild, a mine, an island). Keep a list of the region's
+   place-names (its towns plus its named sub-areas) and substring-match the wiki
+   `location` field against them; include any hit even if its `leagueRegion`
+   did not qualify.
+
+Do **not** rely on `leagueRegion` alone, and do **not** filter by town as the
+*only* axis either. Union both. The generator already enumerates and parses every
+NPC page; reuse its functions:
 
 ```python
 import sys; sys.path.insert(0, "tools"); import generate_npc_voices as g
-titles = g.enumerate_npc_pages()                 # ~5-6k pages, slow; cache it
+REGION = {"misthalin", "asgarnia"}                 # <- your league region(s)
+PLACES = ["lumbridge", "varrock", "draynor", "edgeville", "falador",
+          "burthorpe", "taverley", "port sarim", "dorgesh", "grand exchange",
+          "dwarven mine", "barbarian village", "wizards' tower", "entrana", ...]
+titles = g.enumerate_npc_pages()                   # ~5-6k pages, slow; cache it
 for title, wikitext, cats in g.fetch_infoboxes(titles):
     lr = (g.first_field(wikitext, "leagueRegion") or "").lower()
-    if "," in lr or "&" in lr:        # multi-region NPCs carry no single ethnicity
-        continue                       #   (they keep the British default; skip)
-    if lr not in {"misthalin", "asgarnia"}:   # <- your region(s)
+    loc = (g.first_field(wikitext, "location") or "").lower()
+    single = lr and "," not in lr and "&" not in lr   # multi-region -> British default
+    in_region = (single and lr in REGION) or any(p in loc for p in PLACES)
+    if not in_region:
         continue
     ids = sorted({i for grp in g.parse_id_groups(wikitext) for i in grp})
-    # talkable test: the Infobox options line must contain "Talk-to"
 ```
 
 Then:
-- **Talkable filter:** keep only NPCs whose `|options...=` line contains
-  `Talk-to` (case-insensitive). This drops museum displays, livestock, pets,
-  furniture, fake-player NPCs, and pure-combat monsters. A few genuine quest NPCs
-  with a blank options field fall out too; that is acceptable.
+- **Talkable filter:** keep NPCs whose `|options...=` line contains `Talk-to`
+  (case-insensitive). This drops museum displays, livestock, pets, furniture, and
+  fake-player NPCs. **Caveat:** some NPCs that genuinely talk in-game have a blank
+  options line or only an `Infobox Monster` page (combat-flavoured NPCs with minor
+  dialogue, e.g. the Dorgesh-Kaan cave goblin miners/guards). The wiki
+  under-documents them, so the Talk-to filter and even the location union can miss
+  them. The **race-sanity sweep** and the **in-game QA pass** (sections 4 and 6)
+  are the safety nets for that class; do not assume the wiki is complete.
 - **Subtract the already-bespoke:** skip any NPC whose ids are already in
   `tools/profiles.json` `byId`.
 - **Cache** the enumeration/fetch to a temp file. The full wiki crawl takes
@@ -111,6 +124,17 @@ differs; most locals need none.
 - **Skip the non-voiced.** Cats (catspeak meows would get a silly human voice),
   boss pets, and overhead-only critters survive the Talk-to filter sometimes;
   drop them.
+- **Race-sanity sweep (catches wiki-invisible NPCs).** Some talkable NPCs never
+  appear on a usable wiki page at all (no `leagueRegion`, no `location`, no
+  `Talk-to`); they reach the bundled table only via the id-dump name cross-ref,
+  defaulted to `Human`. The Dorgesh-Kaan cave goblin miners/guards (ids 5330-5339,
+  internal names `cave_goblin_*`) were exactly this: voiced as humans. Catch them
+  by cross-checking the **cache internal names** (osrs MCP `search_npctypes`, or
+  the local `npctypes` dump) against the table race: an internal name containing a
+  race keyword (`goblin`, `dwarf`, `gnome`, `troll`, `ghost`, `skeleton`, `imp`,
+  `demon`, `dragon`, ...) whose table race is `Human` is almost always a miss. Add
+  `overrides.json` race corrections for the hits. Run this sweep for the region's
+  signature races before shipping.
 - **File formatting is hand-curated.** `profiles.json` `byId` and
   `overrides.json` `npcs` use **one-line entry objects**; other layers are
   multi-line. A blind `json.dump(indent=2)` reformats every existing entry and
