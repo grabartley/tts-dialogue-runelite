@@ -161,40 +161,35 @@
       "id": "wizard",
       "keywords": ["wizard", "sorcerer", "sorceress", "mage", "magus", "necromancer", "enchanter", "warlock", "witch", "archmage"],
       "name": "Wizard",
-      "accent": "Distinguished, learned British English (Received Pronunciation).",
-      "style": "A wise and learned spellcaster, a sage and keeper of arcane lore. Knowing and unhurried, weighty with deep magical knowledge.",
+      "style": "A wise and learned spellcaster, a sage and keeper of arcane lore; knowing and unhurried, speaking in a measured, scholarly register weighty with deep magical knowledge.",
       "pace": "Measured and thoughtful, with deliberate, knowing pauses."
     },
     {
       "id": "monk",
       "keywords": ["monk", "friar", "abbot", "priest", "priestess", "nun", "cleric"],
       "name": "Devotee",
-      "accent": "Gentle, devout British English, Received Pronunciation.",
-      "style": "A pious monastic of the faith. Calm, kindly, and serene, speaking with quiet conviction and an unshakeable peace.",
+      "style": "A pious monastic of the faith; calm, kindly, and serene, speaking in a gentle, devout register with quiet, unshakeable conviction.",
       "pace": "Slow and tranquil, softly measured."
     },
     {
       "id": "royalty",
       "keywords": ["king", "queen", "emperor", "empress", "prince", "princess", "duke", "duchess"],
       "name": "Royalty",
-      "accent": "Grand, commanding British English, an elevated Received Pronunciation.",
-      "style": "A sovereign of the realm. Regal, authoritative, and gracious, every word carrying the weight of a crown.",
+      "style": "A sovereign of the realm; regal, authoritative, and gracious, speaking in a refined, aristocratic, elevated register, every word carrying the weight of a crown.",
       "pace": "Stately and deliberate, never rushed."
     },
     {
       "id": "knight",
       "keywords": ["knight", "paladin", "squire", "templar", "sir"],
       "name": "Knight",
-      "accent": "Stern, well-bred British English (Received Pronunciation), the proper accent of a chivalric officer.",
-      "style": "A noble knight of the realm. Honourable, disciplined, and gallant, every word weighted with chivalric duty.",
+      "style": "A noble knight of the realm; honourable, disciplined, and gallant, speaking in a crisp, formal, well-bred register weighted with chivalric duty.",
       "pace": "Firm and measured, crisp and commanding."
     },
     {
       "id": "noble",
       "keywords": ["lord", "lady", "baron", "baroness", "advisor", "chancellor", "steward", "dame", "noble"],
       "name": "Noble",
-      "accent": "Refined, well-bred British English (Received Pronunciation), the polished accent of the aristocracy.",
-      "style": "A highborn aristocrat of the realm. Polished, urbane, and self-assured, accustomed to deference.",
+      "style": "A highborn aristocrat of the realm; polished, urbane, and self-assured, speaking in a refined, well-bred register, accustomed to deference.",
       "pace": "Measured and composed."
     }
   ],
@@ -219,7 +214,7 @@
       "accent": "A Welsh accent, lilting and lyrical, of the western land of Tirannwn."
     },
     "varlamore": {
-      "accent": "An Italian accent, warm and melodic, as spoken in Italy, of the sun-baked realm of Varlamore."
+      "accent": "A strong, clearly Italian accent, the lyrical melodic cadence of a native Italian speaking English, of the sun-baked realm of Varlamore."
     },
     "kharidian": {
       "accent": "A Middle Eastern accent, Arabic-inflected English, as spoken in the desert cities of the Kharidian."

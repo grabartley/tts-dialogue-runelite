@@ -122,7 +122,7 @@ SINGLE_ETHNICITY = {
 }
 
 
-def ethnicity_key(league_region, location):
+def ethnicity_key(league_region, location, categories=None):
     if not league_region:
         return None
     lr = league_region.strip()
@@ -130,7 +130,10 @@ def ethnicity_key(league_region, location):
         return None  # documented in several regions -> no single ethnicity
     key = lr.lower()
     if key == "desert":
-        return "menaphite" if location and MENAPHITE_HINT.search(location) else "kharidian"
+        # Split the Egyptian Menaphite cities (Sophanem/Menaphos) out of the desert, by the NPC's
+        # location text or its wiki categories (e.g. Category:Menaphites, Category:Sophanem).
+        hint = " ".join([location or ""] + (categories or []))
+        return "menaphite" if MENAPHITE_HINT.search(hint) else "kharidian"
     return SINGLE_ETHNICITY.get(key)
 
 
@@ -235,14 +238,22 @@ def first_field(wikitext, key):
     return clean_value(m.group(1)) if m else None
 
 
-def parse_ids(wikitext):
-    ids = []
+GENDER_LINE_RE = re.compile(r"\|\s*gender\d*\s*=\s*([^\n|]+)", re.IGNORECASE)
+
+
+def parse_id_groups(wikitext):
+    """One group of ids per |idN= line, preserving order. A switch-infobox page lists ids and
+    genders as parallel per-version lines, so the i-th id group pairs with the i-th gender."""
+    groups = []
     for raw in ID_RE.findall(wikitext):
-        for token in clean_value(raw).split(","):
-            token = token.strip()
-            if token.isdigit():
-                ids.append(int(token))
-    return ids
+        ids = [int(t) for t in re.split(r"[,\s]+", clean_value(raw)) if t.isdigit()]
+        if ids:
+            groups.append(ids)
+    return groups
+
+
+def parse_genders(wikitext):
+    return [normalise_gender(clean_value(g)) for g in GENDER_LINE_RE.findall(wikitext)]
 
 
 def fetch_infoboxes(titles, batch=30):
@@ -306,26 +317,38 @@ def build_table_from_wiki(limit=None):
     name_map = {}
     pages_with_ids = 0
     for title, wikitext, categories in fetch_infoboxes(titles):
-        ids = parse_ids(wikitext)
+        groups = parse_id_groups(wikitext)
+        genders = parse_genders(wikitext)
         # Infobox race when present (NPC pages); otherwise the page's categories (Monster pages).
         race = bucket_for_race(first_field(wikitext, "race"))
         if race is None:
             race = bucket_from_categories(categories)
         race = race or "Human"
-        gender = normalise_gender(first_field(wikitext, "gender"))
         ethnicity = ethnicity_key(
-            first_field(wikitext, "leagueRegion"), first_field(wikitext, "location"))
-        entry = {"race": race, "gender": gender}
-        if ethnicity:
-            entry["ethnicity"] = ethnicity
+            first_field(wikitext, "leagueRegion"), first_field(wikitext, "location"), categories)
+
+        def build_entry(gender):
+            entry = {"race": race, "gender": gender}
+            if ethnicity:
+                entry["ethnicity"] = ethnicity
+            return entry
+
+        # Gender can vary per version (e.g. male/female guard variants). When the page lists one
+        # gender per id group, pair them; otherwise fall back to the first gender for every id.
+        aligned = len(genders) == len(groups) and groups
+        default_gender = genders[0] if genders else "Male"
+
         # First page to claim a name wins, so the canonical NPC page beats a stray transclusion.
         key = normalize_name(title)
         if key and key not in name_map:
-            name_map[key] = entry
-        if ids:
+            name_map[key] = build_entry(default_gender)
+
+        if groups:
             pages_with_ids += 1
-            for npc_id in ids:
-                table.setdefault(npc_id, entry)
+            for index, group in enumerate(groups):
+                entry = build_entry(genders[index] if aligned else default_gender)
+                for npc_id in group:
+                    table.setdefault(npc_id, entry)
     return table, len(titles), pages_with_ids, name_map
 
 

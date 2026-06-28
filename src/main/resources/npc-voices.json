@@ -5,39 +5,39 @@
     "source": "oldschool.runescape.wiki Infobox NPC (race/gender/leagueRegion/location), cross-referenced by name against a full id dump for variant ids, + curated tools/overrides.json; profiles from tools/profiles.json.",
     "npc_pages": 5899,
     "count": 13661,
-    "name_matched_ids": 714,
+    "name_matched_ids": 713,
     "overrides_applied": 100,
     "race_counts": {
       "Demon": 751,
-      "Dwarf": 516,
+      "Dwarf": 515,
       "Elf": 314,
       "Gnome": 263,
       "Goblin": 233,
-      "Human": 10346,
+      "Human": 10347,
       "Troll": 434,
       "Undead": 800,
       "Wizard": 4
     },
     "gender_counts": {
-      "Female": 1592,
-      "Male": 12069
+      "Female": 1819,
+      "Male": 11842
     },
-    "profiles_bespoke": 31,
     "ethnicity_counts": {
       "asgarnia": 581,
       "easternlands": 1,
       "fremennik": 645,
       "kandarin": 1071,
       "karamja": 196,
-      "kharidian": 576,
+      "kharidian": 553,
       "kourend": 819,
-      "menaphite": 94,
+      "menaphite": 117,
       "misthalin": 923,
       "morytania": 1056,
       "tirannwn": 343,
-      "varlamore": 999,
+      "varlamore": 998,
       "wilderness": 124
-    }
+    },
+    "profiles_bespoke": 31
   },
   "profiles": {
     "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise. Resolution combines every matching layer: default -> byRace[race] -> byEthnicity[ethnicity] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
@@ -270,8 +270,7 @@
           "archmage"
         ],
         "name": "Wizard",
-        "accent": "Distinguished, learned British English (Received Pronunciation).",
-        "style": "A wise and learned spellcaster, a sage and keeper of arcane lore. Knowing and unhurried, weighty with deep magical knowledge.",
+        "style": "A wise and learned spellcaster, a sage and keeper of arcane lore; knowing and unhurried, speaking in a measured, scholarly register weighty with deep magical knowledge.",
         "pace": "Measured and thoughtful, with deliberate, knowing pauses."
       },
       {
@@ -286,8 +285,7 @@
           "cleric"
         ],
         "name": "Devotee",
-        "accent": "Gentle, devout British English, Received Pronunciation.",
-        "style": "A pious monastic of the faith. Calm, kindly, and serene, speaking with quiet conviction and an unshakeable peace.",
+        "style": "A pious monastic of the faith; calm, kindly, and serene, speaking in a gentle, devout register with quiet, unshakeable conviction.",
         "pace": "Slow and tranquil, softly measured."
       },
       {
@@ -303,8 +301,7 @@
           "duchess"
         ],
         "name": "Royalty",
-        "accent": "Grand, commanding British English, an elevated Received Pronunciation.",
-        "style": "A sovereign of the realm. Regal, authoritative, and gracious, every word carrying the weight of a crown.",
+        "style": "A sovereign of the realm; regal, authoritative, and gracious, speaking in a refined, aristocratic, elevated register, every word carrying the weight of a crown.",
         "pace": "Stately and deliberate, never rushed."
       },
       {
@@ -317,8 +314,7 @@
           "sir"
         ],
         "name": "Knight",
-        "accent": "Stern, well-bred British English (Received Pronunciation), the proper accent of a chivalric officer.",
-        "style": "A noble knight of the realm. Honourable, disciplined, and gallant, every word weighted with chivalric duty.",
+        "style": "A noble knight of the realm; honourable, disciplined, and gallant, speaking in a crisp, formal, well-bred register weighted with chivalric duty.",
         "pace": "Firm and measured, crisp and commanding."
       },
       {
@@ -335,8 +331,7 @@
           "noble"
         ],
         "name": "Noble",
-        "accent": "Refined, well-bred British English (Received Pronunciation), the polished accent of the aristocracy.",
-        "style": "A highborn aristocrat of the realm. Polished, urbane, and self-assured, accustomed to deference.",
+        "style": "A highborn aristocrat of the realm; polished, urbane, and self-assured, speaking in a refined, well-bred register, accustomed to deference.",
         "pace": "Measured and composed."
       }
     ],
@@ -361,7 +356,7 @@
         "accent": "A Welsh accent, lilting and lyrical, of the western land of Tirannwn."
       },
       "varlamore": {
-        "accent": "An Italian accent, warm and melodic, as spoken in Italy, of the sun-baked realm of Varlamore."
+        "accent": "A strong, clearly Italian accent, the lyrical melodic cadence of a native Italian speaking English, of the sun-baked realm of Varlamore."
       },
       "kharidian": {
         "accent": "A Middle Eastern accent, Arabic-inflected English, as spoken in the desert cities of the Kharidian."
@@ -596,27 +591,27 @@
     "17": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "18": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "19": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "20": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "22": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "23": {
       "race": "Human",
@@ -3334,7 +3329,7 @@
     },
     "707": {
       "race": "Troll",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "asgarnia"
     },
     "708": {
@@ -3610,7 +3605,7 @@
     },
     "778": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "779": {
@@ -3730,7 +3725,7 @@
     },
     "805": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "806": {
@@ -3740,7 +3735,7 @@
     },
     "807": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "808": {
@@ -4644,15 +4639,15 @@
     },
     "1015": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "1016": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "1017": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "1018": {
       "race": "Human",
@@ -4712,27 +4707,27 @@
     },
     "1032": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "1033": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "1034": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "1035": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "1036": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "1037": {
@@ -5308,7 +5303,7 @@
     },
     "1183": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "1184": {
@@ -5328,7 +5323,7 @@
     },
     "1187": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "1188": {
@@ -5343,7 +5338,7 @@
     },
     "1190": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "1191": {
@@ -6504,7 +6499,7 @@
     },
     "1480": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "1481": {
@@ -7122,7 +7117,7 @@
     },
     "1618": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "1619": {
       "race": "Human",
@@ -7196,11 +7191,11 @@
     },
     "1633": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "1634": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "1635": {
       "race": "Demon",
@@ -7713,12 +7708,12 @@
     },
     "1757": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "asgarnia"
     },
     "1758": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "asgarnia"
     },
     "1759": {
@@ -7738,7 +7733,7 @@
     },
     "1762": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "asgarnia"
     },
     "1764": {
@@ -7773,7 +7768,7 @@
     },
     "1770": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "asgarnia"
     },
     "1771": {
@@ -8071,7 +8066,7 @@
     },
     "1844": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "1845": {
@@ -8378,7 +8373,7 @@
     },
     "1913": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "misthalin"
     },
     "1914": {
@@ -9036,12 +9031,12 @@
     },
     "2118": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2119": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2120": {
@@ -9171,7 +9166,7 @@
     },
     "2149": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2150": {
@@ -9181,7 +9176,7 @@
     },
     "2151": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2152": {
@@ -9650,12 +9645,12 @@
     },
     "2268": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "misthalin"
     },
     "2269": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "misthalin"
     },
     "2270": {
@@ -9665,22 +9660,22 @@
     },
     "2271": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "misthalin"
     },
     "2272": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "misthalin"
     },
     "2273": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "misthalin"
     },
     "2274": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "misthalin"
     },
     "2275": {
@@ -9770,7 +9765,7 @@
     },
     "2292": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2293": {
@@ -9814,7 +9809,7 @@
     },
     "2301": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "misthalin"
     },
     "2302": {
@@ -9839,12 +9834,12 @@
     },
     "2306": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2307": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2308": {
@@ -9962,42 +9957,42 @@
     },
     "2331": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2332": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2333": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2334": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2335": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2336": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2337": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2338": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2339": {
@@ -10149,7 +10144,7 @@
     },
     "2369": {
       "race": "Dwarf",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "fremennik"
     },
     "2370": {
@@ -10412,7 +10407,7 @@
     },
     "2422": {
       "race": "Gnome",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "fremennik"
     },
     "2423": {
@@ -10914,7 +10909,7 @@
     },
     "2541": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2542": {
@@ -12393,7 +12388,7 @@
     },
     "2898": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "2899": {
@@ -13139,7 +13134,7 @@
     },
     "3091": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kharidian"
     },
     "3092": {
@@ -14992,17 +14987,17 @@
     },
     "3558": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kharidian"
     },
     "3559": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kharidian"
     },
     "3560": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kharidian"
     },
     "3561": {
@@ -15353,7 +15348,7 @@
     },
     "3634": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "3635": {
@@ -15658,17 +15653,17 @@
     },
     "3704": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "3705": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "3706": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "3707": {
@@ -16141,22 +16136,22 @@
     },
     "3815": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "3816": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "3817": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "3818": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "3819": {
@@ -16416,7 +16411,7 @@
     "3875": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "3876": {
       "race": "Human",
@@ -16455,12 +16450,12 @@
     },
     "3883": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "3884": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "3887": {
@@ -16470,7 +16465,7 @@
     },
     "3888": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "menaphite"
     },
     "3889": {
@@ -16772,7 +16767,7 @@
     },
     "3955": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "karamja"
     },
     "3956": {
@@ -17820,17 +17815,17 @@
     "4206": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "4207": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "4208": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "4209": {
       "race": "Human",
@@ -17840,7 +17835,7 @@
     "4210": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "4212": {
       "race": "Human",
@@ -17946,7 +17941,7 @@
     },
     "4234": {
       "race": "Gnome",
-      "gender": "Female"
+      "gender": "Male"
     },
     "4235": {
       "race": "Human",
@@ -20231,12 +20226,12 @@
     },
     "4792": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "4793": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "4794": {
@@ -23263,15 +23258,15 @@
     },
     "5580": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "5581": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "5582": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "5583": {
       "race": "Undead",
@@ -25207,7 +25202,7 @@
     },
     "6028": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "6029": {
@@ -25267,7 +25262,7 @@
     },
     "6040": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "6041": {
@@ -25335,7 +25330,7 @@
     },
     "6055": {
       "race": "Gnome",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "fremennik"
     },
     "6056": {
@@ -26464,7 +26459,7 @@
     },
     "6509": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "asgarnia"
     },
     "6510": {
@@ -27750,17 +27745,17 @@
     },
     "6862": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6863": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6864": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6865": {
@@ -27785,7 +27780,7 @@
     },
     "6869": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6870": {
@@ -27795,7 +27790,7 @@
     },
     "6871": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6872": {
@@ -27834,11 +27829,11 @@
     },
     "6879": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "6880": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "6881": {
       "race": "Human",
@@ -27867,17 +27862,17 @@
     },
     "6886": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6887": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6888": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6889": {
@@ -27897,17 +27892,17 @@
     },
     "6892": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6893": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6894": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6895": {
@@ -28051,7 +28046,7 @@
     },
     "6928": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "6929": {
@@ -28061,7 +28056,7 @@
     },
     "6930": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6931": {
@@ -28071,7 +28066,7 @@
     },
     "6932": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6933": {
@@ -28081,7 +28076,7 @@
     },
     "6934": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6935": {
@@ -28091,7 +28086,7 @@
     },
     "6936": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6937": {
@@ -28116,12 +28111,12 @@
     },
     "6941": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6942": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6943": {
@@ -28161,12 +28156,12 @@
     },
     "6951": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6952": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "6953": {
@@ -28247,7 +28242,7 @@
     },
     "6970": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "6971": {
@@ -28650,12 +28645,12 @@
     },
     "7059": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "7060": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "7061": {
@@ -28760,12 +28755,12 @@
     },
     "7081": {
       "race": "Dwarf",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "7082": {
       "race": "Dwarf",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "7083": {
@@ -28825,7 +28820,7 @@
     },
     "7094": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "7095": {
@@ -32984,12 +32979,12 @@
     },
     "8185": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "8186": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "8187": {
@@ -33107,7 +33102,7 @@
     },
     "8214": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "8215": {
@@ -33460,7 +33455,7 @@
     },
     "8322": {
       "race": "Undead",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "morytania"
     },
     "8323": {
@@ -33470,7 +33465,7 @@
     },
     "8324": {
       "race": "Undead",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "8326": {
@@ -33480,7 +33475,7 @@
     },
     "8327": {
       "race": "Undead",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "8328": {
@@ -34115,12 +34110,12 @@
     },
     "8509": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "8510": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "8511": {
@@ -34269,7 +34264,7 @@
     },
     "8543": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "8544": {
@@ -34390,12 +34385,12 @@
     },
     "8568": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "8569": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "8570": {
@@ -34425,7 +34420,7 @@
     },
     "8575": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "8576": {
@@ -34494,7 +34489,7 @@
     },
     "8590": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "8591": {
@@ -34710,7 +34705,7 @@
     },
     "8666": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "8667": {
@@ -35122,7 +35117,7 @@
     },
     "8770": {
       "race": "Elf",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "tirannwn"
     },
     "8771": {
@@ -35381,12 +35376,12 @@
     },
     "8834": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "8835": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "8836": {
@@ -35629,12 +35624,12 @@
     },
     "8888": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "8889": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "8890": {
@@ -35644,7 +35639,7 @@
     },
     "8891": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "8892": {
@@ -35795,7 +35790,7 @@
     },
     "8933": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "8934": {
@@ -35805,7 +35800,7 @@
     },
     "8935": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "8936": {
@@ -35871,7 +35866,7 @@
     },
     "8949": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "8950": {
@@ -35901,7 +35896,7 @@
     },
     "8958": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "8959": {
@@ -35911,7 +35906,7 @@
     },
     "8960": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "8961": {
@@ -36724,12 +36719,12 @@
     },
     "9131": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "9132": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "9133": {
@@ -37001,7 +36996,7 @@
     },
     "9190": {
       "race": "Elf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "tirannwn"
     },
     "9191": {
@@ -38449,7 +38444,7 @@
     },
     "9584": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "9585": {
@@ -38797,7 +38792,7 @@
     },
     "9668": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "morytania"
     },
     "9675": {
@@ -38827,7 +38822,7 @@
     },
     "9680": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "9681": {
@@ -38837,7 +38832,7 @@
     },
     "9682": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "9683": {
@@ -39022,7 +39017,7 @@
     },
     "9719": {
       "race": "Undead",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "morytania"
     },
     "9720": {
@@ -39171,17 +39166,17 @@
     },
     "9753": {
       "race": "Undead",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "9754": {
       "race": "Undead",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "9755": {
       "race": "Undead",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "9756": {
@@ -39333,7 +39328,7 @@
     },
     "9787": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "morytania"
     },
     "9788": {
@@ -39368,7 +39363,7 @@
     },
     "9794": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "morytania"
     },
     "9795": {
@@ -39398,12 +39393,12 @@
     },
     "9801": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "9802": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "morytania"
     },
     "9850": {
@@ -41559,7 +41554,7 @@
     },
     "10385": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "wilderness"
     },
     "10386": {
@@ -42457,7 +42452,7 @@
     },
     "10599": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kharidian"
     },
     "10600": {
@@ -42472,7 +42467,7 @@
     },
     "10602": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kharidian"
     },
     "10603": {
@@ -42501,12 +42496,12 @@
     },
     "10608": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kharidian"
     },
     "10609": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kharidian"
     },
     "10610": {
@@ -42839,7 +42834,7 @@
     },
     "10698": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "asgarnia"
     },
     "10699": {
@@ -42937,7 +42932,7 @@
     },
     "10735": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "10736": {
@@ -42947,7 +42942,7 @@
     },
     "10737": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "10739": {
@@ -43649,12 +43644,12 @@
     },
     "10898": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "10899": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "10900": {
@@ -43669,7 +43664,7 @@
     },
     "10902": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "10903": {
@@ -43684,7 +43679,7 @@
     },
     "10905": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "10906": {
@@ -43699,7 +43694,7 @@
     },
     "10908": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "10909": {
@@ -44103,7 +44098,7 @@
     },
     "10994": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "10995": {
@@ -44113,12 +44108,12 @@
     },
     "10996": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "10997": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "10998": {
@@ -44138,7 +44133,7 @@
     },
     "11001": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "11002": {
@@ -44148,7 +44143,7 @@
     },
     "11003": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "11004": {
@@ -44163,7 +44158,7 @@
     },
     "11006": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "11007": {
@@ -44173,12 +44168,12 @@
     },
     "11008": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "11009": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "11010": {
@@ -44203,7 +44198,7 @@
     },
     "11014": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "11015": {
@@ -44213,12 +44208,12 @@
     },
     "11016": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "11017": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "11018": {
@@ -44345,7 +44340,7 @@
     },
     "11047": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "11048": {
@@ -45991,12 +45986,12 @@
     "11502": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11503": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11504": {
       "race": "Human",
@@ -46152,22 +46147,22 @@
     },
     "11537": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11538": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11539": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11540": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11541": {
@@ -46192,22 +46187,22 @@
     },
     "11545": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11546": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11547": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11548": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11549": {
@@ -46232,22 +46227,22 @@
     },
     "11553": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11554": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11555": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11556": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "menaphite"
     },
     "11557": {
@@ -46268,12 +46263,12 @@
     "11562": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11563": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11564": {
       "race": "Human",
@@ -46452,47 +46447,47 @@
     "11602": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11603": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11604": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11605": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11606": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11607": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11608": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11609": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11610": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11650": {
       "race": "Human",
@@ -47196,11 +47191,11 @@
     },
     "11816": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "11817": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "11840": {
       "race": "Human",
@@ -47300,7 +47295,7 @@
     },
     "11864": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "11865": {
       "race": "Human",
@@ -47308,7 +47303,7 @@
     },
     "11866": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "11867": {
       "race": "Human",
@@ -47395,7 +47390,7 @@
     },
     "11895": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "11896": {
@@ -47405,12 +47400,12 @@
     },
     "11897": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "11898": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "11899": {
@@ -47420,7 +47415,7 @@
     },
     "11900": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "fremennik"
     },
     "11901": {
@@ -47438,7 +47433,7 @@
     },
     "11904": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "11905": {
@@ -47463,12 +47458,12 @@
     },
     "11909": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "11910": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "11911": {
@@ -47589,11 +47584,11 @@
     },
     "11940": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "11941": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "11942": {
       "race": "Human",
@@ -47847,7 +47842,7 @@
     },
     "12018": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "12019": {
@@ -47891,7 +47886,7 @@
     },
     "12028": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "12029": {
@@ -48061,12 +48056,12 @@
     },
     "12068": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "12069": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "12070": {
@@ -48181,7 +48176,7 @@
     },
     "12096": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "12097": {
@@ -48191,7 +48186,7 @@
     },
     "12098": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kandarin"
     },
     "12099": {
@@ -48254,7 +48249,7 @@
     },
     "12115": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "wilderness"
     },
     "12116": {
@@ -48269,7 +48264,7 @@
     },
     "12118": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "wilderness"
     },
     "12120": {
@@ -50360,12 +50355,12 @@
     },
     "12656": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "12657": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "12658": {
@@ -50375,7 +50370,7 @@
     },
     "12659": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "12660": {
@@ -50400,7 +50395,7 @@
     },
     "12664": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12665": {
@@ -50435,17 +50430,17 @@
     },
     "12671": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12672": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12673": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12674": {
@@ -50530,47 +50525,47 @@
     },
     "12690": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12691": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12692": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12693": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12694": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12695": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12696": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12697": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12698": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "misthalin"
     },
     "12699": {
@@ -50625,7 +50620,7 @@
     },
     "12709": {
       "race": "Dwarf",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "12710": {
@@ -50635,7 +50630,7 @@
     },
     "12711": {
       "race": "Dwarf",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "kourend"
     },
     "12712": {
@@ -52137,17 +52132,17 @@
     },
     "13068": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13069": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13070": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13071": {
@@ -52156,7 +52151,7 @@
     },
     "13072": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13073": {
@@ -52186,27 +52181,27 @@
     },
     "13078": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13079": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13080": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13081": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13082": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13083": {
@@ -52251,12 +52246,12 @@
     },
     "13091": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13092": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13093": {
@@ -52271,18 +52266,17 @@
     },
     "13095": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13096": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13097": {
-      "race": "Dwarf",
-      "gender": "Female",
-      "ethnicity": "varlamore"
+      "race": "Human",
+      "gender": "Male"
     },
     "13098": {
       "race": "Dwarf",
@@ -52505,12 +52499,12 @@
     },
     "13143": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13144": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13145": {
@@ -52530,7 +52524,7 @@
     },
     "13148": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13149": {
@@ -52555,22 +52549,22 @@
     },
     "13153": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13154": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13155": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13156": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13157": {
@@ -52635,27 +52629,27 @@
     },
     "13169": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13170": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13171": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13172": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13173": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13174": {
@@ -52670,7 +52664,7 @@
     },
     "13176": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13177": {
@@ -52705,27 +52699,27 @@
     },
     "13183": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13184": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13185": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13186": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13187": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13188": {
@@ -52740,12 +52734,12 @@
     },
     "13190": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13191": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13192": {
@@ -52775,27 +52769,27 @@
     },
     "13197": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13198": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13199": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13200": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13201": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13202": {
@@ -52810,12 +52804,12 @@
     },
     "13204": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13205": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13206": {
@@ -52945,22 +52939,22 @@
     },
     "13232": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13233": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13234": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13235": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13236": {
@@ -52981,19 +52975,19 @@
     },
     "13240": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13241": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13242": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13243": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13244": {
       "race": "Human",
@@ -53007,7 +53001,7 @@
     },
     "13246": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13247": {
@@ -53027,12 +53021,12 @@
     },
     "13250": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13251": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13252": {
@@ -53072,17 +53066,17 @@
     },
     "13259": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13260": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13261": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13262": {
@@ -53111,27 +53105,27 @@
     },
     "13267": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13268": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13269": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13270": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13271": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13272": {
@@ -53161,27 +53155,27 @@
     },
     "13277": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13278": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13279": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13280": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13281": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13282": {
@@ -53281,12 +53275,12 @@
     },
     "13304": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13305": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13306": {
@@ -53459,7 +53453,7 @@
     },
     "13343": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13344": {
       "race": "Human",
@@ -54066,7 +54060,7 @@
     },
     "13539": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13540": {
       "race": "Human",
@@ -54227,7 +54221,7 @@
     },
     "13576": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13577": {
       "race": "Human",
@@ -54235,7 +54229,7 @@
     },
     "13578": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13579": {
       "race": "Human",
@@ -54243,7 +54237,7 @@
     },
     "13580": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "13581": {
       "race": "Human",
@@ -55362,7 +55356,7 @@
     },
     "13854": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13856": {
@@ -55372,7 +55366,7 @@
     },
     "13858": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13860": {
@@ -55382,7 +55376,7 @@
     },
     "13862": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13864": {
@@ -55392,7 +55386,7 @@
     },
     "13866": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13868": {
@@ -55402,7 +55396,7 @@
     },
     "13870": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13871": {
@@ -55467,12 +55461,12 @@
     },
     "13884": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13885": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13886": {
@@ -55492,7 +55486,7 @@
     },
     "13889": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13890": {
@@ -55502,12 +55496,12 @@
     },
     "13891": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13892": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13893": {
@@ -55562,7 +55556,7 @@
     },
     "13903": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "13904": {
@@ -55735,22 +55729,22 @@
     },
     "13940": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13941": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13942": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13943": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13944": {
@@ -55785,12 +55779,12 @@
     },
     "13950": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13951": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13952": {
@@ -55805,12 +55799,12 @@
     },
     "13954": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13955": {
       "race": "Dwarf",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13956": {
@@ -55909,7 +55903,7 @@
     },
     "13975": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13976": {
@@ -55919,7 +55913,7 @@
     },
     "13977": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13978": {
@@ -56931,7 +56925,7 @@
     },
     "14367": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "14368": {
@@ -56941,7 +56935,7 @@
     },
     "14369": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "14370": {
@@ -56951,7 +56945,7 @@
     },
     "14371": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "kourend"
     },
     "14372": {
@@ -56996,7 +56990,7 @@
     },
     "14392": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14396": {
@@ -57011,7 +57005,7 @@
     },
     "14398": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14399": {
@@ -57021,7 +57015,7 @@
     },
     "14400": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14407": {
@@ -57039,7 +57033,7 @@
     },
     "14416": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14417": {
@@ -57049,7 +57043,7 @@
     },
     "14418": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14420": {
@@ -57105,12 +57099,12 @@
     },
     "14438": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14455": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14456": {
@@ -57624,17 +57618,17 @@
     },
     "14649": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14650": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14651": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14652": {
@@ -57644,7 +57638,7 @@
     },
     "14653": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14654": {
@@ -57654,7 +57648,7 @@
     },
     "14655": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "14656": {
@@ -57731,12 +57725,12 @@
     },
     "14672": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "14673": {
       "race": "Human",
-      "gender": "Female",
+      "gender": "Male",
       "ethnicity": "varlamore"
     },
     "14674": {
@@ -58030,17 +58024,17 @@
     },
     "14744": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14745": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14746": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14747": {
@@ -58050,7 +58044,7 @@
     },
     "14748": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14749": {
@@ -58060,7 +58054,7 @@
     },
     "14750": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14751": {
@@ -58075,12 +58069,12 @@
     },
     "14753": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14754": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14755": {
@@ -58093,11 +58087,11 @@
     },
     "14757": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "14758": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "14759": {
       "race": "Human",
@@ -58136,17 +58130,17 @@
     },
     "14766": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14767": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14768": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14769": {
@@ -58156,7 +58150,7 @@
     },
     "14770": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14771": {
@@ -58166,7 +58160,7 @@
     },
     "14772": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14773": {
@@ -58571,11 +58565,11 @@
     },
     "14894": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "14895": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "14896": {
       "race": "Human",
@@ -58587,11 +58581,11 @@
     },
     "14898": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "14899": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "14900": {
       "race": "Human",
@@ -59043,11 +59037,11 @@
     },
     "15039": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15040": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15041": {
       "race": "Human",
@@ -59059,11 +59053,11 @@
     },
     "15043": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15044": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15046": {
       "race": "Human",
@@ -60295,19 +60289,19 @@
     },
     "15400": {
       "race": "Dwarf",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15401": {
       "race": "Dwarf",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15402": {
       "race": "Dwarf",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15403": {
       "race": "Dwarf",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15404": {
       "race": "Dwarf",
@@ -60319,7 +60313,7 @@
     },
     "15406": {
       "race": "Dwarf",
-      "gender": "Male"
+      "gender": "Female"
     },
     "15407": {
       "race": "Dwarf",
@@ -60533,11 +60527,11 @@
     },
     "15460": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15461": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15462": {
       "race": "Demon",
@@ -60545,11 +60539,11 @@
     },
     "15463": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15464": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15465": {
       "race": "Demon",
@@ -60557,7 +60551,7 @@
     },
     "15466": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15467": {
       "race": "Demon",
@@ -60565,7 +60559,7 @@
     },
     "15468": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15469": {
       "race": "Demon",
@@ -60573,11 +60567,11 @@
     },
     "15470": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15471": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15472": {
       "race": "Demon",
@@ -60589,7 +60583,7 @@
     },
     "15474": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15475": {
       "race": "Demon",
@@ -60597,11 +60591,11 @@
     },
     "15476": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15477": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15478": {
       "race": "Demon",
@@ -60617,7 +60611,7 @@
     },
     "15481": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15482": {
       "race": "Demon",
@@ -60625,15 +60619,15 @@
     },
     "15483": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15484": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15485": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15486": {
       "race": "Demon",
@@ -60645,11 +60639,11 @@
     },
     "15488": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15489": {
       "race": "Demon",
-      "gender": "Female"
+      "gender": "Male"
     },
     "15490": {
       "race": "Human",
