@@ -6,7 +6,7 @@
     "npc_pages": 5899,
     "count": 13661,
     "name_matched_ids": 713,
-    "overrides_applied": 100,
+    "overrides_applied": 103,
     "race_counts": {
       "Demon": 751,
       "Dwarf": 515,
@@ -356,7 +356,7 @@
         "accent": "A Welsh accent, lilting and lyrical, of the western land of Tirannwn."
       },
       "varlamore": {
-        "accent": "A strong, clearly Italian accent, the lyrical melodic cadence of a native Italian speaking English, of the sun-baked realm of Varlamore."
+        "accent": "An Italian accent, warm and expressive, as spoken by a native of Rome, Italy speaking English, with a melodic, rolling, up-and-down intonation."
       },
       "kharidian": {
         "accent": "A Middle Eastern accent, Arabic-inflected English, as spoken in the desert cities of the Kharidian."
@@ -51287,12 +51287,12 @@
     "12884": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "varlamore"
     },
     "12885": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "varlamore"
     },
     "12886": {
       "race": "Human",
@@ -52834,7 +52834,7 @@
     },
     "13210": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13211": {
