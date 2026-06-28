@@ -44,6 +44,24 @@ public class CharacterProfileTest {
   }
 
   @Test
+  public void trailingWhitespaceIsStrippedSoThePrefixIsByteIdenticalAndCacheStable() {
+    // A stray trailing space (from the bundled table or a config field) would otherwise re-key the
+    // cacheable prefix and defeat Gemini's prompt cache; it is normalised away at construction.
+    CharacterProfile padded =
+        new CharacterProfile(
+            "Wizard  ",
+            "Distinguished elderly British English.\n",
+            "A wise old wizard. \t",
+            "Measured.   ");
+    assertEquals(
+        "the rendered block is identical to the unpadded profile",
+        WIZARD.renderPromptBlock(),
+        padded.renderPromptBlock());
+    assertEquals(
+        "padded and unpadded profiles share a cache key", WIZARD.cacheKey(), padded.cacheKey());
+  }
+
+  @Test
   public void cacheKeyChangesWhenAnyFieldChanges() {
     assertNotEquals(
         "a changed style re-keys",

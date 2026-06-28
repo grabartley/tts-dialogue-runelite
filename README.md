@@ -101,6 +101,8 @@ Synthesis and playback run off the game thread, so the client stays responsive e
 
 The cloud backend adds a few cost and latency guards on top of the cache. Each line is capped at **Max Cloud Characters** and truncated at a sentence or word boundary before sending, so a pathological long line can never run up the per-character bill; OSRS lines are short, so this only bites edge cases. Cloud calls carry a 10-second timeout so a hung request cannot pin the pipeline, and a response that lands after you have already skipped ahead is dropped rather than played late. If two identical lines hit the synth step at once, only one cloud call is made and the second reuses its result.
 
+Cloud requests are tuned for latency. They reuse a long-lived keepalive connection pool so back-to-back lines skip the TCP/TLS handshake, and they ask OpenRouter to route to the fastest provider for the model. The per-speaker character-profile block leads each request and is byte-stable, so Gemini's implicit prompt cache hits on repeats for the same speaker (cheaper input, faster start). Speculative prefetch (**Prefetch Dialogue Audio**) warms the cache for the dialogue options you can see, so the line you pick next plays from cache; it runs off-thread behind the same dedup and cache tiers, no more than two requests in flight, capped per conversation, and holds off when the backend is rate-limited. With **Spoken Language** set to anything other than English, each line is translated by a lightweight model before it is voiced, with names and RuneScape terms preserved; translations are cached per language so the same line is never re-billed. A **Global Quirk** (Gen Z slang, pirate speak, and so on) layers a delivery style onto every line through that same model.
+
 ## Configuration
 
 | Setting | Default | What it does |
@@ -108,7 +110,7 @@ The cloud backend adds a few cost and latency guards on top of the cache. Each l
 | **Voice Backend** | `Cloud` | Selects the synthesis engine: `Cloud` (OpenRouter, falls back to local until a key is set) or `Local` (offline neutral Kokoro). |
 | **Enable Emotion** | `On` | Carries the emotion detected from the speaker's chat-head animation through to synthesis. The Cloud voice renders happy, sad, angry, and scared delivery; the Local voice is neutral-only. Off voices every line as Neutral. |
 | **Persistent Audio Cache** | `On` | Saves synthesized dialogue to disk so repeated lines play instantly across sessions and cloud backends are not re-billed. |
-| **Cache Size Limit (MiB)** | `256` | Maximum size of the on-disk audio cache. When a new clip would exceed it, the oldest clips are deleted first (FIFO) so the cache never grows past this limit. |
+| **Cache Size Limit (MiB)** | `256` | Maximum size of the on-disk audio cache. When a new clip would exceed it, the oldest clips are deleted first (FIFO) so the cache never grows past this limit. Set to `0` for no limit: the cache keeps every clip and is never evicted. |
 | **Dialogue Volume** | `100` | Volume of the spoken dialogue (0 to 100). |
 | **Enable Automatic NPC Voices** | `On` | Picks a voice per NPC from the race and gender table. When off, every NPC uses the default Human voice. |
 | **Player Voice** | `Player Male` | The voice used for the player character. |
@@ -117,6 +119,9 @@ The cloud backend adds a few cost and latency guards on top of the cache. Each l
 | **OpenRouter API Key** | empty | Your OpenRouter API key. Required for the Cloud backend; stored locally and never bundled with the plugin. |
 | **Max Cloud Characters** | `600` | Caps how many characters of a line are sent to the cloud backend, truncating at a sentence or word boundary. Bounds worst-case per-line cost. `0` disables the cap. |
 | **Cloud Speaking Pace** | `100` | Speaking pace for the cloud backend as a percent of normal. Sent as the OpenRouter speed parameter only when not `100`; the active model may ignore it. No effect on the local backend. |
+| **Spoken Language** | `English` | Language dialogue is spoken in: type any language name (e.g. `Brazilian Portuguese`, `Japanese`). `English` voices the original line directly; anything else translates each line first (preserving names, places, and item terms), then voices the translation. Adds a translation request per new line. Cloud only. |
+| **Global Quirk** | `None` | Optional delivery register layered onto every line on top of the language (Gen Z slang, pirate speak, formal, and so on). `None` changes nothing; any other value rewrites each line in that style via the translation model. Registers are language-agnostic, so they compose with any Spoken Language. Cloud only. |
+| **Prefetch Dialogue Audio** | `On` | Warms the audio cache for the dialogue options you can see, so the line you pick next plays instantly. Raises Cloud API spend on branches you never choose. Cloud only. |
 
 ## Dev Setup
 

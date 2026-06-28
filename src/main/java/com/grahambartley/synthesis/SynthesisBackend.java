@@ -39,6 +39,16 @@ public interface SynthesisBackend {
     return "";
   }
 
+  /**
+   * Whether this backend is currently backing off after being rate-limited (HTTP 429), so
+   * speculative work (prefetch) should hold off rather than pile onto the limit. User-initiated
+   * lines ignore this and always attempt synthesis. Default {@code false}: a backend with no remote
+   * rate limit is never throttled.
+   */
+  default boolean isThrottled() {
+    return false;
+  }
+
   /** Optional one-off warm-up (e.g. model load) run on the pipeline thread before first use. */
   default void warmUp() {}
 

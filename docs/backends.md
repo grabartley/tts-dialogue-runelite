@@ -39,10 +39,11 @@ one-time notice.
 Because the cloud backend is billed per character, several guards keep cost bounded and latency low:
 
 - **Cache key.** `cacheVariant` folds in the model, the resolved Gemini voice, and (only when not at
-  their defaults) the speaking pace and the character cap, on top of the shared
-  `(backendId, voiceKey, emotion, text)` identity. A model, voice, or pace change therefore never
-  replays the wrong audio, while a short line stays on a stable key so changing a setting that cannot
-  affect it does not force a needless re-bill.
+  their defaults) the speaking pace, the character cap, the character profile, and a non-English
+  spoken language, on top of the shared `(backendId, voiceKey, emotion, text)` identity. A model,
+  voice, pace, profile, or language change therefore never replays the wrong audio, while a short
+  English line stays on a stable key so changing a setting that cannot affect it does not force a
+  needless re-bill.
 - **Per-line character cap.** Each line is truncated to **Max Cloud Characters** (default 600) at a
   sentence boundary, or a word boundary if there is none, before sending. `0` disables it. OSRS lines
   are short, so this only bounds pathological cases.
@@ -53,6 +54,48 @@ Because the cloud backend is billed per character, several guards keep cost boun
   dialogue has advanced, so stale audio never plays late.
 - **Speaking pace.** **Cloud Speaking Pace** is sent as the OpenRouter `speed` parameter only when it
   is not 100%, so the default request body is unchanged; the active model may ignore it.
+- **Keepalive connection.** The backend reuses one long-lived client derived from the injected one
+  (an 8-connection 5-minute keepalive pool, a 2s connect and 15s read budget), so back-to-back lines
+  reuse a warm connection instead of re-handshaking. It is pinned to HTTP/1.1: the speech endpoint
+  streams raw PCM, and HTTP/2 would multiplex the prefetch pool and the live line onto one
+  connection where a concurrent streamed body can return truncated as an empty 200, so each
+  concurrent call instead gets its own pooled connection. The same client backs the translation hop.
+- **Empty-200 retry.** A 200 with a zero-byte body is a transient server glitch (the generation id
+  is present but no audio came back), so the line is retried once before falling back; any other
+  failure is not retried.
+- **Fastest-provider routing.** Every request carries a `provider` block with `sort: "throughput"`
+  (the `:nitro` equivalent), so OpenRouter routes to the lowest-latency provider for the model.
+- **Prompt-cache stabilisation.** The per-speaker character-profile block leads each request and is
+  byte-stable (profile fields are trailing-trimmed at construction), so Gemini's implicit prompt
+  cache hits on repeats for the same speaker, lowering input cost and time-to-first-byte.
+- **Rate-limit back-off.** A `429` opens a geometric, capped back-off window; user lines still try,
+  but speculative prefetch holds off (`isThrottled`) so the plugin never retry-storms a limit.
+
+Beyond per-line guards, two larger levers cut perceived latency and broaden reach:
+
+- **Speculative prefetch.** When dialogue options are visible, `DialoguePrefetcher` builds the exact
+  request the player would speak for each option and warms it through `DialogueAudioService.prefetch`,
+  which shares the in-flight dedup and both cache tiers but never plays audio or touches the playback
+  epoch. A small fixed pool caps it at two requests in flight, a per-conversation cap bounds spend,
+  already-cached lines are skipped, and leaving the node cancels still-queued prefetches. Gated by
+  **Prefetch Dialogue Audio**.
+- **Optional translation.** With **Spoken Language** set to anything but English, `OpenRouterTranslator`
+  translates each line through `google/gemini-3.1-flash-lite-preview` (a fixed per-language system
+  prompt for prompt-cache stability, preserving names and RuneScape terms) before the speech call,
+  which then carries a BCP-47 `language_code` derived from the base language. The language (with any
+  quirk) is folded into the cache key, so a line is translated and billed at most once per
+  language/quirk; a failed translation fails the line gracefully rather than voicing the wrong
+  language. **Spoken Language** is free text (any name; a recognised one gets a `language_code`, an
+  unrecognised one omits the optional code and lets the model detect language from the text).
+- **Global Quirk.** An optional language-agnostic delivery register (Gen Z slang, pirate speak,
+  formal, and so on) is appended to the spoken language, so the translation hop rewrites every line
+  in that style. It routes through the hop even for English, and composes with any language.
+
+The translation model is invoked only when there is something for it to do. With **Global Quirk** on
+`None` and **Spoken Language** English (or blank), the effective target is plain English, so the
+line bypasses the model entirely and the source text goes straight to speech: no chat-completions
+request, no added latency or cost. Setting a non-English language, a quirk, or both is what turns
+the hop on.
 
 Streaming the audio response to start playback sooner was evaluated and deferred: OSRS lines are short,
 the full-buffer decode is already fast, and streaming would complicate the raw-PCM decode and the
@@ -61,7 +104,9 @@ epoch-based stale-drop for little perceived gain.
 The primary cost lever remains the persistent disk cache, on by default, which keeps any already-heard
 line from being billed again across sessions. Its footprint is bounded by the **Cache Size Limit**
 (default 256 MiB) and evicted oldest-first (FIFO) so it never grows past the configured limit; a read
-never rescues an old entry, and the just-written clip always survives.
+never rescues an old entry, and the just-written clip always survives. Setting the limit to `0` opts
+out of eviction entirely, so the cache keeps every clip for users who would rather spend disk than
+ever re-bill a line.
 
 ## Local (Kokoro) backend
 

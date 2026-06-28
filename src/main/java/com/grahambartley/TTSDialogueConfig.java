@@ -42,6 +42,48 @@ public interface TTSDialogueConfig extends Config {
     CLOUD
   }
 
+  /**
+   * An optional global delivery quirk layered onto every spoken line. {@link #NONE} (the default)
+   * changes nothing; any other value appends its {@link #phrase()} to the configured spoken
+   * language, so the line is routed through the translation model and rewritten in that register
+   * (for example "English" plus Gen Z slang behaves like a "English Gen Z slang" target). Every
+   * value is a register or tone, not a dialect, so it stays language-agnostic and composes with any
+   * spoken language ("French pirate speak", "Japanese Gen Z slang"). Cloud only.
+   */
+  enum GlobalQuirk {
+    NONE("None", ""),
+    GEN_Z("Gen Z Slang", "Gen Z slang"),
+    MILLENNIAL("Millennial Slang", "millennial slang"),
+    STREET("Street Slang", "casual street slang"),
+    FORMAL("Formal & Posh", "very formal and posh"),
+    DRAMATIC("Over-Dramatic", "wildly over-dramatic and theatrical"),
+    CUTESY("Cutesy & Bubbly", "cutesy, bubbly and over-enthusiastic"),
+    PIRATE("Pirate Speak", "pirate speak");
+
+    private final String label;
+    private final String phrase;
+
+    GlobalQuirk(String label, String phrase) {
+      this.label = label;
+      this.phrase = phrase;
+    }
+
+    /** Whether this is the no-op default. */
+    public boolean isNone() {
+      return this == NONE;
+    }
+
+    /** The style descriptor appended to the spoken language for the translation model. */
+    public String phrase() {
+      return phrase;
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
+  }
+
   @ConfigItem(
       keyName = "voiceBackend",
       name = "Voice Backend",
@@ -124,6 +166,50 @@ public interface TTSDialogueConfig extends Config {
   @Range(min = 50, max = 200)
   default int cloudSpeedPercent() {
     return 100;
+  }
+
+  @ConfigItem(
+      keyName = "targetLanguage",
+      name = "Spoken Language",
+      description =
+          "Language dialogue is spoken in. Type any language name (e.g. French, Brazilian"
+              + " Portuguese, Japanese). English (default) speaks the original line directly. Any"
+              + " other language routes each line through a translation model first, preserving"
+              + " names, places, and item terms, then voices the translation. Adds a translation"
+              + " request per new line. Used only by the Cloud backend.",
+      position = 3,
+      section = cloudOpenRouterSection)
+  default String targetLanguage() {
+    return "English";
+  }
+
+  @ConfigItem(
+      keyName = "globalQuirk",
+      name = "Global Quirk",
+      description =
+          "Optional delivery register layered onto every line, on top of the Spoken Language. None"
+              + " (default) changes nothing; any other value rewrites each line in that style (Gen Z"
+              + " slang, pirate speak, and so on) via the translation model, so it routes through"
+              + " that hop even for English. Registers are language-agnostic and compose with any"
+              + " Spoken Language. Leave this on None with English (or blank) language to skip the"
+              + " translation model entirely. Used only by the Cloud backend.",
+      position = 4,
+      section = cloudOpenRouterSection)
+  default GlobalQuirk globalQuirk() {
+    return GlobalQuirk.NONE;
+  }
+
+  @ConfigItem(
+      keyName = "enablePrefetch",
+      name = "Prefetch Dialogue Audio",
+      description =
+          "Warm the audio cache for the dialogue options you can see, so the line you pick next plays"
+              + " instantly. Raises Cloud API spend on branches you never choose. Used only when the"
+              + " Cloud backend is active; the local voice is free, so this just speeds it up.",
+      position = 5,
+      section = cloudOpenRouterSection)
+  default boolean enablePrefetch() {
+    return true;
   }
 
   @ConfigItem(
@@ -229,10 +315,11 @@ public interface TTSDialogueConfig extends Config {
       description =
           "Maximum size of the on-disk audio cache in MiB. When a new clip would push the cache over"
               + " this limit, the oldest clips are deleted first (FIFO) to make room, so the cache"
-              + " never grows past it. Only applies when Persistent Audio Cache is on.",
+              + " never grows past it. Set to 0 for no limit (the cache grows with what you hear and"
+              + " is never evicted). Only applies when Persistent Audio Cache is on.",
       position = 6,
       section = generalSection)
-  @Range(min = 16, max = 4096)
+  @Range(min = 0, max = 4096)
   default int diskCacheMaxMiB() {
     return 256;
   }

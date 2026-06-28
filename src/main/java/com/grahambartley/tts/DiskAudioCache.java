@@ -67,8 +67,16 @@ public final class DiskAudioCache {
    */
   public static final long DEFAULT_MAX_BYTES = 256L * 1024 * 1024;
 
+  /**
+   * Sentinel for an uncapped cache: a non-positive {@code maxBytes} disables eviction entirely, so
+   * the cache keeps every clip and grows only with what the user actually hears. Opt-in for users
+   * who would rather spend disk than ever re-bill a cloud line.
+   */
+  public static final long UNLIMITED = 0;
+
   private final Path dir;
   private final long maxBytes;
+  private final boolean unlimited;
 
   /** Set once the directory is known unusable, so we stop retrying I/O every line. */
   private volatile boolean disabled;
@@ -78,10 +86,8 @@ public final class DiskAudioCache {
   }
 
   public DiskAudioCache(Path dir, long maxBytes) {
-    if (maxBytes < 1) {
-      throw new IllegalArgumentException("maxBytes must be at least 1");
-    }
     this.dir = dir;
+    this.unlimited = maxBytes <= UNLIMITED;
     this.maxBytes = maxBytes;
   }
 
@@ -260,9 +266,13 @@ public final class DiskAudioCache {
   /**
    * Deletes oldest-first (by write time) entries until the directory's total size is back under the
    * cap, so the cache never persists more than its limit. Only {@code .tdc} entries count; stray
-   * temp files are ignored (they are short-lived and cleaned up by their own writers).
+   * temp files are ignored (they are short-lived and cleaned up by their own writers). A no-op for
+   * an {@link #UNLIMITED} cache, which never evicts.
    */
   private void enforceSizeCap() {
+    if (unlimited) {
+      return;
+    }
     List<Entry> entries = new ArrayList<>();
     long total = 0;
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.tdc")) {

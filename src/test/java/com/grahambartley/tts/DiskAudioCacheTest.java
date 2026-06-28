@@ -150,6 +150,26 @@ public class DiskAudioCacheTest {
   }
 
   @Test
+  public void unlimitedCapNeverEvicts() throws Exception {
+    // A non-positive cap opts out of eviction: every clip is kept no matter the total size, where a
+    // tight cap would have dropped the oldest entries.
+    DiskAudioCache cache = new DiskAudioCache(cacheDir(), DiskAudioCache.UNLIMITED);
+
+    float[] samples = new float[26];
+    for (int i = 0; i < 12; i++) {
+      cache.put(
+          "local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-" + i, new Pcm(samples, 24_000));
+    }
+
+    assertNotNull(
+        "the oldest line survives under an unlimited cache",
+        cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-0"));
+    assertNotNull(
+        "the newest line survives too",
+        cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-11"));
+  }
+
+  @Test
   public void readDoesNotRescueAnEntryFromFifoEviction() throws Exception {
     // ~120 bytes/entry (16 + 26*4), so five entries fit under the cap and a sixth evicts the
     // oldest. Eviction is FIFO by write time: reading the oldest entry must not save it.

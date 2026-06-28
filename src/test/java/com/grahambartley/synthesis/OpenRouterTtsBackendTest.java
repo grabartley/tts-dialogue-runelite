@@ -34,6 +34,8 @@ public class OpenRouterTtsBackendTest {
     String key = "";
     int maxChars = 600;
     int speedPercent = 100;
+    String language = "English";
+    TTSDialogueConfig.GlobalQuirk quirk = TTSDialogueConfig.GlobalQuirk.NONE;
 
     @Override
     public String openRouterApiKey() {
@@ -49,6 +51,29 @@ public class OpenRouterTtsBackendTest {
     public int cloudSpeedPercent() {
       return speedPercent;
     }
+
+    @Override
+    public String targetLanguage() {
+      return language;
+    }
+
+    @Override
+    public TTSDialogueConfig.GlobalQuirk globalQuirk() {
+      return quirk;
+    }
+  }
+
+  private static String chatResponse(String content) {
+    JsonObject message = new JsonObject();
+    message.addProperty("role", "assistant");
+    message.addProperty("content", content);
+    JsonObject choice = new JsonObject();
+    choice.add("message", message);
+    com.google.gson.JsonArray choices = new com.google.gson.JsonArray();
+    choices.add(choice);
+    JsonObject body = new JsonObject();
+    body.add("choices", choices);
+    return body.toString();
   }
 
   private MockWebServer server;
@@ -412,6 +437,232 @@ public class OpenRouterTtsBackendTest {
   }
 
   @Test
+  public void everyRequestRoutesForThroughput() throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
+
+    backend(config).synthesize(req());
+
+    JsonObject body =
+        new JsonParser().parse(server.takeRequest().getBody().readUtf8()).getAsJsonObject();
+    assertEquals(
+        "every TTS call asks for the fastest provider",
+        "throughput",
+        body.getAsJsonObject("provider").get("sort").getAsString());
+  }
+
+  @Test
+  public void englishWithNoQuirkBypassesTheTranslationModel() throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    // Default language English, default quirk None: the line must go straight to speech with no
+    // translation hop, so a single enqueued speech response is enough.
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
+
+    assertNotNull(backend(config).synthesize(req()));
+    assertEquals("English + no quirk makes exactly one (speech) call", 1, server.getRequestCount());
+    assertTrue(
+        "the only request is the speech call, never the translation model",
+        server.takeRequest().getPath().endsWith("/audio/speech"));
+  }
+
+  @Test
+  public void blankLanguageWithNoQuirkAlsoBypassesTranslation() {
+    TestConfig config = new TestConfig();
+    config.language = "";
+    assertFalse(
+        "a blank language with no quirk needs no translation",
+        OpenRouterTtsBackend.needsTranslation(backend(config).effectiveSpokenLanguage()));
+  }
+
+  @Test
+  public void combineLanguageAppendsTheQuirkOnlyWhenSet() {
+    assertEquals(
+        "no quirk leaves the language untouched",
+        "English",
+        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.GlobalQuirk.NONE));
+    assertEquals(
+        "a quirk on English becomes a styled English target",
+        "English Gen Z slang",
+        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.GlobalQuirk.GEN_Z));
+    assertEquals(
+        "a quirk layers onto a non-English language too",
+        "French pirate speak",
+        OpenRouterTtsBackend.combineLanguage("French", TTSDialogueConfig.GlobalQuirk.PIRATE));
+    assertEquals(
+        "a blank language defaults to English before the quirk",
+        "English Gen Z slang",
+        OpenRouterTtsBackend.combineLanguage("  ", TTSDialogueConfig.GlobalQuirk.GEN_Z));
+  }
+
+  @Test
+  public void globalQuirkRoutesEnglishThroughTranslationAndKeepsTheBaseLanguageCode()
+      throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    config.language = "English";
+    config.quirk = TTSDialogueConfig.GlobalQuirk.GEN_Z;
+    // Even with English as the base, the quirk forces the translation hop; it is served first.
+    server.enqueue(
+        new MockResponse().setResponseCode(200).setBody(chatResponse("no cap, well met")));
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
+
+    backend(config)
+        .synthesize(
+            new SynthesisRequest(
+                "Well met.", VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE), Emotion.NEUTRAL));
+
+    RecordedRequest translation = server.takeRequest();
+    assertTrue(
+        "the quirk routes English through the translation hop",
+        translation.getPath().endsWith("/chat/completions"));
+    assertTrue(
+        "the quirk is carried in the system prompt as a styled English target",
+        translation.getBody().readUtf8().contains("Gen Z slang"));
+
+    JsonObject speech =
+        new JsonParser().parse(server.takeRequest().getBody().readUtf8()).getAsJsonObject();
+    assertEquals(
+        "the rewritten line is what is voiced",
+        "no cap, well met",
+        speech.get("input").getAsString());
+    assertEquals(
+        "the language_code stays the base language, not the quirk",
+        "en-US",
+        speech.get("language_code").getAsString());
+  }
+
+  @Test
+  public void globalQuirkPartitionsTheCacheKey() {
+    TestConfig config = new TestConfig();
+    OpenRouterTtsBackend backend = backend(config);
+    SynthesisRequest line =
+        new SynthesisRequest("a", VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE), Emotion.NEUTRAL);
+
+    String plain = backend.cacheVariant(line);
+    assertFalse("plain English with no quirk adds no language fragment", plain.contains("|l"));
+
+    config.quirk = TTSDialogueConfig.GlobalQuirk.GEN_Z;
+    assertNotEquals(
+        "a quirk must not collide with the unquirked line", plain, backend.cacheVariant(line));
+  }
+
+  @Test
+  public void needsTranslationTreatsBlankAndEnglishAsNoTranslation() {
+    assertFalse(OpenRouterTtsBackend.needsTranslation("English"));
+    assertFalse(OpenRouterTtsBackend.needsTranslation("  english  "));
+    assertFalse(OpenRouterTtsBackend.needsTranslation(""));
+    assertFalse(OpenRouterTtsBackend.needsTranslation(null));
+    assertTrue(OpenRouterTtsBackend.needsTranslation("French"));
+  }
+
+  @Test
+  public void nonEnglishTargetFoldsLanguageIntoTheCacheVariant() {
+    TestConfig config = new TestConfig();
+    OpenRouterTtsBackend backend = backend(config);
+    SynthesisRequest line =
+        new SynthesisRequest("a", VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE), Emotion.NEUTRAL);
+
+    String english = backend.cacheVariant(line);
+    assertFalse("English (default) adds no language fragment", english.contains("|l"));
+
+    config.language = "French";
+    String french = backend.cacheVariant(line);
+    assertNotEquals(
+        "the same line in another language must not share a cache key", english, french);
+    assertTrue("the language is folded in", french.contains("|lfrench"));
+  }
+
+  @Test
+  public void nonEnglishTargetTranslatesBeforeVoicingAndSetsLanguageCode() throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    config.language = "French";
+    // The translator call is served first, then the speech call (same mock server, queue order).
+    server.enqueue(new MockResponse().setResponseCode(200).setBody(chatResponse("Bonjour")));
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
+
+    backend(config)
+        .synthesize(
+            new SynthesisRequest(
+                "Hello", VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE), Emotion.NEUTRAL));
+
+    RecordedRequest first = server.takeRequest();
+    assertTrue("the translation hop runs first", first.getPath().endsWith("/chat/completions"));
+    RecordedRequest second = server.takeRequest();
+    assertTrue("then the speech call", second.getPath().endsWith("/audio/speech"));
+    JsonObject body = new JsonParser().parse(second.getBody().readUtf8()).getAsJsonObject();
+    assertEquals(
+        "the spoken transcript is the translation, not the source",
+        "Bonjour",
+        body.get("input").getAsString());
+    assertEquals(
+        "the BCP-47 language_code matches the target",
+        "fr-FR",
+        body.get("language_code").getAsString());
+  }
+
+  @Test
+  public void translationFailureFailsTheLineWithoutCallingSpeech() {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    config.language = "French";
+    server.enqueue(new MockResponse().setResponseCode(500).setBody("translation down"));
+
+    int[] notices = {0};
+    OpenRouterTtsBackend backend = backend(config);
+    backend.setNotice(msg -> notices[0]++);
+
+    assertNull("a failed translation fails the line gracefully", backend.synthesize(req()));
+    assertEquals("only the translation call was attempted", 1, server.getRequestCount());
+    assertEquals("the failure surfaces one notice", 1, notices[0]);
+  }
+
+  @Test
+  public void backoffWindowGrowsGeometricallyAndCaps() {
+    assertEquals(
+        "first 429 backs off the base window", 1_000, OpenRouterTtsBackend.backoffWindowMillis(1));
+    assertEquals("second doubles", 2_000, OpenRouterTtsBackend.backoffWindowMillis(2));
+    assertEquals("third doubles again", 4_000, OpenRouterTtsBackend.backoffWindowMillis(3));
+    assertEquals(
+        "the window is capped so it never grows without bound",
+        30_000,
+        OpenRouterTtsBackend.backoffWindowMillis(50));
+  }
+
+  @Test
+  public void rateLimitThrottlesThenClearsOnACleanCall() {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    OpenRouterTtsBackend backend = backend(config);
+    assertFalse("a fresh backend is not throttled", backend.isThrottled());
+
+    server.enqueue(new MockResponse().setResponseCode(429).setBody("slow down"));
+    backend.synthesize(req());
+    assertTrue("a 429 opens a back-off window so prefetch holds off", backend.isThrottled());
+
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
+    backend.synthesize(req());
+    assertFalse("a clean call clears the back-off", backend.isThrottled());
+  }
+
+  @Test
   public void nonSuccessResponseReturnsNullWithOneNotice() {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
@@ -425,6 +676,42 @@ public class OpenRouterTtsBackendTest {
 
     assertNull("a non-2xx fails the line gracefully", pcm);
     assertEquals("the failure surfaces a one-time notice", 1, notices[0]);
+  }
+
+  @Test
+  public void transientEmptyBodyIsRetriedOnceAndRecovers() throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    // First call comes back as an empty 200 (the transient glitch); the immediate retry succeeds.
+    server.enqueue(new MockResponse().setResponseCode(200).setBody(""));
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1, 2, 3}))));
+
+    int[] notices = {0};
+    OpenRouterTtsBackend backend = backend(config);
+    backend.setNotice(msg -> notices[0]++);
+
+    assertNotNull("a single empty 200 is recovered by the retry", backend.synthesize(req()));
+    assertEquals("the line was attempted twice", 2, server.getRequestCount());
+    assertEquals("a recovered line surfaces no failure notice", 0, notices[0]);
+  }
+
+  @Test
+  public void repeatedEmptyBodyFailsAfterOneRetry() {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    server.enqueue(new MockResponse().setResponseCode(200).setBody(""));
+    server.enqueue(new MockResponse().setResponseCode(200).setBody(""));
+
+    int[] notices = {0};
+    OpenRouterTtsBackend backend = backend(config);
+    backend.setNotice(msg -> notices[0]++);
+
+    assertNull("two empty bodies in a row fail the line", backend.synthesize(req()));
+    assertEquals("it retries exactly once, never storms", 2, server.getRequestCount());
+    assertEquals("the persistent failure surfaces one notice", 1, notices[0]);
   }
 
   @Test

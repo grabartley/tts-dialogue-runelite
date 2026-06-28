@@ -7,11 +7,19 @@ import com.grahambartley.tts.Pcm;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.ConnectionPool;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -69,11 +77,46 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
    */
   private static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
 
+  /** TCP/TLS handshake budget. Short: a slow connect should fail fast onto the local fallback. */
+  private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
+
+  /**
+   * Per-read budget, generous enough for the model's prefill while still under the call timeout.
+   */
+  private static final Duration READ_TIMEOUT = Duration.ofSeconds(15);
+
+  /** Idle connections kept warm so back-to-back lines reuse a pooled connection. */
+  private static final int MAX_IDLE_CONNECTIONS = 8;
+
+  private static final Duration KEEP_ALIVE = Duration.ofMinutes(5);
+
+  /** One speech call plus a single retry, only ever for a transient empty 200 body. */
+  private static final int MAX_SPEECH_ATTEMPTS = 2;
+
+  /** Base 429 back-off; doubled per consecutive limit hit and capped so prefetch never storms. */
+  private static final long BACKOFF_BASE_MILLIS = 1_000;
+
+  private static final long BACKOFF_MAX_MILLIS = 30_000;
+
   private final OkHttpClient httpClient;
   private final TTSDialogueConfig config;
   private final Gson gson;
   private final String endpoint;
   private final GeminiVoiceMap voiceMap = new GeminiVoiceMap();
+  private final OpenRouterTranslator translator;
+
+  /**
+   * Per-profile digest of the stable cacheable prefix, used only in debug mode to assert the prefix
+   * a given profile renders is byte-identical across the process lifetime (so Gemini's prompt cache
+   * can hit). A mismatch means a non-stable field leaked into the prefix and is logged once.
+   */
+  private final Map<String, Integer> prefixHashes = new ConcurrentHashMap<>();
+
+  /** Epoch-millis until which the backend is rate-limit backing off; 0 means not throttled. */
+  private final AtomicLong backoffUntil = new AtomicLong();
+
+  /** Consecutive 429s, so the back-off window grows geometrically and resets on a clean call. */
+  private final AtomicInteger consecutive429 = new AtomicInteger();
 
   /** One-time user notice hook for cloud failures; defaults to a no-op. */
   private Consumer<String> notice = msg -> {};
@@ -91,12 +134,39 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
    */
   OpenRouterTtsBackend(
       OkHttpClient httpClient, TTSDialogueConfig config, Gson gson, String endpoint) {
-    // Derive a call-timeout client from the injected one: newBuilder() shares the connection pool
-    // and dispatcher (cheap), and never mutates the shared client's global timeouts.
-    this.httpClient = httpClient.newBuilder().callTimeout(CALL_TIMEOUT).build();
+    // Derive a long-lived keepalive client from the injected one (Hub rule: never new an
+    // OkHttpClient). newBuilder() shares the dispatcher cheaply; we give it our own warm connection
+    // pool so back-to-back lines skip the TCP/TLS handshake, and our own connect/read/call timeouts
+    // without mutating the shared client's globals. Pinned to HTTP/1.1 deliberately: the speech
+    // endpoint streams raw PCM, and HTTP/2 multiplexes concurrent calls (the prefetch pool plus the
+    // live line) onto one connection, where a concurrent streamed body can come back truncated as
+    // an
+    // empty 200. HTTP/1.1 gives each concurrent call its own pooled connection, so they never
+    // contend; sequential lines still reuse a warm connection. Built once and reused for the
+    // process
+    // lifetime (and the translation hop below).
+    this.httpClient =
+        httpClient
+            .newBuilder()
+            .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+            .connectionPool(
+                new ConnectionPool(MAX_IDLE_CONNECTIONS, KEEP_ALIVE.toMinutes(), TimeUnit.MINUTES))
+            .connectTimeout(CONNECT_TIMEOUT)
+            .readTimeout(READ_TIMEOUT)
+            .callTimeout(CALL_TIMEOUT)
+            .retryOnConnectionFailure(true)
+            .build();
     this.config = config;
     this.gson = gson;
     this.endpoint = endpoint;
+    // The translation hop shares the same keepalive client. Its chat-completions endpoint is the
+    // sibling of the speech endpoint, so a test pointing speech at a mock server points translation
+    // at the same server without extra wiring.
+    String translatorEndpoint =
+        endpoint.contains("/audio/speech")
+            ? endpoint.replace("/audio/speech", "/chat/completions")
+            : OpenRouterTranslator.PRODUCTION_ENDPOINT;
+    this.translator = new OpenRouterTranslator(this.httpClient, config, gson, translatorEndpoint);
   }
 
   /** Registers a one-time notice hook (e.g. a chat or log message) for cloud failures. */
@@ -149,7 +219,43 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     if (profile != null) {
       variant.append("|p").append(profile.cacheKey());
     }
+    // A non-English target (or a global quirk) re-keys the line: the audio is the transformed
+    // speech, not the source words, so the same source text must not collide across languages or
+    // quirks. Plain English with no quirk adds nothing, so pre-translation cache entries stay
+    // valid.
+    String language = effectiveSpokenLanguage();
+    if (needsTranslation(language)) {
+      variant.append("|l").append(language.toLowerCase());
+    }
     return variant.toString();
+  }
+
+  /** A target language other than English (case-insensitive, blank treated as English). */
+  static boolean needsTranslation(String language) {
+    return language != null
+        && !language.trim().isEmpty()
+        && !language.trim().equalsIgnoreCase("English");
+  }
+
+  /**
+   * The spoken language actually requested of the model: the configured language with any global
+   * quirk appended, so "English" plus a Gen Z quirk becomes an "English Gen Z slang" target that
+   * routes through the translation hop and is rewritten in that style. A blank language defaults to
+   * English; the no-op quirk leaves the language untouched.
+   */
+  String effectiveSpokenLanguage() {
+    return combineLanguage(config.targetLanguage(), config.globalQuirk());
+  }
+
+  /**
+   * Appends a non-empty quirk phrase to the (blank-safe) base language, e.g. "French pirate speak".
+   */
+  static String combineLanguage(String language, TTSDialogueConfig.GlobalQuirk quirk) {
+    String base = language == null || language.trim().isEmpty() ? "English" : language.trim();
+    if (quirk == null || quirk.isNone()) {
+      return base;
+    }
+    return base + " " + quirk.phrase();
   }
 
   @Override
@@ -162,13 +268,34 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     String key = config.openRouterApiKey().trim();
     String voice = voiceMap.voiceFor(request.voice());
     String cappedText = capLength(request.text(), config.maxCloudCharsPerLine());
-    String styledInput = GeminiEmotionStyle.apply(cappedText, request.emotion());
+    // Optional first hop: a non-English target language (or a global quirk) routes the (already
+    // capped) line through the translation model before it is voiced, so the spoken transcript is
+    // the transformed text. A failed translation fails the line rather than voicing the wrong
+    // language or caching a mistranslation under the language key.
+    String language = effectiveSpokenLanguage();
+    boolean translating = needsTranslation(language);
+    String spokenText = cappedText;
+    if (translating) {
+      String translated = translator.translate(cappedText, language.trim(), key);
+      if (translated == null) {
+        warnOnce(
+            "OpenRouter translation to "
+                + language.trim()
+                + " failed; falling back to the local voice.");
+        return null;
+      }
+      spokenText = translated;
+    }
+    String styledInput = GeminiEmotionStyle.apply(spokenText, request.emotion());
     // The profile block sets the tone (accent/style/pace) and the emotion tag colours the moment;
     // they compose, so the block leads and the emotion-tagged transcript follows the divider. A
     // null
     // profile leaves the input exactly as the pre-profile backend produced it.
     CharacterProfile profile = request.profile();
     String input = profile == null ? styledInput : profile.renderPromptBlock() + styledInput;
+    if (profile != null) {
+      assertStablePrefix(profile);
+    }
 
     if (config.debugMode()) {
       String tag = GeminiEmotionStyle.tagFor(request.emotion());
@@ -208,6 +335,19 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
         log.info("[TTS cloud] speed {}", speed / 100.0);
       }
     }
+    // A translated line gets a BCP-47 language_code from the base language (not the quirk) when we
+    // can map the name, so the voice pronounces the text natively; an unmapped language omits it
+    // and
+    // lets the model detect language from the transcript.
+    if (translating) {
+      String code = LanguageCodes.codeFor(config.targetLanguage());
+      if (code != null) {
+        payload.addProperty("language_code", code);
+      }
+    }
+    // Route every call to the fastest provider (throughput sort, the :nitro equivalent). Identical
+    // block on the translation hop, so routing is consistent.
+    OpenRouterProvider.apply(payload);
 
     Request httpRequest =
         new Request.Builder()
@@ -219,49 +359,116 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
                     JSON_MEDIA_TYPE, gson.toJson(payload).getBytes(StandardCharsets.UTF_8)))
             .build();
 
-    try (Response response = httpClient.newCall(httpRequest).execute()) {
-      ResponseBody body = response.body();
-      // Read the bytes once; on any failure they are the diagnostic payload (an OpenRouter/Gemini
-      // error is usually returned as a JSON/text body, sometimes even with HTTP 200), so capturing
-      // them is the only way to see why a line was rejected rather than guessing.
-      byte[] bytes = body == null ? new byte[0] : body.bytes();
-      String contentType = headerOrEmpty(response, "Content-Type");
-      String generationId = headerOrEmpty(response, "X-Generation-Id");
+    // A 200 with a zero-byte body is a transient server-side glitch (the generation id is present
+    // but no audio came back), so one immediate retry recovers the line; the byte[]-backed request
+    // body is reusable across calls. Any other failure is not retried here.
+    for (int attempt = 1; attempt <= MAX_SPEECH_ATTEMPTS; attempt++) {
+      try (Response response = httpClient.newCall(httpRequest).execute()) {
+        ResponseBody body = response.body();
+        // Read the bytes once; on any failure they are the diagnostic payload (an OpenRouter/Gemini
+        // error is usually returned as a JSON/text body, sometimes even with HTTP 200), so
+        // capturing
+        // them is the only way to see why a line was rejected rather than guessing.
+        byte[] bytes = body == null ? new byte[0] : body.bytes();
+        String contentType = headerOrEmpty(response, "Content-Type");
+        String generationId = headerOrEmpty(response, "X-Generation-Id");
 
-      if (!response.isSuccessful()) {
+        if (!response.isSuccessful()) {
+          if (response.code() == 429) {
+            enterBackoff();
+          }
+          warnOnce(
+              "OpenRouter TTS request failed (HTTP "
+                  + response.code()
+                  + "); check your API key. Falling back to the local voice.");
+          logFailure(
+              "non-2xx", response.code(), response.message(), contentType, generationId, bytes);
+          return null;
+        }
+        // A clean call clears any rate-limit back-off so prefetch can resume.
+        clearBackoff();
+        if (bytes.length == 0) {
+          logFailure(
+              "empty-body", response.code(), response.message(), contentType, generationId, bytes);
+          if (attempt < MAX_SPEECH_ATTEMPTS) {
+            log.debug("[TTS cloud] empty 200 body; retrying once");
+            continue;
+          }
+          warnOnce("OpenRouter TTS returned an empty response; falling back to the local voice.");
+          return null;
+        }
+        Pcm pcm = RawPcmDecoder.decode(bytes, SAMPLE_RATE);
+        if (pcm == null) {
+          warnOnce(
+              "OpenRouter TTS returned audio that could not be decoded; falling back to the local"
+                  + " voice.");
+          logFailure(
+              "undecodable", response.code(), response.message(), contentType, generationId, bytes);
+          return null;
+        }
+        return pcm;
+      } catch (IOException e) {
         warnOnce(
-            "OpenRouter TTS request failed (HTTP "
-                + response.code()
-                + "); check your API key. Falling back to the local voice.");
-        logFailure(
-            "non-2xx", response.code(), response.message(), contentType, generationId, bytes);
+            "OpenRouter TTS request could not reach the network; falling back to the local voice.");
+        log.debug("OpenRouter TTS network error: {}", e.getMessage());
+        return null;
+      } catch (RuntimeException e) {
+        warnOnce("OpenRouter TTS request failed unexpectedly; falling back to the local voice.");
+        log.debug("OpenRouter TTS unexpected error: {}", e.getMessage());
         return null;
       }
-      if (bytes.length == 0) {
-        warnOnce("OpenRouter TTS returned an empty response; falling back to the local voice.");
-        logFailure(
-            "empty-body", response.code(), response.message(), contentType, generationId, bytes);
-        return null;
-      }
-      Pcm pcm = RawPcmDecoder.decode(bytes, SAMPLE_RATE);
-      if (pcm == null) {
-        warnOnce(
-            "OpenRouter TTS returned audio that could not be decoded; falling back to the local"
-                + " voice.");
-        logFailure(
-            "undecodable", response.code(), response.message(), contentType, generationId, bytes);
-        return null;
-      }
-      return pcm;
-    } catch (IOException e) {
-      warnOnce(
-          "OpenRouter TTS request could not reach the network; falling back to the local voice.");
-      log.debug("OpenRouter TTS network error: {}", e.getMessage());
-      return null;
-    } catch (RuntimeException e) {
-      warnOnce("OpenRouter TTS request failed unexpectedly; falling back to the local voice.");
-      log.debug("OpenRouter TTS unexpected error: {}", e.getMessage());
-      return null;
+    }
+    return null;
+  }
+
+  @Override
+  public boolean isThrottled() {
+    return System.currentTimeMillis() < backoffUntil.get();
+  }
+
+  /** Opens (or widens) the rate-limit back-off window after a 429, geometrically per repeat hit. */
+  private void enterBackoff() {
+    long window = backoffWindowMillis(consecutive429.incrementAndGet());
+    backoffUntil.set(System.currentTimeMillis() + window);
+    log.debug("[TTS cloud] rate limited (429); backing off prefetch for {}ms", window);
+  }
+
+  /** Clears the back-off after any clean call so prefetch resumes immediately. */
+  private void clearBackoff() {
+    if (backoffUntil.get() != 0) {
+      consecutive429.set(0);
+      backoffUntil.set(0);
+    }
+  }
+
+  /**
+   * The back-off window for the n-th consecutive 429: {@code base * 2^(n-1)}, capped, so repeated
+   * limits widen the pause geometrically instead of retry-storming, and a single 429 pauses only
+   * briefly.
+   */
+  static long backoffWindowMillis(int consecutive) {
+    int shift = Math.min(Math.max(consecutive, 1) - 1, 16);
+    long window = BACKOFF_BASE_MILLIS << shift;
+    return Math.min(window, BACKOFF_MAX_MILLIS);
+  }
+
+  /**
+   * Debug-only guard: records the digest of a profile's stable cacheable prefix on first sight and
+   * warns once if a later call for the same profile renders a different prefix, which would
+   * silently defeat Gemini's implicit prompt cache. A no-op outside debug mode.
+   */
+  private void assertStablePrefix(CharacterProfile profile) {
+    if (!config.debugMode()) {
+      return;
+    }
+    int hash = profile.renderPromptBlock().hashCode();
+    Integer seen = prefixHashes.putIfAbsent(profile.cacheKey(), hash);
+    if (seen != null && seen != hash) {
+      log.warn(
+          "[TTS cloud] cacheable prefix for profile '{}' changed across calls (prompt cache will"
+              + " miss); cacheKey={}",
+          profile.name(),
+          profile.cacheKey());
     }
   }
 
