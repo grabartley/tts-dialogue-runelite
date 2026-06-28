@@ -13,10 +13,12 @@ Ensure Java 17 is active (`jenv local 17` or `sdk use java 17-amzn`), build the 
 
 ```bash
 ./gradlew shadowJar
-java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/tTSDialogue-1.0-SNAPSHOT-all.jar --developer-mode --debug
+java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/tTSDialogue-1.0-SNAPSHOT-all.jar --developer-mode --debug 2>&1 | tee /tmp/tts-client.log
 ```
 
 `TTSDialoguePluginTest.main` forwards these program arguments to `RuneLite.main`. `--developer-mode` belongs only with this launcher and is required for login to work; omit it and login fails. `--debug` is optional and turns on RuneLite debug-level logging, which pairs well with the plugin's Debug Mode config toggle.
+
+**Always write the client output to `/tmp/tts-client.log`** (the `tee` above, or `> /tmp/tts-client.log 2>&1 &` when launching in the background) so the logs can be read and grepped during and after testing. With Debug Mode on, that file carries the `[TTS profile]` / `[TTS voice]` / `[TTS cloud]` traces used to diagnose voice issues (see the `diagnose-npc-voice` skill).
 
 The entry point calls `ExternalPluginManager.loadBuiltin(TTSDialoguePlugin.class)` and starts RuneLite. You can also run that `main` directly from the IDE with the same VM options and the `--developer-mode` (and optional `--debug`) program arguments.
 
