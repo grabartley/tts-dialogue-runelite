@@ -6,39 +6,39 @@
     "npc_pages": 5899,
     "count": 13663,
     "name_matched_ids": 713,
-    "overrides_applied": 570,
+    "overrides_applied": 639,
     "race_counts": {
-      "Demon": 757,
+      "Demon": 759,
       "Dwarf": 517,
-      "Elf": 323,
+      "Elf": 333,
       "Gnome": 263,
       "Goblin": 334,
-      "Human": 10129,
+      "Human": 10116,
       "Monkey": 67,
       "Troll": 448,
       "Undead": 819,
-      "Wizard": 6
+      "Wizard": 7
     },
     "gender_counts": {
-      "Female": 1840,
-      "Male": 11823
+      "Female": 1876,
+      "Male": 11787
     },
     "ethnicity_counts": {
       "asgarnia": 568,
       "easternlands": 2,
-      "fremennik": 626,
-      "kandarin": 1064,
+      "fremennik": 628,
+      "kandarin": 1067,
       "karamja": 182,
       "kharidian": 522,
-      "kourend": 820,
+      "kourend": 821,
       "menaphite": 127,
-      "misthalin": 793,
+      "misthalin": 795,
       "morytania": 991,
-      "tirannwn": 343,
-      "varlamore": 1000,
+      "tirannwn": 322,
+      "varlamore": 980,
       "wilderness": 124
     },
-    "profiles_bespoke": 3322
+    "profiles_bespoke": 4283
   },
   "profiles": {
     "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise. Resolution combines every matching layer: default -> byRace[race] -> byEthnicity[ethnicity] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
@@ -13879,6 +13879,3877 @@
       "12395": {
         "name": "Enakhra",
         "style": "Imperious sorceress; cold, haughty, deliberate delivery dripping with disdain, silken and menacing, savours every threat."
+      },
+      "1477": {
+        "name": "Eudav",
+        "style": "Practical, no-frills shopkeeper; matter-of-fact and amiably brisk."
+      },
+      "1478": {
+        "name": "Oronwen",
+        "style": "Mild, courteous and gentle, the soft attentiveness of an elven seamstress."
+      },
+      "1479": {
+        "name": "Banker",
+        "style": "Composed and courteous, with the quiet professionalism of a clerk."
+      },
+      "1480": {
+        "name": "Banker",
+        "style": "Composed and courteous, with the quiet professionalism of a clerk."
+      },
+      "1481": {
+        "name": "Dalldav",
+        "style": "Steady, practical shopkeeper's tone with quiet rebel resolve."
+      },
+      "1482": {
+        "name": "Gethin",
+        "style": "Amiable and welcoming shopkeep, the easy good humour of a cook proud of his kitchen."
+      },
+      "1616": {
+        "name": "High Priestess Zul-Harcinqa",
+        "style": "Solemn and grave, zealous reverence in every measured word as the leader of her tribe."
+      },
+      "1617": {
+        "name": "Priestess Zul-Gwenwynig",
+        "style": "Solemn and hushed, reverent devout phrasing offered in quiet service."
+      },
+      "2033": {
+        "name": "Priestess Zul-Gwenwynig",
+        "style": "Solemn and hushed, reverent devout phrasing offered in quiet service."
+      },
+      "2034": {
+        "name": "Zul-Urgish",
+        "style": "Gruff, brutish, territorial enforcer; heavy and intimidating."
+      },
+      "2035": {
+        "name": "Zul-Cheray",
+        "style": "Weary, mournful mother, speaks softly with fretful sorrow."
+      },
+      "2036": {
+        "name": "Zul-Gutusolly",
+        "style": "Small, innocent and mournful, the quiet voice of a saddened gnome child."
+      },
+      "2037": {
+        "name": "Sacrifice",
+        "style": "Young, earnest and gently resigned; soft, brave little voice."
+      },
+      "2038": {
+        "name": "Zul-Onan",
+        "style": "Quiet and reverent, with the weathered, solemn cadence of an isolated tribal fisherman devoted to his god."
+      },
+      "2039": {
+        "name": "Zul-Aniel",
+        "style": "Weary and unsettled, a once-soldier's hollow devotion in low, haunted tones."
+      },
+      "2040": {
+        "name": "Zul-Areth",
+        "style": "Rambling and unhinged; muttering, frayed delivery of a soldier whose mind has slipped."
+      },
+      "2041": {
+        "name": "Broken Handz",
+        "style": "Laid-back, casual observer with a chilled, matter-of-fact delivery."
+      },
+      "2127": {
+        "name": "Pet snakeling",
+        "style": "Tiny serpent pet; soft, sibilant and playful, a small slithery hiss-tinged little voice."
+      },
+      "2128": {
+        "name": "Pet snakeling",
+        "style": "Tiny serpent pet; soft, sibilant and playful, a small slithery hiss-tinged little voice."
+      },
+      "2129": {
+        "name": "Pet snakeling",
+        "style": "Tiny serpent pet; soft, sibilant and playful, a small slithery hiss-tinged little voice."
+      },
+      "2130": {
+        "name": "Pet snakeling",
+        "style": "Tiny serpent pet; soft, sibilant and playful, a small slithery hiss-tinged little voice."
+      },
+      "2131": {
+        "name": "Pet snakeling",
+        "style": "Tiny serpent pet; soft, sibilant and playful, a small slithery hiss-tinged little voice."
+      },
+      "2132": {
+        "name": "Pet snakeling",
+        "style": "Tiny serpent pet; soft, sibilant and playful, a small slithery hiss-tinged little voice."
+      },
+      "2689": {
+        "name": "Liliwen",
+        "style": "Gentle, nurturing gardener with a warm, patient and caring manner."
+      },
+      "3413": {
+        "name": "Koftik",
+        "style": "Helpful, steady cave guide; warm and reassuring, though growing increasingly strained and uneasy."
+      },
+      "3414": {
+        "name": "Idris",
+        "style": "Wary, challenging interrogator, sharp and suspicious."
+      },
+      "3415": {
+        "name": "Essyllt",
+        "style": "Cold, imperious Iorwerth commander; clipped, menacing and merciless in delivery."
+      },
+      "3416": {
+        "name": "Morvran",
+        "style": "Cold, clipped and faintly menacing, a hardened warrior's sinister edge."
+      },
+      "3432": {
+        "name": "Arianwyn",
+        "style": "Measured, grave and earnest; speaks with the quiet authority of a resistance leader carrying heavy burdens."
+      },
+      "3437": {
+        "name": "General Hining",
+        "style": "Gruff, commanding career soldier; brusque and impatient with subordinates."
+      },
+      "3438": {
+        "name": "Quartermaster",
+        "style": "Brisk, no-nonsense supply officer, terse and businesslike."
+      },
+      "4010": {
+        "name": "Thorgel",
+        "style": "Grumpy and impatient, a short-tempered dwarf barking blunt demands."
+      },
+      "4551": {
+        "name": "Niloof",
+        "style": "Sturdy and good-natured, with the gruff, hearty warmth of a hardy dwarf."
+      },
+      "4552": {
+        "name": "Klank",
+        "style": "Gruff and practical, a no-nonsense dwarven craftsman's blunt clipped delivery."
+      },
+      "4553": {
+        "name": "Kamen",
+        "style": "Merry, slurring and tipsy. Words wander and trail off, cheerfully muddled by homemade brew.",
+        "pace": "slow"
+      },
+      "5297": {
+        "name": "Goreu",
+        "style": "Polished and softly proud, the measured cadence of a Lletya elf."
+      },
+      "5299": {
+        "name": "Arvel",
+        "style": "Wary and softly cautioning, offering guarded, principled advice with a faint air of distrust."
+      },
+      "5300": {
+        "name": "Mawrth",
+        "style": "Warm but weary mother. Speaks with gentle, slightly exasperated patience."
+      },
+      "5302": {
+        "name": "Eoin",
+        "style": "Excitable elven child mid-game of tag; bubbly, breathless and playful, darting through words with youthful energy.",
+        "pace": "quick"
+      },
+      "5303": {
+        "name": "Iona",
+        "style": "Playful young elf child. Bright, sing-song and giddy, chattering with childlike delight."
+      },
+      "5304": {
+        "name": "Eluned",
+        "style": "Graceful and serene, soft melodic phrasing with an air of timeless calm."
+      },
+      "6724": {
+        "name": "Friendly Forester",
+        "style": "Warm, encouraging outdoorsman; communal and upbeat, the welcoming tone of a mentor keen to share the craft."
+      },
+      "7911": {
+        "name": "Bartender",
+        "style": "Gruff, low-key barkeep, dry and unhurried."
+      },
+      "8676": {
+        "name": "Ilfeen",
+        "style": "Gentle, soft-spoken and serene, the calm warmth of a wandering enchantress."
+      },
+      "8729": {
+        "name": "Youngllef",
+        "style": "Feral, otherworldly young crystal beast with skittish, growly vocalisations."
+      },
+      "8730": {
+        "name": "Youngllef",
+        "style": "Feral, otherworldly young crystal beast with skittish, growly vocalisations."
+      },
+      "8731": {
+        "name": "Smolcano",
+        "style": "Tiny molten creature; playful little rumbles and crackles, more sound than speech."
+      },
+      "8737": {
+        "name": "Youngllef",
+        "style": "Feral, otherworldly young crystal beast with skittish, growly vocalisations."
+      },
+      "8738": {
+        "name": "Youngllef",
+        "style": "Feral, otherworldly young crystal beast with skittish, growly vocalisations."
+      },
+      "8739": {
+        "name": "Smolcano",
+        "style": "Tiny molten creature; playful little rumbles and crackles, more sound than speech."
+      },
+      "8761": {
+        "name": "Elf Tracker",
+        "style": "Terse, alert scout with clipped, watchful delivery."
+      },
+      "8762": {
+        "name": "Tyras guard",
+        "style": "Bored, gruff sentry with a flat, off-duty grumble."
+      },
+      "8766": {
+        "name": "Eluned",
+        "style": "Graceful and serene, soft melodic phrasing with an air of timeless calm."
+      },
+      "8767": {
+        "name": "Eluned",
+        "style": "Graceful and serene, soft melodic phrasing with an air of timeless calm."
+      },
+      "8768": {
+        "name": "Elven Scout",
+        "style": "Alert and watchful; terse, clipped delivery of someone on guard duty."
+      },
+      "8769": {
+        "name": "Ilfeen",
+        "style": "Gentle, soft-spoken and serene, the calm warmth of a wandering enchantress."
+      },
+      "8770": {
+        "name": "Elven Scout",
+        "style": "Alert and watchful; terse, clipped delivery of someone on guard duty."
+      },
+      "8775": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8776": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8777": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8778": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8779": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8780": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8781": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8782": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8783": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8784": {
+        "name": "Memory of Seren",
+        "style": "Ethereal, sorrowful divine voice; serene and resonant, speaking with otherworldly melodic gravity and quiet lament.",
+        "pace": "slow"
+      },
+      "8814": {
+        "name": "Ysgawyn",
+        "style": "Curt, brusque and grudging, the terse edge of a grumpy elf with a grievance."
+      },
+      "8815": {
+        "name": "Ysgawyn",
+        "style": "Curt, brusque and grudging, the terse edge of a grumpy elf with a grievance."
+      },
+      "8816": {
+        "name": "Ysgawyn",
+        "style": "Curt, brusque and grudging, the terse edge of a grumpy elf with a grievance."
+      },
+      "8825": {
+        "name": "Ilfeen",
+        "style": "Gentle, soft-spoken and serene, the calm warmth of a wandering enchantress."
+      },
+      "8827": {
+        "name": "Ilfeen",
+        "style": "Gentle, soft-spoken and serene, the calm warmth of a wandering enchantress."
+      },
+      "8829": {
+        "name": "Eluned",
+        "style": "Graceful and serene, soft melodic phrasing with an air of timeless calm."
+      },
+      "8830": {
+        "name": "Eluned",
+        "style": "Graceful and serene, soft melodic phrasing with an air of timeless calm."
+      },
+      "8847": {
+        "name": "Essyllt",
+        "style": "Cold, imperious Iorwerth commander; clipped, menacing and merciless in delivery."
+      },
+      "8865": {
+        "name": "Arianwyn",
+        "style": "Measured, grave and earnest; speaks with the quiet authority of a resistance leader carrying heavy burdens."
+      },
+      "8866": {
+        "name": "Arianwyn",
+        "style": "Measured, grave and earnest; speaks with the quiet authority of a resistance leader carrying heavy burdens."
+      },
+      "8867": {
+        "name": "Arianwyn",
+        "style": "Measured, grave and earnest; speaks with the quiet authority of a resistance leader carrying heavy burdens."
+      },
+      "8868": {
+        "name": "Arianwyn",
+        "style": "Measured, grave and earnest; speaks with the quiet authority of a resistance leader carrying heavy burdens."
+      },
+      "8869": {
+        "name": "Morvran",
+        "style": "Cold, clipped and faintly menacing, a hardened warrior's sinister edge."
+      },
+      "8870": {
+        "name": "Morvran",
+        "style": "Cold, clipped and faintly menacing, a hardened warrior's sinister edge."
+      },
+      "8871": {
+        "name": "Essyllt",
+        "style": "Cold, imperious Iorwerth commander; clipped, menacing and merciless in delivery."
+      },
+      "8872": {
+        "name": "Essyllt",
+        "style": "Cold, imperious Iorwerth commander; clipped, menacing and merciless in delivery."
+      },
+      "8892": {
+        "name": "Lady Tangwen Trahaearn",
+        "style": "Regal and commanding, with stately, measured authority carried with imperious grace."
+      },
+      "8895": {
+        "name": "Lady Tangwen Trahaearn",
+        "style": "Regal and commanding, with stately, measured authority carried with imperious grace."
+      },
+      "8897": {
+        "name": "Lord Ieuan Amlodd",
+        "style": "Regal and measured, a clan lord's dignified, otherworldly poise; every word unhurried and refined.",
+        "pace": "slow"
+      },
+      "8898": {
+        "name": "Lord Ieuan Amlodd",
+        "style": "Regal and measured, a clan lord's dignified, otherworldly poise; every word unhurried and refined.",
+        "pace": "slow"
+      },
+      "8899": {
+        "name": "Lord Ieuan Amlodd",
+        "style": "Regal and measured, a clan lord's dignified, otherworldly poise; every word unhurried and refined.",
+        "pace": "slow"
+      },
+      "8903": {
+        "name": "Lord Piquan Crwys",
+        "style": "Stately, dignified clan leader. Speaks slowly and gravely in a deep, ancient, measured register.",
+        "pace": "slow"
+      },
+      "8904": {
+        "name": "Lord Piquan Crwys",
+        "style": "Stately, dignified clan leader. Speaks slowly and gravely in a deep, ancient, measured register.",
+        "pace": "slow"
+      },
+      "8906": {
+        "name": "Lady Carys Hefin",
+        "style": "Serene and dignified, speaks softly and gracefully with regal, noble poise."
+      },
+      "8907": {
+        "name": "Lady Carys Hefin",
+        "style": "Serene and dignified, speaks softly and gracefully with regal, noble poise."
+      },
+      "8908": {
+        "name": "Lady Carys Hefin",
+        "style": "Serene and dignified, speaks softly and gracefully with regal, noble poise."
+      },
+      "8910": {
+        "name": "Lady Ffion Meilyr",
+        "style": "Regal and commanding, a noble leader's poise lit by a keen, restless taste for adventure."
+      },
+      "8911": {
+        "name": "Lady Ffion Meilyr",
+        "style": "Regal and commanding, a noble leader's poise lit by a keen, restless taste for adventure."
+      },
+      "8913": {
+        "name": "Kelyn",
+        "style": "Bright, vivacious noblewoman with a graceful, regal poise."
+      },
+      "8914": {
+        "name": "Kelyn",
+        "style": "Bright, vivacious noblewoman with a graceful, regal poise."
+      },
+      "8915": {
+        "name": "Kelyn",
+        "style": "Bright, vivacious noblewoman with a graceful, regal poise."
+      },
+      "8924": {
+        "name": "Lord Iestin Iorwerth",
+        "style": "Grave, scholarly, dignified noble's delivery; serious and considered."
+      },
+      "8925": {
+        "name": "Lord Iestin Iorwerth",
+        "style": "Grave, scholarly, dignified noble's delivery; serious and considered."
+      },
+      "8926": {
+        "name": "Lord Iestin Iorwerth",
+        "style": "Grave, scholarly, dignified noble's delivery; serious and considered."
+      },
+      "8927": {
+        "name": "Mawrth",
+        "style": "Warm but weary mother. Speaks with gentle, slightly exasperated patience."
+      },
+      "8928": {
+        "name": "Mawrth",
+        "style": "Warm but weary mother. Speaks with gentle, slightly exasperated patience."
+      },
+      "8929": {
+        "name": "Iona",
+        "style": "Playful young elf child. Bright, sing-song and giddy, chattering with childlike delight."
+      },
+      "8930": {
+        "name": "Eoin",
+        "style": "Excitable elven child mid-game of tag; bubbly, breathless and playful, darting through words with youthful energy.",
+        "pace": "quick"
+      },
+      "8931": {
+        "name": "Eoin",
+        "style": "Excitable elven child mid-game of tag; bubbly, breathless and playful, darting through words with youthful energy.",
+        "pace": "quick"
+      },
+      "8940": {
+        "name": "Klank",
+        "style": "Gruff and practical, a no-nonsense dwarven craftsman's blunt clipped delivery."
+      },
+      "8941": {
+        "name": "Niloof",
+        "style": "Sturdy and good-natured, with the gruff, hearty warmth of a hardy dwarf."
+      },
+      "8942": {
+        "name": "Kamen",
+        "style": "Merry, slurring and tipsy. Words wander and trail off, cheerfully muddled by homemade brew.",
+        "pace": "slow"
+      },
+      "8943": {
+        "name": "Thorgel",
+        "style": "Grumpy and impatient, a short-tempered dwarf barking blunt demands."
+      },
+      "8944": {
+        "name": "General Hining",
+        "style": "Gruff, commanding career soldier; brusque and impatient with subordinates."
+      },
+      "8950": {
+        "name": "Essyllt",
+        "style": "Cold, imperious Iorwerth commander; clipped, menacing and merciless in delivery."
+      },
+      "8965": {
+        "name": "Rebel Scout",
+        "style": "Alert and hushed, the low, vigilant tone of a lookout keeping watch for the rebels."
+      },
+      "8966": {
+        "name": "Rebel Scout",
+        "style": "Alert and hushed, the low, vigilant tone of a lookout keeping watch for the rebels."
+      },
+      "8976": {
+        "name": "Koftik",
+        "style": "Helpful, steady cave guide; warm and reassuring, though growing increasingly strained and uneasy."
+      },
+      "8979": {
+        "name": "Slave",
+        "style": "Faint, trembling, downtrodden whisper; halting and submissive."
+      },
+      "8980": {
+        "name": "Slave",
+        "style": "Faint, trembling, downtrodden whisper; halting and submissive."
+      },
+      "8981": {
+        "name": "Slave",
+        "style": "Faint, trembling, downtrodden whisper; halting and submissive."
+      },
+      "8982": {
+        "name": "Slave",
+        "style": "Faint, trembling, downtrodden whisper; halting and submissive."
+      },
+      "8983": {
+        "name": "Slave",
+        "style": "Faint, trembling, downtrodden whisper; halting and submissive."
+      },
+      "8984": {
+        "name": "Slave",
+        "style": "Faint, trembling, downtrodden whisper; halting and submissive."
+      },
+      "8985": {
+        "name": "Slave",
+        "style": "Faint, trembling, downtrodden whisper; halting and submissive."
+      },
+      "8991": {
+        "name": "Kardia",
+        "style": "Rasping, sinister old crone; venomous and slyly cackling."
+      },
+      "9014": {
+        "name": "Arianwyn",
+        "style": "Measured, grave and earnest; speaks with the quiet authority of a resistance leader carrying heavy burdens."
+      },
+      "9015": {
+        "name": "Kelyn",
+        "style": "Bright, vivacious noblewoman with a graceful, regal poise."
+      },
+      "9016": {
+        "name": "Essyllt",
+        "style": "Cold, imperious Iorwerth commander; clipped, menacing and merciless in delivery."
+      },
+      "9019": {
+        "name": "Ed",
+        "style": "Distracted and obsessive, mutters and trails off, half-lost in his own search."
+      },
+      "9020": {
+        "name": "Bryn",
+        "style": "Patient, clear and instructive, walking newcomers through each step without rushing."
+      },
+      "9052": {
+        "name": "Rhiannon",
+        "style": "Melodic, clear-voiced advisor with a calm, ringing lilt."
+      },
+      "9053": {
+        "name": "Amrod",
+        "style": "Calm, courteous trader who explains his exchanges with patient, measured ease."
+      },
+      "9054": {
+        "name": "Miriel",
+        "style": "Loose, merry and a touch tipsy; warm, rambling delivery."
+      },
+      "9055": {
+        "name": "Curufin",
+        "style": "Soft-spoken and contemplative, the measured cadence of one given to sermons."
+      },
+      "9056": {
+        "name": "Enerdhil",
+        "style": "Relaxed, easygoing city-dweller. Speaks with a laid-back, refined lilt."
+      },
+      "9057": {
+        "name": "Tatie",
+        "style": "Homely, gentle elf. Speaks softly and contentedly with a domestic, welcoming warmth."
+      },
+      "9058": {
+        "name": "Finduilas",
+        "style": "Refined and airy, the cool elegant cadence of a Prifddinas citizen."
+      },
+      "9059": {
+        "name": "Gelmir",
+        "style": "Brisk and busy, words tumbling out between his endless back-and-forth errands."
+      },
+      "9060": {
+        "name": "Mithrellas",
+        "style": "Idle, relaxed city-dweller, breezy and unhurried."
+      },
+      "9061": {
+        "name": "Erestor",
+        "style": "Idle, unhurried small talk of a refined city-dweller with time to spare."
+      },
+      "9062": {
+        "name": "Lindir",
+        "style": "Refined and self-assured, an elegant unhurried elven manner."
+      },
+      "9063": {
+        "name": "Idril",
+        "style": "Composed, everyday city resident; even and unhurried, with a calm, unremarkable conversational tone."
+      },
+      "9064": {
+        "name": "Ingwion",
+        "style": "Idle and slightly aimless, the offhand drift of a citizen with little to do."
+      },
+      "9065": {
+        "name": "Thingol",
+        "style": "Refined, poised Prifddinas citizen with a reserved, unhurried manner."
+      },
+      "9066": {
+        "name": "Elenwe",
+        "style": "Refined, leisurely and unhurried; relaxed elven poise."
+      },
+      "9067": {
+        "name": "Orophin",
+        "style": "Refined and breezy, an elegant light elven cadence."
+      },
+      "9068": {
+        "name": "Vaire",
+        "style": "Refined and serene, smooth elegant elven phrasing."
+      },
+      "9069": {
+        "name": "Elladan",
+        "style": "Refined, unhurried Prifddinas citizen with a poised, reserved manner."
+      },
+      "9070": {
+        "name": "Guilin",
+        "style": "Laid-back trader, relaxed and conversational."
+      },
+      "9071": {
+        "name": "Ingwe",
+        "style": "Assured, skilled craftsman's tone; calm and exacting."
+      },
+      "9072": {
+        "name": "Cirdan",
+        "style": "Refined, faintly aloof city-dweller. Speaks in calm, measured tones with quiet self-assurance."
+      },
+      "9073": {
+        "name": "Glorfindel",
+        "style": "Easygoing, mildly weary tone of a citizen who gets little space to himself."
+      },
+      "9074": {
+        "name": "Aredhel",
+        "style": "Reserved, softly-spoken Prifddinas citizen with a refined, unhurried manner."
+      },
+      "9075": {
+        "name": "Celegorm",
+        "style": "Aloof, world-weary wanderer with a low, detached murmur."
+      },
+      "9076": {
+        "name": "Anaire",
+        "style": "Refined and softly aloof, with the unhurried poise of an everyday Prifddinas citizen and a light, melodic delivery."
+      },
+      "9077": {
+        "name": "Maeglin",
+        "style": "Refined and cool, smooth measured elven phrasing."
+      },
+      "9078": {
+        "name": "Edrahil",
+        "style": "Easygoing and unhurried, given to idle, friendly chatter."
+      },
+      "9079": {
+        "name": "Fingon",
+        "style": "Idle, easygoing city-dweller, casual and unbothered."
+      },
+      "9080": {
+        "name": "Salgant",
+        "style": "Genteel and leisurely, with the languid, refined delivery of a comfortable gentleman of leisure."
+      },
+      "9081": {
+        "name": "Celebrian",
+        "style": "Bright, breezy city dweller; light and a touch curious, with an unbothered everyday cadence."
+      },
+      "9082": {
+        "name": "Imin",
+        "style": "Refined and easy, the smooth elegant lilt of a city elf."
+      },
+      "9083": {
+        "name": "Oropher",
+        "style": "Refined, poised Prifddinas citizen with a reserved, unhurried manner."
+      },
+      "9084": {
+        "name": "Fingolfin",
+        "style": "Idle, easygoing citizen chatter; relaxed and unhurried."
+      },
+      "9085": {
+        "name": "Mahtan",
+        "style": "Casual, wandering citizen chatter; mellow and unbothered."
+      },
+      "9086": {
+        "name": "Indis",
+        "style": "Refined and inquisitive, the polished curiosity of a visitor taking everything in."
+      },
+      "9087": {
+        "name": "Iminye",
+        "style": "Prim and faintly affronted; clipped, indignant delivery as if you've intruded."
+      },
+      "9088": {
+        "name": "Feanor",
+        "style": "Mildly unsure wanderer; hesitant and unhurried, with the slightly distracted air of someone a little lost."
+      },
+      "9089": {
+        "name": "Saeros",
+        "style": "Casual, idle citizen, light and offhand."
+      },
+      "9090": {
+        "name": "Nellas",
+        "style": "Down-to-earth, gentle elf with an unhurried, homely warmth."
+      },
+      "9101": {
+        "name": "Nimrodel",
+        "style": "Quiet and absorbed, the soft, distracted murmur of a bookworm half-lost in her reading."
+      },
+      "9102": {
+        "name": "Maedhros",
+        "style": "Scholarly library-goer; contemplative, articulate and softly studious."
+      },
+      "9103": {
+        "name": "Finarfin",
+        "style": "Soft, contented scholar's voice, perfectly at ease among his beloved books."
+      },
+      "9104": {
+        "name": "Gwindor",
+        "style": "Bookish and enthusiastic, an eager reader who talks quickly and brightly about what he has learned."
+      },
+      "9105": {
+        "name": "Eldalote",
+        "style": "Hushed, prim librarian. Speaks in a soft, careful near-whisper, ever shushing for quiet."
+      },
+      "9106": {
+        "name": "Enelye",
+        "style": "Serene and lofty, gazing down over the city with a calm, detached grace."
+      },
+      "9107": {
+        "name": "Nerdanel",
+        "style": "Serene and content; soft, leisurely delivery taking in the view."
+      },
+      "9108": {
+        "name": "Nimloth",
+        "style": "Serene, appreciative citizen's tone; soft and reflective."
+      },
+      "9109": {
+        "name": "Findis",
+        "style": "Refined, softly-spoken Prifddinas citizen with a poised, reserved manner."
+      },
+      "9110": {
+        "name": "Earwen",
+        "style": "Refined and faintly aloof, the smooth unhurried lilt of a crystal-city elf."
+      },
+      "9111": {
+        "name": "Caranthir",
+        "style": "Relaxed and pleasant, savouring the view from on high with an idle, contented air."
+      },
+      "9112": {
+        "name": "Enel",
+        "style": "Idle, contemplative citizen's tone; softly distracted."
+      },
+      "9113": {
+        "name": "Hendor",
+        "style": "Relaxed Prifddinas citizen taking in the sights, with a refined, easy-going manner."
+      },
+      "9114": {
+        "name": "Galathil",
+        "style": "Refined and unhurried, an elegant cool-toned elven manner."
+      },
+      "9115": {
+        "name": "Turgon",
+        "style": "Contented city stroller; calm and unhurried, speaking with the easy serenity of one admiring the view."
+      },
+      "9116": {
+        "name": "Lenwe",
+        "style": "Subdued, downcast wanderer; quiet and low-energy, speaking softly as though preoccupied and looking at his feet."
+      },
+      "9117": {
+        "name": "Aranwe",
+        "style": "Relaxed, observant lookout with an unhurried, faintly smug drawl."
+      },
+      "9119": {
+        "name": "Lord Ieuan Amlodd",
+        "style": "Regal and measured, a clan lord's dignified, otherworldly poise; every word unhurried and refined.",
+        "pace": "slow"
+      },
+      "9121": {
+        "name": "Kelyn",
+        "style": "Bright, vivacious noblewoman with a graceful, regal poise."
+      },
+      "9122": {
+        "name": "Lady Tangwen Trahaearn",
+        "style": "Regal and commanding, with stately, measured authority carried with imperious grace."
+      },
+      "9123": {
+        "name": "Lord Piquan Crwys",
+        "style": "Stately, dignified clan leader. Speaks slowly and gravely in a deep, ancient, measured register.",
+        "pace": "slow"
+      },
+      "9124": {
+        "name": "Lady Ffion Meilyr",
+        "style": "Regal and commanding, a noble leader's poise lit by a keen, restless taste for adventure."
+      },
+      "9125": {
+        "name": "Lady Carys Hefin",
+        "style": "Serene and dignified, speaks softly and gracefully with regal, noble poise."
+      },
+      "9126": {
+        "name": "Lord Iestin Iorwerth",
+        "style": "Grave, scholarly, dignified noble's delivery; serious and considered."
+      },
+      "9127": {
+        "name": "Banker",
+        "style": "Crisp, courteous and precise, with the polished efficiency of a financial professional."
+      },
+      "9128": {
+        "name": "Banker",
+        "style": "Crisp, courteous and precise, with the polished efficiency of a financial professional."
+      },
+      "9129": {
+        "name": "Banker",
+        "style": "Crisp, courteous and precise, with the polished efficiency of a financial professional."
+      },
+      "9130": {
+        "name": "Banker",
+        "style": "Crisp, courteous and precise, with the polished efficiency of a financial professional."
+      },
+      "9131": {
+        "name": "Banker",
+        "style": "Crisp, courteous and precise, with the polished efficiency of a financial professional."
+      },
+      "9132": {
+        "name": "Banker",
+        "style": "Crisp, courteous and precise, with the polished efficiency of a financial professional."
+      },
+      "9133": {
+        "name": "Reese",
+        "style": "Serene and musical. Speaks in a soft, melodic, almost singing lilt about crystal and song."
+      },
+      "9134": {
+        "name": "Reese",
+        "style": "Serene and musical. Speaks in a soft, melodic, almost singing lilt about crystal and song."
+      },
+      "9135": {
+        "name": "Conwenna",
+        "style": "Serene, lyrical crystal-singer; melodic and tranquil, speaking with the gentle musicality of one devoted to song."
+      },
+      "9136": {
+        "name": "Conwenna",
+        "style": "Serene, lyrical crystal-singer; melodic and tranquil, speaking with the gentle musicality of one devoted to song."
+      },
+      "9137": {
+        "name": "Alwyn",
+        "style": "Courteous, polished estate-agent patter; helpful and businesslike, walking you through options with unhurried professional warmth."
+      },
+      "9138": {
+        "name": "Oswallt",
+        "style": "Down-to-earth and mellow, the unhurried manner of a contented gardener."
+      },
+      "9139": {
+        "name": "Eira",
+        "style": "Warm and welcoming barkeep; easy, hospitable cheer with a melodic note."
+      },
+      "9140": {
+        "name": "Sawmill Operator",
+        "style": "Brisk, efficient woodworker; matter-of-fact about logs and planks."
+      },
+      "9141": {
+        "name": "Pennant",
+        "style": "Warm, knowledgeable, gentle horticultural enthusiasm; happy to share tree lore."
+      },
+      "9142": {
+        "name": "Pennant",
+        "style": "Warm, knowledgeable, gentle horticultural enthusiasm; happy to share tree lore."
+      },
+      "9145": {
+        "name": "Eluned",
+        "style": "Graceful and serene, soft melodic phrasing with an air of timeless calm."
+      },
+      "9149": {
+        "name": "Morvran",
+        "style": "Cold, clipped and faintly menacing, a hardened warrior's sinister edge."
+      },
+      "9150": {
+        "name": "Lilifang",
+        "style": "Bright, eager book-lover, chattering with delight about her library finds."
+      },
+      "9151": {
+        "name": "Crefydd",
+        "style": "Devout Serenist priest with a solemn, measured, reverent tone."
+      },
+      "9152": {
+        "name": "Ystwyth",
+        "style": "Lively, agile Prifddinas citizen; brisk and chipper when reporting agility stats."
+      },
+      "9153": {
+        "name": "Iwan",
+        "style": "Eager mace-shop salesman; brisk and self-promoting, talking up his wares with cheerful sales-pitch energy."
+      },
+      "9154": {
+        "name": "Derwen",
+        "style": "Genial food-stall keeper; friendly and welcoming, the easy patter of a tradesman proud of his wares."
+      },
+      "9155": {
+        "name": "Elgan",
+        "style": "Cheery merchant who can't resist a pun, delivering wordplay with a wink."
+      },
+      "9156": {
+        "name": "Celyn",
+        "style": "Confident, appraising tone of a weapons connoisseur who knows his stock cold."
+      },
+      "9157": {
+        "name": "Aneirin",
+        "style": "Measured, knowledgeable tradesman's cadence with a soldier's bluntness about weapons and craft."
+      },
+      "9158": {
+        "name": "Gwallter",
+        "style": "Affable and obliging, with the easy, melodic warmth of a friendly shopkeeper."
+      },
+      "9159": {
+        "name": "Gwyn",
+        "style": "Hearty, practical merchant. Speaks plainly and warmly, with the easy confidence of a seasoned miner."
+      },
+      "9160": {
+        "name": "Osian",
+        "style": "Refined, polished merchant with a smooth, persuasive patter."
+      },
+      "9161": {
+        "name": "Caerwyn",
+        "style": "Smooth, worldly merchant's patter; warmly persuasive and proud of his spices from far-off lands."
+      },
+      "9162": {
+        "name": "Anwen",
+        "style": "Refined, poised silk trader; smooth and softly persuasive, with the cultured ease of a fine-materials merchant."
+      },
+      "9163": {
+        "name": "Glenda",
+        "style": "Shrewd, smooth-talking merchant with a refined, sales-savvy lilt."
+      },
+      "9164": {
+        "name": "Guinevere",
+        "style": "Bright and lively, a colourful, spirited patter to match the dyes she sells."
+      },
+      "9165": {
+        "name": "Nia",
+        "style": "Flamboyant and theatrical, every line delivered with extravagant flourish."
+      },
+      "9166": {
+        "name": "Sian",
+        "style": "Brisk weapons merchant, sharp and to the point."
+      },
+      "9167": {
+        "name": "Branwen",
+        "style": "Warm, gentle shopkeeper with a green thumb; nurturing and unhurried, the soft patience of a seasoned gardener."
+      },
+      "9168": {
+        "name": "Llio",
+        "style": "Knowledgeable and gracious, with the refined, melodic poise of a specialist herbalist."
+      },
+      "9169": {
+        "name": "Efa",
+        "style": "Refined and knowledgeable, with the gracious, melodic delivery of a poised specialist merchant."
+      },
+      "9170": {
+        "name": "Lliann",
+        "style": "Stylish and self-assured, talking fashion with effortless flair."
+      },
+      "9175": {
+        "name": "Rhoddwr Tan",
+        "style": "Steady, watchful and rugged, the grounded authority of a forest camp leader."
+      },
+      "9176": {
+        "name": "Meddwl Ymlaen Llaw",
+        "style": "Serene, contemplative calm; gentle and at peace in communion with nature."
+      },
+      "9177": {
+        "name": "Lleidr Golau",
+        "style": "Rugged, solitary fisherman, slow and laid-back."
+      },
+      "9178": {
+        "name": "Gwerin Hapus",
+        "style": "Content, gentle miller's delivery; mild and unhurried."
+      },
+      "9179": {
+        "name": "Preswylwyr Dall",
+        "style": "Homely village baker with a warm, gentle, contented manner."
+      },
+      "9180": {
+        "name": "Marwolaeth Dawnsio",
+        "style": "Mystical and cryptic, a seer's slow, knowing delivery that hints at prophecy beneath every word.",
+        "pace": "slow"
+      },
+      "9190": {
+        "name": "Guard",
+        "style": "Dutiful and courteous, with the calm, measured authority of a vigilant gatekeeper."
+      },
+      "9191": {
+        "name": "Guard",
+        "style": "Dutiful and courteous, with the calm, measured authority of a vigilant gatekeeper."
+      },
+      "9192": {
+        "name": "Raven",
+        "style": "Ominous, cryptic, croaking corvid delivery; slow and portentous."
+      },
+      "9193": {
+        "name": "Lenny",
+        "style": "Gentle, soft-spoken nature lover; simple and contented among the rabbits."
+      },
+      "9194": {
+        "name": "Ghost",
+        "style": "Wistful, ethereal and airy; dreamy artistic musing drifting on the wind."
+      },
+      "9196": {
+        "name": "Surma",
+        "style": "Jolly, sing-song sailor's delivery; warm and rhythmic like a sea shanty."
+      },
+      "9197": {
+        "name": "Slippers",
+        "style": "Hearty and rhythmic, a dockside musician's lively, sing-song cheer keeping time with the shanty."
+      },
+      "9200": {
+        "name": "Ed",
+        "style": "Distracted and obsessive, mutters and trails off, half-lost in his own search."
+      },
+      "9202": {
+        "name": "Tide",
+        "style": "Wistful and dreamy, speaks slowly and contemplatively, lost in thought."
+      },
+      "9248": {
+        "name": "Arianwyn",
+        "style": "Measured, grave and earnest; speaks with the quiet authority of a resistance leader carrying heavy burdens."
+      },
+      "11427": {
+        "name": "Friendly Forester",
+        "style": "Warm, encouraging outdoorsman; communal and upbeat, the welcoming tone of a mentor keen to share the craft."
+      },
+      "12154": {
+        "name": "Butch",
+        "style": "Wordless, guttural little growls and snarls; an ominous, menacing presence rather than real speech."
+      },
+      "12158": {
+        "name": "Butch",
+        "style": "Wordless, guttural little growls and snarls; an ominous, menacing presence rather than real speech."
+      },
+      "12644": {
+        "name": "Alina",
+        "style": "Bright, breathless and eager, words tumbling out with youthful enthusiasm and wide-eyed curiosity."
+      },
+      "12645": {
+        "name": "Alina",
+        "style": "Bright, breathless and eager, words tumbling out with youthful enthusiasm and wide-eyed curiosity."
+      },
+      "12653": {
+        "name": "Furia Tullus",
+        "style": "Poised, aristocratic royal servant of noble dynastic heritage; commanding, polished, high-register delivery."
+      },
+      "12654": {
+        "name": "Ennius Tullus",
+        "style": "Measured, formal courtly diction that hardens into zealous, unwavering conviction."
+      },
+      "12766": {
+        "name": "Harminia",
+        "style": "Easy, earthy gardener; practical and reassuring, soil under the fingernails."
+      },
+      "12767": {
+        "name": "Smol heredit",
+        "style": "Tiny but swaggering little gladiator. Boastful and gruff in a small, scrappy way."
+      },
+      "12768": {
+        "name": "Quetzin",
+        "style": "A small bird's wordless chirps and trills, with no real speech at all."
+      },
+      "12807": {
+        "name": "Minimus",
+        "style": "Boisterous and proud, a battle-hardened showman booming with gladiatorial bravado."
+      },
+      "12808": {
+        "name": "Minimus",
+        "style": "Boisterous and proud, a battle-hardened showman booming with gladiatorial bravado."
+      },
+      "12809": {
+        "name": "Gloria",
+        "style": "Attentive Colosseum overseer with a bright, informative, encouraging delivery."
+      },
+      "12834": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12835": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12836": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12837": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12838": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12839": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12840": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12841": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12842": {
+        "name": "Gladiator",
+        "style": "Hardened arena fighter; gruff, swaggering and bold, with the tough bravado of a seasoned combatant."
+      },
+      "12857": {
+        "name": "Smol heredit",
+        "style": "Tiny but swaggering little gladiator. Boastful and gruff in a small, scrappy way."
+      },
+      "12858": {
+        "name": "Quetzin",
+        "style": "A small bird's wordless chirps and trills, with no real speech at all."
+      },
+      "12861": {
+        "name": "Attala",
+        "style": "Dignified and self-assured, speaking with measured, authoritative composure befitting an influential city advisor."
+      },
+      "12862": {
+        "name": "Jessamine",
+        "style": "Bright, eager and scholarly; quick, enthusiastic delivery brimming with curiosity."
+      },
+      "12865": {
+        "name": "Jessamine",
+        "style": "Bright, eager and scholarly; quick, enthusiastic delivery brimming with curiosity."
+      },
+      "12869": {
+        "name": "Eyatlalli",
+        "style": "Ancient and serene, speaks in slow, flowing, otherworldly calm."
+      },
+      "12870": {
+        "name": "Eyatlalli",
+        "style": "Ancient and serene, speaks in slow, flowing, otherworldly calm."
+      },
+      "12876": {
+        "name": "Builder",
+        "style": "Plain working man whose simple, blue-collar speech drifts unexpectedly into musing, philosophical asides."
+      },
+      "12877": {
+        "name": "Builder",
+        "style": "Plain working man whose simple, blue-collar speech drifts unexpectedly into musing, philosophical asides."
+      },
+      "12881": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "12890": {
+        "name": "Furia Tullus",
+        "style": "Poised, aristocratic royal servant of noble dynastic heritage; commanding, polished, high-register delivery."
+      },
+      "12891": {
+        "name": "Furia Tullus",
+        "style": "Poised, aristocratic royal servant of noble dynastic heritage; commanding, polished, high-register delivery."
+      },
+      "12892": {
+        "name": "Ennius Tullus",
+        "style": "Measured, formal courtly diction that hardens into zealous, unwavering conviction."
+      },
+      "12893": {
+        "name": "Ennius Tullus",
+        "style": "Measured, formal courtly diction that hardens into zealous, unwavering conviction."
+      },
+      "12894": {
+        "name": "Metzli, Teokan of Ranul",
+        "style": "Commanding, charismatic and controlled, the persuasive solemnity of a high priestess."
+      },
+      "12899": {
+        "name": "Servius, Teokan of Ralos",
+        "style": "Dignified and devout, warm but commanding, the measured gravitas of a high priest."
+      },
+      "12900": {
+        "name": "Servius, Teokan of Ralos",
+        "style": "Dignified and devout, warm but commanding, the measured gravitas of a high priest."
+      },
+      "12901": {
+        "name": "Servius, Teokan of Ralos",
+        "style": "Dignified and devout, warm but commanding, the measured gravitas of a high priest."
+      },
+      "12921": {
+        "name": "Pet snakeling",
+        "style": "Tiny serpent pet; soft, sibilant and playful, a small slithery hiss-tinged little voice."
+      },
+      "12929": {
+        "name": "Citizen",
+        "style": "Shifty and evasive, speaks in quick, nervous, guarded bursts."
+      },
+      "12931": {
+        "name": "Guild Hunter Fox",
+        "style": "Rugged, capable guild hunter; confident and weathered, the brisk practicality of an outdoorsman who knows his trade."
+      },
+      "12932": {
+        "name": "Guild Hunter Fox",
+        "style": "Rugged, capable guild hunter; confident and weathered, the brisk practicality of an outdoorsman who knows his trade."
+      },
+      "12933": {
+        "name": "Atza",
+        "style": "Brisk, practical artisan tone; confident and matter-of-fact when discussing fabrics."
+      },
+      "12935": {
+        "name": "Marcellus",
+        "style": "Jittery and on edge, anxious mutterings about the frogs he's convinced are out to get him."
+      },
+      "12936": {
+        "name": "Marcellus",
+        "style": "Jittery and on edge, anxious mutterings about the frogs he's convinced are out to get him."
+      },
+      "12939": {
+        "name": "Gary",
+        "style": "Gruff, world-weary union frog, grumbles and gripes about the bosses."
+      },
+      "12940": {
+        "name": "Pet snakeling",
+        "style": "Tiny serpent pet; soft, sibilant and playful, a small slithery hiss-tinged little voice."
+      },
+      "12943": {
+        "name": "Dave",
+        "style": "Laid-back, croaky and a touch petulant, drawling like an amphibian on strike who would rather not be bothered.",
+        "pace": "slow"
+      },
+      "12947": {
+        "name": "Sue",
+        "style": "Cranky, disgruntled union frog, grumbling and droll."
+      },
+      "12951": {
+        "name": "Jane",
+        "style": "Droll, laid-back amphibian with attitude, drawling her grievances over the labour dispute."
+      },
+      "12955": {
+        "name": "Cuthbert",
+        "style": "Pompous and theatrical, with croaky, self-important grandeur puffed up far beyond his station."
+      },
+      "12957": {
+        "name": "Cuthbert",
+        "style": "Pompous and theatrical, with croaky, self-important grandeur puffed up far beyond his station."
+      },
+      "13035": {
+        "name": "Shopkeeper",
+        "style": "Matter-of-fact, helpful merchant. Sturdy and direct with a brisk, businesslike manner."
+      },
+      "13036": {
+        "name": "Nahta",
+        "style": "Shrewd and guarded, a sharp shopkeeper who keeps her secrets close and sees through any flattery."
+      },
+      "13037": {
+        "name": "Tizoro",
+        "style": "Gruff but helpful, the no-nonsense pitch of a seasoned tool merchant."
+      },
+      "13038": {
+        "name": "Blacksmith",
+        "style": "Gruff, gravelly and proud, the clipped certainty of the best metalworker in town who knows his craft."
+      },
+      "13039": {
+        "name": "Yarnio",
+        "style": "Warm, hearty baker; jovial sales patter offering up his pies."
+      },
+      "13040": {
+        "name": "Conara",
+        "style": "Warm and sparkling with enthusiasm, delighting in her gems with an inviting, gleaming lilt."
+      },
+      "13041": {
+        "name": "Huito",
+        "style": "Hearty, gruff dwarven merchant with a warm, gravelly cheer."
+      },
+      "13042": {
+        "name": "Sonalo",
+        "style": "Flamboyant, chatty stylist, proud and theatrical about grooming."
+      },
+      "13043": {
+        "name": "Bartender",
+        "style": "Warm, welcoming barkeep; chatty and good-humoured while pouring drinks."
+      },
+      "13044": {
+        "name": "Banker",
+        "style": "Brisk, professional banker, polite but businesslike and efficient."
+      },
+      "13045": {
+        "name": "Banker",
+        "style": "Brisk, professional banker, polite but businesslike and efficient."
+      },
+      "13046": {
+        "name": "Banker",
+        "style": "Brisk, professional banker, polite but businesslike and efficient."
+      },
+      "13047": {
+        "name": "Banker",
+        "style": "Brisk, professional banker, polite but businesslike and efficient."
+      },
+      "13048": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13049": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13050": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13051": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13052": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13053": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13054": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13055": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13056": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13057": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13058": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13059": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13060": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13061": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13062": {
+        "name": "Guard",
+        "style": "Stern and curt; short, no-nonsense delivery that warns you off."
+      },
+      "13063": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13064": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13065": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13066": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13067": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13068": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13069": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13070": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13071": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13072": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13073": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13074": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13075": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13076": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13077": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13078": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13079": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13080": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13081": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13082": {
+        "name": "Citizen",
+        "style": "Plain-spoken, hardy townsfolk with a gruff, no-nonsense delivery."
+      },
+      "13083": {
+        "name": "Child",
+        "style": "Aloof young child; short, disinterested and slightly snippy delivery."
+      },
+      "13084": {
+        "name": "Child",
+        "style": "Aloof young child; short, disinterested and slightly snippy delivery."
+      },
+      "13085": {
+        "name": "Child",
+        "style": "Aloof young child; short, disinterested and slightly snippy delivery."
+      },
+      "13086": {
+        "name": "Child",
+        "style": "Aloof young child; short, disinterested and slightly snippy delivery."
+      },
+      "13087": {
+        "name": "Funbo",
+        "style": "Boozy, rambling barfly, loud and slurring with cheerful overconfidence."
+      },
+      "13088": {
+        "name": "Kalko",
+        "style": "Jolly and boisterous, words loosened and slurred by drink, swaying from one merry thought to the next.",
+        "pace": "slow"
+      },
+      "13089": {
+        "name": "Worker",
+        "style": "Gruff, hardworking and plainspoken, the sturdy tone of a busy smith."
+      },
+      "13090": {
+        "name": "Worker",
+        "style": "Gruff, hardworking and plainspoken, the sturdy tone of a busy smith."
+      },
+      "13091": {
+        "name": "Worker",
+        "style": "Gruff, hardworking and plainspoken, the sturdy tone of a busy smith."
+      },
+      "13092": {
+        "name": "Worker",
+        "style": "Gruff, hardworking and plainspoken, the sturdy tone of a busy smith."
+      },
+      "13093": {
+        "name": "Worker",
+        "style": "Gruff, hardworking and plainspoken, the sturdy tone of a busy smith."
+      },
+      "13094": {
+        "name": "Worker",
+        "style": "Gruff, hardworking and plainspoken, the sturdy tone of a busy smith."
+      },
+      "13095": {
+        "name": "Worker",
+        "style": "Gruff, hardworking and plainspoken, the sturdy tone of a busy smith."
+      },
+      "13096": {
+        "name": "Worker",
+        "style": "Gruff, hardworking and plainspoken, the sturdy tone of a busy smith."
+      },
+      "13097": {
+        "name": "Cuica",
+        "style": "Rugged and hearty; relaxed, satisfied delivery of a hunter unwinding over a drink."
+      },
+      "13098": {
+        "name": "Callio",
+        "style": "Chatty and good-natured, happily rambling about the rocks and the workings of the mine."
+      },
+      "13099": {
+        "name": "Attala",
+        "style": "Dignified and self-assured, speaking with measured, authoritative composure befitting an influential city advisor."
+      },
+      "13110": {
+        "name": "Guard",
+        "style": "Stern and imposing, blunt commands with no-nonsense authority."
+      },
+      "13111": {
+        "name": "Guard",
+        "style": "Stern and imposing, blunt commands with no-nonsense authority."
+      },
+      "13112": {
+        "name": "Guard",
+        "style": "Stern and imposing, blunt commands with no-nonsense authority."
+      },
+      "13113": {
+        "name": "Guard",
+        "style": "Stern and imposing, blunt commands with no-nonsense authority."
+      },
+      "13120": {
+        "name": "Guildmaster Apatura",
+        "style": "Authoritative and composed; brisk, confident leadership with measured warmth."
+      },
+      "13121": {
+        "name": "Huntmaster Gilman",
+        "style": "Relaxed, boozy, jovial old hunter; laid-back with a slur of good cheer."
+      },
+      "13122": {
+        "name": "Guild Hunter Ornus",
+        "style": "Rugged, plain-spoken outdoorsman, gruffly proud of his hunting craft."
+      },
+      "13123": {
+        "name": "Guild Hunter Cervus",
+        "style": "Keen, upbeat outdoorsy energy; encouraging and brisk."
+      },
+      "13124": {
+        "name": "Guild Hunter Aco",
+        "style": "Highly strung and tense. Talks in quick, restless bursts with nervous, wired energy.",
+        "pace": "fast"
+      },
+      "13125": {
+        "name": "Guild Hunter Teco",
+        "style": "Knowledgeable, outdoorsy and keen, the steady tone of a seasoned guild hunter."
+      },
+      "13126": {
+        "name": "Guild Hunter Wolf",
+        "style": "Seasoned, no-nonsense senior hunter; gruff, confident and direct."
+      },
+      "13127": {
+        "name": "Guild Scribe Verity",
+        "style": "Busy and precise, brisk bookish delivery as though always halfway through her notes."
+      },
+      "13129": {
+        "name": "Banker",
+        "style": "Brisk, businesslike bank clerk; efficient and matter-of-fact with a touch of weariness."
+      },
+      "13130": {
+        "name": "Pellem",
+        "style": "Friendly, practical furrier. Speaks with easy warmth and a tradesman's helpful patter."
+      },
+      "13131": {
+        "name": "Imia",
+        "style": "Practical, protective shopkeeper; friendly but firm and reassuring."
+      },
+      "13135": {
+        "name": "Soar Leader Pitri",
+        "style": "Airy, scattered quetzal caretaker; flighty and enthusiastic, bouncing between thoughts with breezy birdbrained energy."
+      },
+      "13136": {
+        "name": "Orsaga",
+        "style": "Warm and creative; friendly, animated delivery from a maker proud of her handiwork."
+      },
+      "13140": {
+        "name": "Metla",
+        "style": "Gruff, practical tradeswoman, blunt and businesslike."
+      },
+      "13145": {
+        "name": "Avinia",
+        "style": "Practical, no-nonsense mason; grounded and matter-of-fact, the steady confidence of someone who works stone all day."
+      },
+      "13146": {
+        "name": "Bard",
+        "style": "Theatrical, lyrical entertainer. Speaks with a performer's flourish and musical cadence, ever ready to break into song."
+      },
+      "13147": {
+        "name": "Bard",
+        "style": "Theatrical, lyrical entertainer. Speaks with a performer's flourish and musical cadence, ever ready to break into song."
+      },
+      "13148": {
+        "name": "Bard",
+        "style": "Theatrical, lyrical entertainer. Speaks with a performer's flourish and musical cadence, ever ready to break into song."
+      },
+      "13149": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13150": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13151": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13152": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13153": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13154": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13155": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13156": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13158": {
+        "name": "Picaria",
+        "style": "Weathered, salty fisherwoman with a brisk, down-to-earth manner."
+      },
+      "13159": {
+        "name": "Shopkeeper",
+        "style": "Easygoing and friendly, casual upbeat sales patter."
+      },
+      "13160": {
+        "name": "Thurid",
+        "style": "Brash, hearty market patter; confident and good-humoured pitching her helmets."
+      },
+      "13161": {
+        "name": "Reinn",
+        "style": "Hearty, weathered seafarer; bold, direct and rugged."
+      },
+      "13162": {
+        "name": "Inga",
+        "style": "Hardy and forthright, with the blunt, seafaring directness of a northern traveller far from home."
+      },
+      "13163": {
+        "name": "Arnkel",
+        "style": "Hardy, weathered seafarer; blunt and good-natured with a traveller's easy confidence."
+      },
+      "13164": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13165": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13166": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13167": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13168": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13169": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13170": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13171": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13172": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13173": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13174": {
+        "name": "Child",
+        "style": "Young and easily bored, short clipped replies and a dismissive whine."
+      },
+      "13175": {
+        "name": "Child",
+        "style": "Young and easily bored, short clipped replies and a dismissive whine."
+      },
+      "13176": {
+        "name": "Child",
+        "style": "Young and easily bored, short clipped replies and a dismissive whine."
+      },
+      "13177": {
+        "name": "Child",
+        "style": "Young and easily bored, short clipped replies and a dismissive whine."
+      },
+      "13178": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13179": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13180": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13181": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13182": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13183": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13184": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13185": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13186": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13187": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13188": {
+        "name": "Child",
+        "style": "Young and easily bored, short clipped replies and a dismissive whine."
+      },
+      "13189": {
+        "name": "Child",
+        "style": "Young and easily bored, short clipped replies and a dismissive whine."
+      },
+      "13190": {
+        "name": "Child",
+        "style": "Young and easily bored, short clipped replies and a dismissive whine."
+      },
+      "13191": {
+        "name": "Child",
+        "style": "Young and easily bored, short clipped replies and a dismissive whine."
+      },
+      "13192": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13193": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13194": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13195": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13196": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13197": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13198": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13199": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13200": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13201": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13202": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13203": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13204": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13205": {
+        "name": "Citizen",
+        "style": "Easygoing everyday chatter of an ordinary townsperson going about their day."
+      },
+      "13206": {
+        "name": "Tourist",
+        "style": "Wide-eyed, chatty sightseer; impressed and casual, here for the sights."
+      },
+      "13207": {
+        "name": "Tourist",
+        "style": "Wide-eyed, chatty sightseer; impressed and casual, here for the sights."
+      },
+      "13208": {
+        "name": "Tourist",
+        "style": "Wide-eyed, chatty sightseer; impressed and casual, here for the sights."
+      },
+      "13209": {
+        "name": "Tourist",
+        "style": "Wide-eyed, chatty sightseer; impressed and casual, here for the sights."
+      },
+      "13210": {
+        "name": "Tourist",
+        "style": "Wide-eyed, chatty sightseer; impressed and casual, here for the sights."
+      },
+      "13211": {
+        "name": "Tourist",
+        "style": "Wide-eyed, chatty sightseer; impressed and casual, here for the sights."
+      },
+      "13212": {
+        "name": "Banker",
+        "style": "Brisk, polished and courteous, every line delivered with efficient professional poise."
+      },
+      "13213": {
+        "name": "Banker",
+        "style": "Brisk, polished and courteous, every line delivered with efficient professional poise."
+      },
+      "13214": {
+        "name": "Banker",
+        "style": "Brisk, polished and courteous, every line delivered with efficient professional poise."
+      },
+      "13215": {
+        "name": "Banker",
+        "style": "Brisk, polished and courteous, every line delivered with efficient professional poise."
+      },
+      "13216": {
+        "name": "Banker",
+        "style": "Brisk, polished and courteous, every line delivered with efficient professional poise."
+      },
+      "13217": {
+        "name": "Banker",
+        "style": "Brisk, polished and courteous, every line delivered with efficient professional poise."
+      },
+      "13218": {
+        "name": "Banker",
+        "style": "Brisk, polished and courteous, every line delivered with efficient professional poise."
+      },
+      "13219": {
+        "name": "Banker",
+        "style": "Brisk, polished and courteous, every line delivered with efficient professional poise."
+      },
+      "13224": {
+        "name": "Banker",
+        "style": "Polite, efficient, business-like clerk delivery."
+      },
+      "13227": {
+        "name": "Banker",
+        "style": "Polite, efficient, business-like clerk delivery."
+      },
+      "13228": {
+        "name": "Farmer",
+        "style": "Earthy, plain-spoken labourer. Easygoing and unhurried, the steady talk of someone who works the land."
+      },
+      "13229": {
+        "name": "Farmer",
+        "style": "Earthy, plain-spoken labourer. Easygoing and unhurried, the steady talk of someone who works the land."
+      },
+      "13230": {
+        "name": "Farmer",
+        "style": "Earthy, plain-spoken labourer. Easygoing and unhurried, the steady talk of someone who works the land."
+      },
+      "13231": {
+        "name": "Farmer",
+        "style": "Earthy, plain-spoken labourer. Easygoing and unhurried, the steady talk of someone who works the land."
+      },
+      "13232": {
+        "name": "Farmer",
+        "style": "Earthy, plain-spoken labourer. Easygoing and unhurried, the steady talk of someone who works the land."
+      },
+      "13233": {
+        "name": "Farmer",
+        "style": "Earthy, plain-spoken labourer. Easygoing and unhurried, the steady talk of someone who works the land."
+      },
+      "13234": {
+        "name": "Farmer",
+        "style": "Earthy, plain-spoken labourer. Easygoing and unhurried, the steady talk of someone who works the land."
+      },
+      "13235": {
+        "name": "Farmer",
+        "style": "Earthy, plain-spoken labourer. Easygoing and unhurried, the steady talk of someone who works the land."
+      },
+      "13244": {
+        "name": "Squire",
+        "style": "Eager and dutiful, youthful keenness with crisp respectful delivery."
+      },
+      "13245": {
+        "name": "Squire",
+        "style": "Eager and dutiful, youthful keenness with crisp respectful delivery."
+      },
+      "13246": {
+        "name": "Squire",
+        "style": "Eager and dutiful, youthful keenness with crisp respectful delivery."
+      },
+      "13247": {
+        "name": "Squire",
+        "style": "Eager and dutiful, youthful keenness with crisp respectful delivery."
+      },
+      "13248": {
+        "name": "Sailor",
+        "style": "Gruff and overworked, grumbling about the never-ending labour down at the docks."
+      },
+      "13249": {
+        "name": "Sailor",
+        "style": "Gruff and overworked, grumbling about the never-ending labour down at the docks."
+      },
+      "13250": {
+        "name": "Sailor",
+        "style": "Gruff and overworked, grumbling about the never-ending labour down at the docks."
+      },
+      "13251": {
+        "name": "Sailor",
+        "style": "Gruff and overworked, grumbling about the never-ending labour down at the docks."
+      },
+      "13252": {
+        "name": "Fisher",
+        "style": "Weary working tone, grumbling good-naturedly about the endless haul of the day's catch."
+      },
+      "13253": {
+        "name": "Fisher",
+        "style": "Weary working tone, grumbling good-naturedly about the endless haul of the day's catch."
+      },
+      "13254": {
+        "name": "Fisher",
+        "style": "Weary working tone, grumbling good-naturedly about the endless haul of the day's catch."
+      },
+      "13255": {
+        "name": "Fisher",
+        "style": "Weary working tone, grumbling good-naturedly about the endless haul of the day's catch."
+      },
+      "13256": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13257": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13258": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13259": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13260": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13261": {
+        "name": "Worker",
+        "style": "Harried and busy, speaks in quick, distracted, overworked bursts."
+      },
+      "13262": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13263": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13264": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13265": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13266": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13267": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13268": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13269": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13270": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13271": {
+        "name": "Nelta of Ralos",
+        "style": "Serene, devout and soothing, offering quiet blessings in a calm hush."
+      },
+      "13272": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13273": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13274": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13275": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13276": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13277": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13278": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13279": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13280": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13281": {
+        "name": "Nelta of Ranul",
+        "style": "Hushed, solemn funerary attendant; quiet, reverent and measured when speaking of death rites."
+      },
+      "13297": {
+        "name": "Curator Herminius",
+        "style": "Authoritative, erudite custodian, speaks with proud, lecturing precision."
+      },
+      "13298": {
+        "name": "Academic",
+        "style": "Speaks with the measured, precise diction of a learned scholar, calm and self-assured."
+      },
+      "13299": {
+        "name": "Academic",
+        "style": "Speaks with the measured, precise diction of a learned scholar, calm and self-assured."
+      },
+      "13300": {
+        "name": "Academic",
+        "style": "Speaks with the measured, precise diction of a learned scholar, calm and self-assured."
+      },
+      "13301": {
+        "name": "Academic",
+        "style": "Speaks with the measured, precise diction of a learned scholar, calm and self-assured."
+      },
+      "13302": {
+        "name": "Wealthy citizen",
+        "style": "Haughty, self-satisfied air; refined and faintly boastful."
+      },
+      "13303": {
+        "name": "Wealthy citizen",
+        "style": "Haughty, self-satisfied air; refined and faintly boastful."
+      },
+      "13304": {
+        "name": "Wealthy citizen",
+        "style": "Haughty, self-satisfied air; refined and faintly boastful."
+      },
+      "13305": {
+        "name": "Wealthy citizen",
+        "style": "Haughty, self-satisfied air; refined and faintly boastful."
+      },
+      "13306": {
+        "name": "Leo",
+        "style": "Quick, cheeky street kid with a fast, mischievous patter."
+      },
+      "13307": {
+        "name": "Julia",
+        "style": "Quick, sly and streetwise, with the cheeky, rapid-fire patter of a mischievous urchin."
+      },
+      "13308": {
+        "name": "Aurelia",
+        "style": "Quick, sly and streetwise. Chatters in a cheeky, conspiratorial undertone like a cunning young pickpocket."
+      },
+      "13309": {
+        "name": "Cassius",
+        "style": "Shifty, guarded low murmur; streetwise and evasive."
+      },
+      "13310": {
+        "name": "Oriana",
+        "style": "Sly, soft-spoken and guarded, choosing words carefully."
+      },
+      "13311": {
+        "name": "Oriana",
+        "style": "Sly, soft-spoken and guarded, choosing words carefully."
+      },
+      "13312": {
+        "name": "Lavinia",
+        "style": "Refined, sophisticated, slightly haughty upper-class register."
+      },
+      "13313": {
+        "name": "Victor",
+        "style": "Haughty and self-satisfied; posh, condescending drawl of the idle rich."
+      },
+      "13314": {
+        "name": "Caius",
+        "style": "Smug and self-important, talks down to others with lazy, entitled poise."
+      },
+      "13315": {
+        "name": "Rufus",
+        "style": "Shifty and sly, conspiratorial low-voiced patter of a streetwise urchin."
+      },
+      "13316": {
+        "name": "Ava",
+        "style": "Quick, furtive, conspiratorial whisper; streetwise urchin sizing you up."
+      },
+      "13317": {
+        "name": "Lucia",
+        "style": "Streetwise young urchin; sly, hushed and quick, trading tips in a furtive conspiratorial undertone."
+      },
+      "13318": {
+        "name": "Oli",
+        "style": "Scrappy, hungry street urchin; quick and cheeky, sharing whispers of empty houses in a furtive, eager tone."
+      },
+      "13319": {
+        "name": "Helvia",
+        "style": "Poised, formal and courtly, the measured diction of a palace appointments-keeper."
+      },
+      "13320": {
+        "name": "Warden",
+        "style": "Stern, no-nonsense jailer. Speaks with curt, hard authority, used to giving orders."
+      },
+      "13323": {
+        "name": "Guard Captain",
+        "style": "Gruff and authoritative, the worn, no-nonsense bark of an officer trying to keep unruly guards in line."
+      },
+      "13324": {
+        "name": "Cuali, Teoki of Ralos",
+        "style": "Serene, gentle and devout, speaking with calm measured warmth befitting a temple servant."
+      },
+      "13325": {
+        "name": "Hegio, Teoki of Ranul",
+        "style": "Solemn, devout priest with a hushed, reverent cadence."
+      },
+      "13330": {
+        "name": "Shopkeeper",
+        "style": "Brisk, friendly shopkeep; ready with a pitch and a smile."
+      },
+      "13331": {
+        "name": "Shopkeeper",
+        "style": "Chipper, talkative storekeeper with ready salesman patter."
+      },
+      "13332": {
+        "name": "Blacksmith",
+        "style": "Proud, no-nonsense royal craftswoman with a sturdy, workmanlike tone."
+      },
+      "13333": {
+        "name": "Spike",
+        "style": "Tough, blunt weapons-dealer who talks up her spiky wares with gruff pride."
+      },
+      "13334": {
+        "name": "Silk Merchant",
+        "style": "Smooth and inviting, with the silky, persuasive patter of a market stall trader."
+      },
+      "13335": {
+        "name": "Fur Merchant",
+        "style": "Warm, inviting market trader's pitch, coaxing you toward her cosy wares."
+      },
+      "13336": {
+        "name": "Gem Merchant",
+        "style": "Eager and smooth, with persuasive sales patter that lights up over anything shiny."
+      },
+      "13337": {
+        "name": "Spice Merchant",
+        "style": "Lively, playful sales patter, talking up wares from mild to mouth-searing."
+      },
+      "13338": {
+        "name": "Baker",
+        "style": "Warm, hearty tradesperson with a chatty, welcoming patter."
+      },
+      "13339": {
+        "name": "Agelus",
+        "style": "Earthy, hearty farm-shop owner; plain-spoken and welcoming, the relaxed warmth of a man used to dirt and hard work."
+      },
+      "13340": {
+        "name": "Floria",
+        "style": "Bubbly and flamboyant, with effusive, stylish flair as she fusses over your look."
+      },
+      "13341": {
+        "name": "Cobado",
+        "style": "Cheerful, eccentric grocer with a playful, slightly absurd patter."
+      },
+      "13342": {
+        "name": "Artima",
+        "style": "Brisk, helpful tradeswoman with a friendly, businesslike manner."
+      },
+      "13344": {
+        "name": "Bartender",
+        "style": "Warm, easygoing and chatty, pouring out friendly banter like a well-practised host."
+      },
+      "13345": {
+        "name": "Bartender",
+        "style": "Easygoing, chatty publican; welcoming and unhurried behind the bar."
+      },
+      "13346": {
+        "name": "Virilis",
+        "style": "Dry and businesslike, the flat, transactional tone of a bone specialist who has seen it all."
+      },
+      "13347": {
+        "name": "Zuma",
+        "style": "Fervent and impassioned, a devout follower's rising, conviction-filled zeal for his faith."
+      },
+      "13400": {
+        "name": "Guild Hunter Fox",
+        "style": "Rugged, capable guild hunter; confident and weathered, the brisk practicality of an outdoorsman who knows his trade."
+      },
+      "13401": {
+        "name": "Marcellus",
+        "style": "Jittery and on edge, anxious mutterings about the frogs he's convinced are out to get him."
+      },
+      "13420": {
+        "name": "Ueman, Teoki of Ralos",
+        "style": "Authoritative high priest of a holy site; grave, commanding and devout, expecting reverence."
+      },
+      "13421": {
+        "name": "Seia, Teoki of Ranul",
+        "style": "Polite but hurried and clipped, devout yet apologetic for having no time to spare."
+      },
+      "13423": {
+        "name": "Hunter guild member",
+        "style": "Outdoorsy and practical, with the brisk, friendly tone of a seasoned guild hand."
+      },
+      "13424": {
+        "name": "Hunter guild member",
+        "style": "Outdoorsy and practical, with the brisk, friendly tone of a seasoned guild hand."
+      },
+      "13426": {
+        "name": "Guild Hunter Fox",
+        "style": "Rugged, capable guild hunter; confident and weathered, the brisk practicality of an outdoorsman who knows his trade."
+      },
+      "13691": {
+        "name": "Prince Itzla Arkan",
+        "style": "Regal and dignified; poised, measured delivery carrying princely authority and self-assurance."
+      },
+      "13693": {
+        "name": "Prince Itzla Arkan",
+        "style": "Regal and dignified; poised, measured delivery carrying princely authority and self-assurance."
+      },
+      "13694": {
+        "name": "Servius, Teokan of Ralos",
+        "style": "Dignified and devout, warm but commanding, the measured gravitas of a high priest."
+      },
+      "13700": {
+        "name": "Felius",
+        "style": "Eager, earnest hopeful, polite and a little nervous to impress."
+      },
+      "13701": {
+        "name": "Caritta",
+        "style": "Eager, hopeful aspirant. Speaks with bright, earnest enthusiasm about joining the order."
+      },
+      "13702": {
+        "name": "Sergius",
+        "style": "Eager, hopeful citizen keen to prove himself, earnest and a little overzealous."
+      },
+      "13703": {
+        "name": "Sergius",
+        "style": "Eager, hopeful citizen keen to prove himself, earnest and a little overzealous."
+      },
+      "13704": {
+        "name": "Nova",
+        "style": "Earnest, eager hopeful. Speaks with bright, hopeful sincerity about joining the order."
+      },
+      "13705": {
+        "name": "Nova",
+        "style": "Earnest, eager hopeful. Speaks with bright, hopeful sincerity about joining the order."
+      },
+      "13706": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13707": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13708": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13709": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13710": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13711": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13712": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13713": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13714": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "13715": {
+        "name": "Forebearer Fides",
+        "style": "Solemn, ceremonious, authoritative cult-elder cadence; commanding and ritualistic."
+      },
+      "13716": {
+        "name": "Forebearer Fides",
+        "style": "Solemn, ceremonious, authoritative cult-elder cadence; commanding and ritualistic."
+      },
+      "13717": {
+        "name": "Metzli, Teokan of Ranul",
+        "style": "Commanding, charismatic and controlled, the persuasive solemnity of a high priestess."
+      },
+      "13718": {
+        "name": "Furia Tullus",
+        "style": "Poised, aristocratic royal servant of noble dynastic heritage; commanding, polished, high-register delivery."
+      },
+      "13719": {
+        "name": "Ennius Tullus",
+        "style": "Measured, formal courtly diction that hardens into zealous, unwavering conviction."
+      },
+      "13720": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13721": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13726": {
+        "name": "Forebearer Vulcan",
+        "style": "Authoritative, commanding leader. Speaks with grave, formal weight and unshakeable conviction."
+      },
+      "13727": {
+        "name": "Forebearer Vulcan",
+        "style": "Authoritative, commanding leader. Speaks with grave, formal weight and unshakeable conviction."
+      },
+      "13729": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13730": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13744": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13745": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13746": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13747": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13748": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13749": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13750": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13751": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13766": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "13767": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13768": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13769": {
+        "name": "Emissary Ascended",
+        "style": "Solemn and zealous, with a devout, formal cadence and the unsettling calm of a true believer."
+      },
+      "13780": {
+        "name": "Tenoch",
+        "style": "Earnest, guarded initiate, measured and careful when questioned."
+      },
+      "13781": {
+        "name": "Silia",
+        "style": "Guarded and evasive, the careful, hushed answers of a wary new initiate."
+      },
+      "13782": {
+        "name": "Adrius",
+        "style": "Earnest, guarded recruit. Speaks carefully and a touch evasively, weighing each answer about his faith and purpose."
+      },
+      "13783": {
+        "name": "Eleuia",
+        "style": "Earnest, freshly-initiated devotee; sincere and a little guarded, answering questions with measured conviction."
+      },
+      "13784": {
+        "name": "Prince Itzla Arkan",
+        "style": "Regal and dignified; poised, measured delivery carrying princely authority and self-assurance."
+      },
+      "13785": {
+        "name": "Prince Itzla Arkan",
+        "style": "Regal and dignified; poised, measured delivery carrying princely authority and self-assurance."
+      },
+      "13786": {
+        "name": "Prince Itzla Arkan",
+        "style": "Regal and dignified; poised, measured delivery carrying princely authority and self-assurance."
+      },
+      "13804": {
+        "name": "Emelio",
+        "style": "Bubbly and passionate about food, selling his kebabs with infectious enthusiasm."
+      },
+      "13806": {
+        "name": "Lelia",
+        "style": "Sharp, businesslike editor. Brisk and discerning, speaking with the clipped authority of someone who decides what's worth printing."
+      },
+      "13807": {
+        "name": "Alba",
+        "style": "Down-to-earth farmer who speaks plainly and practically, weathered and matter-of-fact about hard rural work."
+      },
+      "13808": {
+        "name": "Lucas",
+        "style": "Casual, opinionated foodie; laid-back and ready with a verdict."
+      },
+      "13809": {
+        "name": "Renata",
+        "style": "Casual, food-curious patron; relaxed and conversational, the easy chattiness of someone keen to sample a kebab."
+      },
+      "13810": {
+        "name": "Vincens",
+        "style": "Opinionated and particular, dishing out picky verdicts on the food before him."
+      },
+      "13820": {
+        "name": "Adala",
+        "style": "Warm, eager-to-please helper's patter that masks a sly, quick-tongued opportunist; chatty and disarming."
+      },
+      "13821": {
+        "name": "Adala",
+        "style": "Warm, eager-to-please helper's patter that masks a sly, quick-tongued opportunist; chatty and disarming."
+      },
+      "13822": {
+        "name": "Adala",
+        "style": "Warm, eager-to-please helper's patter that masks a sly, quick-tongued opportunist; chatty and disarming."
+      },
+      "13823": {
+        "name": "Adala",
+        "style": "Warm, eager-to-please helper's patter that masks a sly, quick-tongued opportunist; chatty and disarming."
+      },
+      "13824": {
+        "name": "Adala",
+        "style": "Warm, eager-to-please helper's patter that masks a sly, quick-tongued opportunist; chatty and disarming."
+      },
+      "13825": {
+        "name": "Constantinius",
+        "style": "Gracious, flamboyant host. Warm, charming and effusive, delivering every line like a charismatic showman welcoming guests."
+      },
+      "13826": {
+        "name": "Constantinius",
+        "style": "Gracious, flamboyant host. Warm, charming and effusive, delivering every line like a charismatic showman welcoming guests."
+      },
+      "13827": {
+        "name": "Cozyac",
+        "style": "Relaxed, unhurried tone of a comfortable older man enjoying his retirement."
+      },
+      "13828": {
+        "name": "Cozyac",
+        "style": "Relaxed, unhurried tone of a comfortable older man enjoying his retirement."
+      },
+      "13829": {
+        "name": "Xocotla",
+        "style": "Polished and shrewd, the smooth, calculating poise of a shipping magnate sizing up the room."
+      },
+      "13830": {
+        "name": "Xocotla",
+        "style": "Polished and shrewd, the smooth, calculating poise of a shipping magnate sizing up the room."
+      },
+      "13831": {
+        "name": "Pavo",
+        "style": "Languid and tipsy, an indulgent party-goer drawling through a pleasant haze of drink."
+      },
+      "13832": {
+        "name": "Pavo",
+        "style": "Languid and tipsy, an indulgent party-goer drawling through a pleasant haze of drink."
+      },
+      "13833": {
+        "name": "Head Butler",
+        "style": "Polished, decorous head butler; crisp and formal in service register, yet warmed by earnest pro-worker conviction."
+      },
+      "13834": {
+        "name": "Stradius",
+        "style": "Plodding and slow-witted; dull, self-important delivery of a none-too-bright guard."
+      },
+      "13835": {
+        "name": "Hutza",
+        "style": "Sharp, tough and confident; the firm, capable directness of someone who is both brains and brawn."
+      },
+      "13836": {
+        "name": "Hutza",
+        "style": "Sharp, tough and confident; the firm, capable directness of someone who is both brains and brawn."
+      },
+      "13837": {
+        "name": "Costumer",
+        "style": "Brisk, detail-minded wardrobe hand, helpful and a touch fussy."
+      },
+      "13838": {
+        "name": "Naiatli",
+        "style": "Dramatic, theatrical performer. Projects every line with stagey flourish and emotive grandeur."
+      },
+      "13845": {
+        "name": "Constantinius",
+        "style": "Gracious, flamboyant host. Warm, charming and effusive, delivering every line like a charismatic showman welcoming guests."
+      },
+      "13846": {
+        "name": "Cozyac",
+        "style": "Relaxed, unhurried tone of a comfortable older man enjoying his retirement."
+      },
+      "13847": {
+        "name": "Xocotla",
+        "style": "Polished and shrewd, the smooth, calculating poise of a shipping magnate sizing up the room."
+      },
+      "13848": {
+        "name": "Pavo",
+        "style": "Languid and tipsy, an indulgent party-goer drawling through a pleasant haze of drink."
+      },
+      "13849": {
+        "name": "Stradius",
+        "style": "Plodding and slow-witted; dull, self-important delivery of a none-too-bright guard."
+      },
+      "13850": {
+        "name": "Hutza",
+        "style": "Sharp, tough and confident; the firm, capable directness of someone who is both brains and brawn."
+      },
+      "13883": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13884": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13885": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13886": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13887": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13888": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13889": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13890": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13891": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13892": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13893": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13894": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13895": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13896": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13897": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13898": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13899": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13900": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13901": {
+        "name": "Citizen",
+        "style": "Ordinary everyday townsperson; casual, neighbourly chatter."
+      },
+      "13902": {
+        "name": "Child",
+        "style": "Aloof, easily bored child who answers in short, dismissive, disinterested replies."
+      },
+      "13903": {
+        "name": "Child",
+        "style": "Aloof, easily bored child who answers in short, dismissive, disinterested replies."
+      },
+      "13904": {
+        "name": "Vineyard worker",
+        "style": "Plain, hardworking laborer's tone; earthy and unhurried."
+      },
+      "13905": {
+        "name": "Vineyard worker",
+        "style": "Plain, hardworking laborer's tone; earthy and unhurried."
+      },
+      "13906": {
+        "name": "Vineyard worker",
+        "style": "Plain, hardworking laborer's tone; earthy and unhurried."
+      },
+      "13907": {
+        "name": "Vineyard worker",
+        "style": "Plain, hardworking laborer's tone; earthy and unhurried."
+      },
+      "13908": {
+        "name": "Vineyard foreman",
+        "style": "Earthy and brisk, with the no-nonsense, practical tone of a working overseer."
+      },
+      "13909": {
+        "name": "Well-dressed man",
+        "style": "Smooth, evasive businessman; suave and controlled, with a polished register that hints at veiled menace."
+      },
+      "13911": {
+        "name": "Nasty Nick",
+        "style": "Sly, taunting tone with gleeful menace; toying and mischievous."
+      },
+      "13913": {
+        "name": "Shopkeeper",
+        "style": "Friendly, helpful general-store keeper's tone."
+      },
+      "13914": {
+        "name": "Faustus",
+        "style": "Cheery, proud grocer; persuasive sales patter talking up his produce."
+      },
+      "13915": {
+        "name": "Toci",
+        "style": "Knowledgeable, enthusiastic gem merchant; sharp and proud of her trade."
+      },
+      "13916": {
+        "name": "Antonius",
+        "style": "Polished, knowledgeable connoisseur. Speaks with refined pride and a sommelier's flourish about his wines and the brewery's history."
+      },
+      "13917": {
+        "name": "Bartender",
+        "style": "Warm, convivial barkeep who greets patrons with easy friendly chatter."
+      },
+      "13920": {
+        "name": "Supervisor Lalo",
+        "style": "Brisk and businesslike, with the authoritative, scholarly tone of a society head running the show."
+      },
+      "13921": {
+        "name": "Supervisor Lalo",
+        "style": "Brisk and businesslike, with the authoritative, scholarly tone of a society head running the show."
+      },
+      "13922": {
+        "name": "Meztlan",
+        "style": "Sheepish, slightly grumbling alchemist reduced to tending plants; mutters and rationalises."
+      },
+      "13923": {
+        "name": "Clanila",
+        "style": "Studious and exacting, with the brisk, precise tone of a guarded expert checking your credentials."
+      },
+      "13925": {
+        "name": "Juatil",
+        "style": "Watchful and measured, speaks with careful, analytical calm."
+      },
+      "13926": {
+        "name": "Alaxxi",
+        "style": "Speaks with the precise, measured cadence of a focused alchemist, clipped and matter-of-fact."
+      },
+      "13927": {
+        "name": "Kali",
+        "style": "Inquisitive, sharp, attentive alchemist's delivery."
+      },
+      "13928": {
+        "name": "Bartender",
+        "style": "Warm, hearty publican's banter, jovial and welcoming from behind the bar."
+      },
+      "13929": {
+        "name": "Ichta",
+        "style": "Warm, no-nonsense shopkeeper. Sturdy and direct, with a craftsperson's blunt pride in her wares."
+      },
+      "13930": {
+        "name": "Necto",
+        "style": "Gruff but approachable mining-supply trader; rough-edged yet friendlier than his kin, happy to share old history."
+      },
+      "13931": {
+        "name": "Banker",
+        "style": "Plain, professional and businesslike, clipped and straight to the point."
+      },
+      "13932": {
+        "name": "Banker",
+        "style": "Plain, professional and businesslike, clipped and straight to the point."
+      },
+      "13933": {
+        "name": "Guard",
+        "style": "Terse, stern and gruff, clipped warnings delivered with little warmth."
+      },
+      "13934": {
+        "name": "Guard",
+        "style": "Terse, stern and gruff, clipped warnings delivered with little warmth."
+      },
+      "13935": {
+        "name": "Guard",
+        "style": "Terse, stern and gruff, clipped warnings delivered with little warmth."
+      },
+      "13936": {
+        "name": "Citizen",
+        "style": "Gruff, terse and stern, offering short blunt remarks with little warmth."
+      },
+      "13937": {
+        "name": "Citizen",
+        "style": "Gruff, terse and stern, offering short blunt remarks with little warmth."
+      },
+      "13938": {
+        "name": "Citizen",
+        "style": "Gruff, terse and stern, offering short blunt remarks with little warmth."
+      },
+      "13939": {
+        "name": "Citizen",
+        "style": "Gruff, terse and stern, offering short blunt remarks with little warmth."
+      },
+      "13940": {
+        "name": "Citizen",
+        "style": "Gruff, terse and stern, offering short blunt remarks with little warmth."
+      },
+      "13941": {
+        "name": "Citizen",
+        "style": "Gruff, terse and stern, offering short blunt remarks with little warmth."
+      },
+      "13942": {
+        "name": "Citizen",
+        "style": "Gruff, terse and stern, offering short blunt remarks with little warmth."
+      },
+      "13943": {
+        "name": "Citizen",
+        "style": "Gruff, terse and stern, offering short blunt remarks with little warmth."
+      },
+      "13944": {
+        "name": "Child",
+        "style": "High, childish and a touch dismissive, with blunt little quips and the impatience of a kid who'd rather be elsewhere."
+      },
+      "13945": {
+        "name": "Child",
+        "style": "High, childish and a touch dismissive, with blunt little quips and the impatience of a kid who'd rather be elsewhere."
+      },
+      "13946": {
+        "name": "Child",
+        "style": "High, childish and a touch dismissive, with blunt little quips and the impatience of a kid who'd rather be elsewhere."
+      },
+      "13947": {
+        "name": "Child",
+        "style": "High, childish and a touch dismissive, with blunt little quips and the impatience of a kid who'd rather be elsewhere."
+      },
+      "13948": {
+        "name": "Worker",
+        "style": "Terse, gruff labourer who answers shortly and sternly."
+      },
+      "13949": {
+        "name": "Worker",
+        "style": "Terse, gruff labourer who answers shortly and sternly."
+      },
+      "13950": {
+        "name": "Worker",
+        "style": "Terse, gruff labourer who answers shortly and sternly."
+      },
+      "13951": {
+        "name": "Worker",
+        "style": "Terse, gruff labourer who answers shortly and sternly."
+      },
+      "13952": {
+        "name": "Worker",
+        "style": "Terse, gruff labourer who answers shortly and sternly."
+      },
+      "13953": {
+        "name": "Worker",
+        "style": "Terse, gruff labourer who answers shortly and sternly."
+      },
+      "13954": {
+        "name": "Worker",
+        "style": "Terse, gruff labourer who answers shortly and sternly."
+      },
+      "13955": {
+        "name": "Worker",
+        "style": "Terse, gruff labourer who answers shortly and sternly."
+      },
+      "13956": {
+        "name": "Overseer Khougo",
+        "style": "Gruff but relaxed, with the weary, good-humoured tone of an overseer taking a well-earned break."
+      },
+      "13969": {
+        "name": "Shopkeeper",
+        "style": "Brisk, friendly general-store keeper with a practical, helpful delivery."
+      },
+      "13970": {
+        "name": "Salius",
+        "style": "Confident salesman's patter; proud of his high-quality plate armour."
+      },
+      "13971": {
+        "name": "Salvager",
+        "style": "Scrappy and opportunistic, the rough, hard-bitten patter of a scavenger picking through salvage."
+      },
+      "13972": {
+        "name": "Salvager",
+        "style": "Scrappy and opportunistic, the rough, hard-bitten patter of a scavenger picking through salvage."
+      },
+      "13973": {
+        "name": "Salvager",
+        "style": "Scrappy and opportunistic, the rough, hard-bitten patter of a scavenger picking through salvage."
+      },
+      "13975": {
+        "name": "Salvager",
+        "style": "Scrappy and opportunistic, the rough, hard-bitten patter of a scavenger picking through salvage."
+      },
+      "13976": {
+        "name": "Salvager",
+        "style": "Scrappy and opportunistic, the rough, hard-bitten patter of a scavenger picking through salvage."
+      },
+      "13977": {
+        "name": "Salvager",
+        "style": "Scrappy and opportunistic, the rough, hard-bitten patter of a scavenger picking through salvage."
+      },
+      "13980": {
+        "name": "Izel",
+        "style": "Steady, capable leader with a calm, reassuring authority."
+      },
+      "13982": {
+        "name": "Worm Tongue",
+        "style": "Droll and laid-back, dryly running his agility course with unbothered ease."
+      },
+      "13983": {
+        "name": "Construction Worker",
+        "style": "Gruff, preoccupied labourer; curt and brushing you off."
+      },
+      "13984": {
+        "name": "Antonia",
+        "style": "Brisk, weathered seafarer's banter; friendly and matter-of-fact, the cadence of someone who has called across many a dock."
+      },
+      "13985": {
+        "name": "Antonia",
+        "style": "Brisk, weathered seafarer's banter; friendly and matter-of-fact, the cadence of someone who has called across many a dock."
+      },
+      "13996": {
+        "name": "Taala",
+        "style": "Commanding and organised, the crisp, steady authority of an expedition leader coordinating the camp."
+      },
+      "13997": {
+        "name": "Seer",
+        "style": "Grave, mystical seer who intones portents in a low, foreboding tone."
+      },
+      "13998": {
+        "name": "Marla",
+        "style": "Hearty, brusque camp cook; warm but no-nonsense."
+      },
+      "13999": {
+        "name": "Marla",
+        "style": "Hearty, brusque camp cook; warm but no-nonsense."
+      },
+      "14000": {
+        "name": "Guard",
+        "style": "Stout, gruff, watchful guardsman's tone."
+      },
+      "14001": {
+        "name": "Viero",
+        "style": "Orderly, no-nonsense dwarven guard, firm and gruff."
+      },
+      "14002": {
+        "name": "Viero",
+        "style": "Orderly, no-nonsense dwarven guard, firm and gruff."
+      },
+      "14003": {
+        "name": "Worker",
+        "style": "Hardy and plainspoken, a dwarven labourer's blunt down-to-earth delivery."
+      },
+      "14004": {
+        "name": "Worker",
+        "style": "Hardy and plainspoken, a dwarven labourer's blunt down-to-earth delivery."
+      },
+      "14007": {
+        "name": "Manauia",
+        "style": "Grumpy and irritable, complains in a clipped, put-upon tone."
+      },
+      "14008": {
+        "name": "Seer",
+        "style": "Grave, mystical seer who intones portents in a low, foreboding tone."
+      },
+      "14020": {
+        "name": "Bartender",
+        "style": "Warm, welcoming and chatty, the easy banter of a seasoned barkeep."
+      },
+      "14021": {
+        "name": "Shopkeeper",
+        "style": "Affable, helpful local trader with easy, welcoming patter."
+      },
+      "14022": {
+        "name": "Pilgrim",
+        "style": "Contemplative and serene, the unhurried reflection of a long-distance wanderer."
+      },
+      "14023": {
+        "name": "Ezco, Teoki of Ranul",
+        "style": "Solemn and reverent, speaking of the obelisk and his god with hushed devotional gravity."
+      },
+      "14024": {
+        "name": "Yolotli, Teoki of Ralos",
+        "style": "Solemn, reverent priest; measured and devout, speaking of holy sites with dignified, contemplative gravity."
+      },
+      "14025": {
+        "name": "Worker",
+        "style": "Gruff, weary labourer on a break; blunt, grumbling delivery."
+      },
+      "14029": {
+        "name": "Lucrezia",
+        "style": "Enthusiastic, knowledgeable connoisseur who talks shop with relish."
+      },
+      "14030": {
+        "name": "Ercos",
+        "style": "Earthy, easygoing gardener with a slow, contented manner."
+      },
+      "14033": {
+        "name": "Huberte",
+        "style": "Polite and dainty; soft, well-mannered little voice."
+      },
+      "14034": {
+        "name": "Moxi",
+        "style": "Tiny, chirpy, curious creature-like vocalisations; high and playful."
+      },
+      "14045": {
+        "name": "Huberte",
+        "style": "Polite and dainty; soft, well-mannered little voice."
+      },
+      "14046": {
+        "name": "Moxi",
+        "style": "Tiny, chirpy, curious creature-like vocalisations; high and playful."
+      },
+      "14065": {
+        "name": "Patzi",
+        "style": "Theatrical, flamboyant aspiring actor; grandiose and expressive with dramatic flourish."
+      },
+      "14066": {
+        "name": "Patzi",
+        "style": "Theatrical, flamboyant aspiring actor; grandiose and expressive with dramatic flourish."
+      },
+      "14067": {
+        "name": "Patzi",
+        "style": "Theatrical, flamboyant aspiring actor; grandiose and expressive with dramatic flourish."
+      },
+      "14144": {
+        "name": "The Sage",
+        "style": "Wry, world-weary mystic, dryly resigned beneath faded airs of grandeur."
+      },
+      "14145": {
+        "name": "League Navigator",
+        "style": "Helpful and brisk, the clear, ready cadence of a guide pointing the way to far-off places."
+      },
+      "14208": {
+        "name": "Marcus",
+        "style": "Loose and laid-back, with an easygoing, pub-worn drawl and convivial warmth."
+      },
+      "14209": {
+        "name": "Antos",
+        "style": "Practical, affable working-man patter; busy craftsman who talks while he works."
+      },
+      "14211": {
+        "name": "Antos",
+        "style": "Practical, affable working-man patter; busy craftsman who talks while he works."
+      },
+      "14212": {
+        "name": "Ictus",
+        "style": "Jittery, intense conspiratorial mutterer; eccentric and on-edge."
+      },
+      "14213": {
+        "name": "Aemilia",
+        "style": "Warm, caring maternal tone; homely and earnest, fussing softly over family."
+      },
+      "14214": {
+        "name": "Francis",
+        "style": "Down-to-earth, warm paternal tone; earnest and steady."
+      },
+      "14215": {
+        "name": "Shas",
+        "style": "Young boy; timid, shaky delivery, frightened and unsure."
+      },
+      "14216": {
+        "name": "Shas",
+        "style": "Young boy; timid, shaky delivery, frightened and unsure."
+      },
+      "14218": {
+        "name": "Captain Ariadna",
+        "style": "Firm and commanding, with the clipped, authoritative delivery of someone used to giving orders."
+      },
+      "14219": {
+        "name": "Etz",
+        "style": "A young boy's voice, earnest and a little timid, simple and open."
+      },
+      "14221": {
+        "name": "Etz",
+        "style": "A young boy's voice, earnest and a little timid, simple and open."
+      },
+      "14231": {
+        "name": "Citlalli",
+        "style": "Talkative and a touch flustered, fussing over the imps causing trouble in her basement."
+      },
+      "14232": {
+        "name": "Ecatl",
+        "style": "Mellow and learned; unhurried, contented delivery of a retired mage happy running his mill."
+      },
+      "14241": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "14242": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "14243": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "14244": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "14245": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "14246": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "14247": {
+        "name": "Forebearer Janus",
+        "style": "Grandiose and zealous, a high cult leader's commanding, defiant conviction that bends every word toward his cause."
+      },
+      "14276": {
+        "name": "Prince Itzla Arkan",
+        "style": "Regal and dignified; poised, measured delivery carrying princely authority and self-assurance."
+      },
+      "14285": {
+        "name": "Prince Itzla Arkan",
+        "style": "Regal and dignified; poised, measured delivery carrying princely authority and self-assurance."
+      },
+      "14286": {
+        "name": "Prince Itzla Arkan",
+        "style": "Regal and dignified; poised, measured delivery carrying princely authority and self-assurance."
+      },
+      "14301": {
+        "name": "Captain Vibia",
+        "style": "Crisp, commanding military officer's delivery; disciplined and authoritative."
+      },
+      "14307": {
+        "name": "Servius, Teokan of Ralos",
+        "style": "Dignified and devout, warm but commanding, the measured gravitas of a high priest."
+      },
+      "14313": {
+        "name": "Metzli, Teokan of Ranul",
+        "style": "Commanding, charismatic and controlled, the persuasive solemnity of a high priestess."
+      },
+      "14318": {
+        "name": "Metzli, Teokan of Ranul",
+        "style": "Commanding, charismatic and controlled, the persuasive solemnity of a high priestess."
+      },
+      "14330": {
+        "name": "Furia Tullus",
+        "style": "Poised, aristocratic royal servant of noble dynastic heritage; commanding, polished, high-register delivery."
+      },
+      "14331": {
+        "name": "Ennius Tullus",
+        "style": "Measured, formal courtly diction that hardens into zealous, unwavering conviction."
+      },
+      "14332": {
+        "name": "Ennius Tullus",
+        "style": "Measured, formal courtly diction that hardens into zealous, unwavering conviction."
+      },
+      "14342": {
+        "name": "Galna",
+        "style": "Down-to-earth resident; plain, friendly everyday chatter."
+      },
+      "14374": {
+        "name": "Servius, Teokan of Ralos",
+        "style": "Dignified and devout, warm but commanding, the measured gravitas of a high priest."
+      },
+      "14377": {
+        "name": "Servius, Teokan of Ralos",
+        "style": "Dignified and devout, warm but commanding, the measured gravitas of a high priest."
+      },
+      "14391": {
+        "name": "Tonali Archer",
+        "style": "Stern and terse, the disciplined, watchful clip of a guardian set to defend the crypt."
+      },
+      "14392": {
+        "name": "Tonali Archer",
+        "style": "Stern and terse, the disciplined, watchful clip of a guardian set to defend the crypt."
+      },
+      "14397": {
+        "name": "Tonali Archer",
+        "style": "Stern and terse, the disciplined, watchful clip of a guardian set to defend the crypt."
+      },
+      "14398": {
+        "name": "Tonali Archer",
+        "style": "Stern and terse, the disciplined, watchful clip of a guardian set to defend the crypt."
+      },
+      "14399": {
+        "name": "Tonali Warrior",
+        "style": "Fierce, disciplined guardian. Speaks with hard, martial resolve, terse and battle-ready."
+      },
+      "14400": {
+        "name": "Tonali Warrior",
+        "style": "Fierce, disciplined guardian. Speaks with hard, martial resolve, terse and battle-ready."
+      },
+      "14415": {
+        "name": "Tonali Archer",
+        "style": "Stern and terse, the disciplined, watchful clip of a guardian set to defend the crypt."
+      },
+      "14416": {
+        "name": "Tonali Archer",
+        "style": "Stern and terse, the disciplined, watchful clip of a guardian set to defend the crypt."
+      },
+      "14417": {
+        "name": "Tonali Warrior",
+        "style": "Fierce, disciplined guardian. Speaks with hard, martial resolve, terse and battle-ready."
+      },
+      "14418": {
+        "name": "Tonali Warrior",
+        "style": "Fierce, disciplined guardian. Speaks with hard, martial resolve, terse and battle-ready."
+      },
+      "14435": {
+        "name": "Tonali Archer",
+        "style": "Stern and terse, the disciplined, watchful clip of a guardian set to defend the crypt."
+      },
+      "14437": {
+        "name": "Tonali Warrior",
+        "style": "Fierce, disciplined guardian. Speaks with hard, martial resolve, terse and battle-ready."
+      },
+      "14438": {
+        "name": "Tonali Warrior",
+        "style": "Fierce, disciplined guardian. Speaks with hard, martial resolve, terse and battle-ready."
+      },
+      "14455": {
+        "name": "Tonali Warrior",
+        "style": "Fierce, disciplined guardian. Speaks with hard, martial resolve, terse and battle-ready."
+      },
+      "14456": {
+        "name": "Tonali Warrior",
+        "style": "Fierce, disciplined guardian. Speaks with hard, martial resolve, terse and battle-ready."
+      },
+      "14475": {
+        "name": "Alan",
+        "style": "Eccentric, over-familiar chatterer who rambles with manic, scattered enthusiasm and lurches between topics."
+      },
+      "14476": {
+        "name": "Alan",
+        "style": "Eccentric, over-familiar chatterer who rambles with manic, scattered enthusiasm and lurches between topics."
+      },
+      "14477": {
+        "name": "Alan",
+        "style": "Eccentric, over-familiar chatterer who rambles with manic, scattered enthusiasm and lurches between topics."
+      },
+      "14487": {
+        "name": "Humphrey Dumphrey",
+        "style": "Mostly silent and bashful, a shy, sunny little presence reluctant to come out of its shell."
+      },
+      "14496": {
+        "name": "King",
+        "style": "Sharp, street-smart and quick-witted, the confident patter of a savvy bartender."
+      },
+      "14503": {
+        "name": "Nezketi",
+        "style": "Easygoing and mellow, speaks in a relaxed, tea-loving drawl."
+      },
+      "14504": {
+        "name": "Kauayotl",
+        "style": "Confident go-getter; brash and self-assured, the breezy bravado of a man sure he can get anything done."
+      },
+      "14505": {
+        "name": "Acatzin",
+        "style": "Speaks with brisk, single-minded focus, every word aimed squarely at the task in front of him."
+      },
+      "14506": {
+        "name": "Nezketi",
+        "style": "Easygoing and mellow, speaks in a relaxed, tea-loving drawl."
+      },
+      "14507": {
+        "name": "Kauayotl",
+        "style": "Confident go-getter; brash and self-assured, the breezy bravado of a man sure he can get anything done."
+      },
+      "14508": {
+        "name": "Acatzin",
+        "style": "Speaks with brisk, single-minded focus, every word aimed squarely at the task in front of him."
+      },
+      "14509": {
+        "name": "Blacksmith",
+        "style": "Gruff, busy craftsman. Terse and distracted, words clipped short between the clang of the forge."
+      },
+      "14514": {
+        "name": "Aub",
+        "style": "Easygoing and earthy, the unhurried warmth of a gardener happy among her trees."
+      },
+      "14515": {
+        "name": "Tziuhtla",
+        "style": "Earthy, nurturing and easygoing, the warm patience of a green-fingered gardener."
+      },
+      "14516": {
+        "name": "Ehecatl",
+        "style": "Easygoing, earthy gardener's delivery; friendly and unhurried."
+      },
+      "14519": {
+        "name": "Dom",
+        "style": "Tiny, impish and otherworldly, playful little growls and chirps with a hint of menace."
+      },
+      "14529": {
+        "name": "Mountain Guide",
+        "style": "Hearty and reassuring, with the confident, sure-footed tone of a seasoned mountain guide."
+      },
+      "14577": {
+        "name": "Ranulph",
+        "style": "Pensive and soft-spoken, with the contemplative, musing cadence of someone lost in thought."
+      },
+      "14578": {
+        "name": "Ranulph",
+        "style": "Pensive and soft-spoken, with the contemplative, musing cadence of someone lost in thought."
+      },
+      "14580": {
+        "name": "Isadora",
+        "style": "Bright, curious child; eager and questioning, full of wonder."
+      },
+      "14581": {
+        "name": "Isadora",
+        "style": "Bright, curious child; eager and questioning, full of wonder."
+      },
+      "14582": {
+        "name": "Ranulph",
+        "style": "Pensive and soft-spoken, with the contemplative, musing cadence of someone lost in thought."
+      },
+      "14646": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk; casual and unremarkable, the plain everyday delivery of common city folk going about their day."
+      },
+      "14647": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk; casual and unremarkable, the plain everyday delivery of common city folk going about their day."
+      },
+      "14648": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk; casual and unremarkable, the plain everyday delivery of common city folk going about their day."
+      },
+      "14649": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk; casual and unremarkable, the plain everyday delivery of common city folk going about their day."
+      },
+      "14650": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk; casual and unremarkable, the plain everyday delivery of common city folk going about their day."
+      },
+      "14651": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk; casual and unremarkable, the plain everyday delivery of common city folk going about their day."
+      },
+      "14652": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk; casual and unremarkable, the plain everyday delivery of common city folk going about their day."
+      },
+      "14653": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk; casual and unremarkable, the plain everyday delivery of common city folk going about their day."
+      },
+      "14654": {
+        "name": "Child",
+        "style": "Bored and dismissive, curt clipped replies that make clear talking to you is a chore."
+      },
+      "14655": {
+        "name": "Child",
+        "style": "Bored and dismissive, curt clipped replies that make clear talking to you is a chore."
+      },
+      "14656": {
+        "name": "Shopkeeper",
+        "style": "Chipper and helpful, the ready, upbeat patter of a general-store merchant keen to make a sale."
+      },
+      "14657": {
+        "name": "Lunami",
+        "style": "Hearty, no-nonsense vendor, blunt and sturdy like the axes she sells."
+      },
+      "14658": {
+        "name": "Sebamo",
+        "style": "Jovial staff-shop merchant; chipper and playful, peppering his pitch with cheeky wordplay and warm salesmanship."
+      },
+      "14659": {
+        "name": "Sawmill Operator",
+        "style": "Practical, plain-spoken tradesman. Matter-of-fact and unhurried about his planks and tools."
+      },
+      "14660": {
+        "name": "Bartender",
+        "style": "Affable, easygoing barkeep; warm and chatty, the relaxed patter of a publican happy to pour you a drink."
+      },
+      "14661": {
+        "name": "Bartender",
+        "style": "Easygoing, talkative barkeep, conversational and happy to spin a long yarn."
+      },
+      "14662": {
+        "name": "Chouani",
+        "style": "Brisk, no-nonsense tradeswoman; clipped and businesslike with the bluntness of a busy tanner."
+      },
+      "14671": {
+        "name": "Banker",
+        "style": "Crisp, courteous and efficient, the polished tone of a busy bank teller."
+      },
+      "14672": {
+        "name": "Banker",
+        "style": "Crisp, courteous and efficient, the polished tone of a busy bank teller."
+      },
+      "14673": {
+        "name": "Banker",
+        "style": "Crisp, courteous and efficient, the polished tone of a busy bank teller."
+      },
+      "14674": {
+        "name": "Banker",
+        "style": "Crisp, courteous and efficient, the polished tone of a busy bank teller."
+      },
+      "14675": {
+        "name": "Dominicus, Teoki of Ranul",
+        "style": "Reverent priest tending a holy site, grave and contemplative with hushed solemnity."
+      },
+      "14676": {
+        "name": "Litlihui, Teoki of Ralos",
+        "style": "Devout and serene; calm, reverent delivery befitting a priestess of Ralos."
+      },
+      "14677": {
+        "name": "Diana",
+        "style": "Studious, measured naturalist who speaks like she's dictating careful field notes."
+      },
+      "14678": {
+        "name": "Taz",
+        "style": "Relaxed, mellow observer; inviting and easygoing while watching the ents."
+      },
+      "14679": {
+        "name": "Ocuil",
+        "style": "Curious, musing ponderer; casual and idly thinking aloud."
+      },
+      "14680": {
+        "name": "Toch",
+        "style": "High, curious and wide-eyed, with eager childish chatter full of innocent wonder."
+      },
+      "14683": {
+        "name": "Ghost",
+        "style": "Mournful, wispy and ethereal. Words drift out faint and forlorn, echoing from beyond."
+      },
+      "14684": {
+        "name": "Jasper",
+        "style": "Eccentric collector who chatters eagerly about his shiny finds and trinkets."
+      },
+      "14685": {
+        "name": "Bernard",
+        "style": "Bright and plucky, brimming with chipper, can-do enthusiasm for the next adventure."
+      },
+      "14687": {
+        "name": "Bernard",
+        "style": "Bright and plucky, brimming with chipper, can-do enthusiasm for the next adventure."
+      },
+      "14688": {
+        "name": "Adrinus",
+        "style": "Speaks softly and solemnly, with the hushed, mournful reverence of a man keeping vigil over a grave.",
+        "pace": "slow"
+      },
+      "14692": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14693": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14694": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14695": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14696": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14697": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14698": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14699": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14700": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14701": {
+        "name": "Border Guard",
+        "style": "Brusque, officious checkpoint authority; clipped and by-the-book."
+      },
+      "14724": {
+        "name": "Xopanatl, Teoki of Ralos",
+        "style": "Solemn, devout priest. Speaks in slow, reverent, ceremonial tones in service to the sun god."
+      },
+      "14725": {
+        "name": "Nenetl, Teoki of Ranul",
+        "style": "Hushed and solemn, watchful devout phrasing fitting a keeper of the crypt."
+      },
+      "14726": {
+        "name": "Jatziri, Teoki of Ralos",
+        "style": "Calm, devout and gentle, the warm steady tone of a temple priestess."
+      },
+      "14727": {
+        "name": "Achilka",
+        "style": "Warm, easygoing ferrywoman with a chatty, welcoming lilt and an unhurried, sing-song cadence as she names off her stops."
+      },
+      "14728": {
+        "name": "Achilka",
+        "style": "Warm, easygoing ferrywoman with a chatty, welcoming lilt and an unhurried, sing-song cadence as she names off her stops."
+      },
+      "14729": {
+        "name": "Achilka",
+        "style": "Warm, easygoing ferrywoman with a chatty, welcoming lilt and an unhurried, sing-song cadence as she names off her stops."
+      },
+      "14733": {
+        "name": "Xilo",
+        "style": "Warm and earnest, with a gently hopeful lilt and a patient, longing quality."
+      },
+      "14736": {
+        "name": "Fabia",
+        "style": "Warm and earnest, with a soft, hopeful lilt and a dreamy, lingering quality."
+      },
+      "14737": {
+        "name": "Bard",
+        "style": "Theatrical, lyrical entertainer. Speaks with a performer's flourish and musical cadence, ever ready to break into song."
+      },
+      "14738": {
+        "name": "Bard",
+        "style": "Theatrical, lyrical entertainer. Speaks with a performer's flourish and musical cadence, ever ready to break into song."
+      },
+      "14739": {
+        "name": "Bard",
+        "style": "Theatrical, lyrical entertainer. Speaks with a performer's flourish and musical cadence, ever ready to break into song."
+      },
+      "14740": {
+        "name": "Kiyahtla",
+        "style": "Grandiloquent eccentric who speaks in florid, ornate, overwrought vocabulary, every sentence theatrically verbose."
+      },
+      "14741": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk with casual, everyday conversational delivery."
+      },
+      "14742": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk with casual, everyday conversational delivery."
+      },
+      "14743": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk with casual, everyday conversational delivery."
+      },
+      "14744": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk with casual, everyday conversational delivery."
+      },
+      "14745": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk with casual, everyday conversational delivery."
+      },
+      "14746": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk with casual, everyday conversational delivery."
+      },
+      "14747": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk with casual, everyday conversational delivery."
+      },
+      "14748": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk with casual, everyday conversational delivery."
+      },
+      "14749": {
+        "name": "Child",
+        "style": "Short, dismissive and uninterested, the bored shrug of a kid who'd rather be anywhere else."
+      },
+      "14750": {
+        "name": "Child",
+        "style": "Short, dismissive and uninterested, the bored shrug of a kid who'd rather be anywhere else."
+      },
+      "14751": {
+        "name": "Farmer",
+        "style": "Plain, hearty rural worker's voice; down-to-earth and unfussy."
+      },
+      "14752": {
+        "name": "Farmer",
+        "style": "Plain, hearty rural worker's voice; down-to-earth and unfussy."
+      },
+      "14753": {
+        "name": "Farmer",
+        "style": "Plain, hearty rural worker's voice; down-to-earth and unfussy."
+      },
+      "14754": {
+        "name": "Farmer",
+        "style": "Plain, hearty rural worker's voice; down-to-earth and unfussy."
+      },
+      "14759": {
+        "name": "Fisher",
+        "style": "Weary working tone, grumbling good-naturedly about the endless haul of the day's catch."
+      },
+      "14760": {
+        "name": "Shopkeeper",
+        "style": "Brisk, friendly general-store keeper; efficient and welcoming, the practiced patter of a small-town merchant."
+      },
+      "14761": {
+        "name": "Ameyalli",
+        "style": "Warm, chatty local shopkeeper, easy and welcoming."
+      },
+      "14762": {
+        "name": "Sulisal",
+        "style": "Cheery and eager, an upbeat shopkeeper keen to kit you out for a day of fishing."
+      },
+      "14763": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk chatter; casual, unremarkable everyday tone."
+      },
+      "14764": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk chatter; casual, unremarkable everyday tone."
+      },
+      "14765": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk chatter; casual, unremarkable everyday tone."
+      },
+      "14766": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk chatter; casual, unremarkable everyday tone."
+      },
+      "14767": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk chatter; casual, unremarkable everyday tone."
+      },
+      "14768": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk chatter; casual, unremarkable everyday tone."
+      },
+      "14769": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk chatter; casual, unremarkable everyday tone."
+      },
+      "14770": {
+        "name": "Citizen",
+        "style": "Ordinary townsfolk chatter; casual, unremarkable everyday tone."
+      },
+      "14771": {
+        "name": "Child",
+        "style": "Short, dismissive, easily-bored childlike replies; curt and uninterested."
+      },
+      "14772": {
+        "name": "Child",
+        "style": "Short, dismissive, easily-bored childlike replies; curt and uninterested."
+      },
+      "14773": {
+        "name": "Farmer",
+        "style": "Humble and plain-spoken, the unpolished, homely cadence of a man tending his chickens."
+      },
+      "14774": {
+        "name": "Xochitl",
+        "style": "Bright, passionate dye merchant; chatty about colour and craft."
+      },
+      "14775": {
+        "name": "Teicuh",
+        "style": "Brisk arcane-goods merchant; matter-of-fact and capable, the assured tone of a rune-shop proprietor."
+      },
+      "14776": {
+        "name": "Arcuani",
+        "style": "Brisk, enthusiastic shop patter from a tradesman who clearly loves his bows and arrows."
+      },
+      "14777": {
+        "name": "Shopkeeper",
+        "style": "Easygoing shopkeeper's patter; friendly and obliging."
+      },
+      "14778": {
+        "name": "Banker",
+        "style": "Polite and professional with a dry, self-deprecating wit about her tiny little branch."
+      },
+      "14781": {
+        "name": "Ru Merald",
+        "style": "Enthusiastic archaeologist; eager and knowledgeable, happy to point the way."
+      },
+      "14782": {
+        "name": "Ru Merald",
+        "style": "Enthusiastic archaeologist; eager and knowledgeable, happy to point the way."
+      },
+      "14785": {
+        "name": "Dom",
+        "style": "Tiny, impish and otherworldly, playful little growls and chirps with a hint of menace."
+      },
+      "15370": {
+        "name": "Shipwright Sennia",
+        "style": "Salty, practical boatwright, confident and matter-of-fact."
+      },
+      "15372": {
+        "name": "Shipwright Silas",
+        "style": "Salty and practical, full of gruff seafaring know-how about boats and ports."
+      },
+      "15377": {
+        "name": "Shipwright Silrien",
+        "style": "Practical and assured, with the knowledgeable, melodic tone of a capable shipwright."
+      },
+      "15606": {
+        "name": "Floria",
+        "style": "Bubbly and flamboyant, with effusive, stylish flair as she fusses over your look."
+      },
+      "15607": {
+        "name": "Floria",
+        "style": "Bubbly and flamboyant, with effusive, stylish flair as she fusses over your look."
+      },
+      "15637": {
+        "name": "Demon butler",
+        "style": "Impeccably polite servant with a deep, formal butler's diction. Crisp, deferential and a touch droll."
+      },
+      "15646": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15647": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15648": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15649": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15650": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15651": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15652": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15653": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15654": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15655": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15656": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15657": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15658": {
+        "name": "Imp",
+        "style": "High, squeaky, mischievous little voice, gleeful and scheming."
+      },
+      "15663": {
+        "name": "Judge of Yama",
+        "style": "Booming, imperious and menacing, pronouncing judgement with cold infernal authority."
+      },
+      "15664": {
+        "name": "Demon scholar",
+        "style": "Cold, scholarly intensity; clipped intellect with menacing undercurrent."
+      },
+      "15665": {
+        "name": "Demon scholar",
+        "style": "Cold, scholarly intensity; clipped intellect with menacing undercurrent."
+      },
+      "23757": {
+        "name": "Youngllef",
+        "style": "Feral, otherworldly young crystal beast with skittish, growly vocalisations."
+      },
+      "23759": {
+        "name": "Youngllef",
+        "style": "Feral, otherworldly young crystal beast with skittish, growly vocalisations."
+      },
+      "23760": {
+        "name": "Smolcano",
+        "style": "Tiny molten creature; playful little rumbles and crackles, more sound than speech."
+      },
+      "28248": {
+        "name": "Butch",
+        "style": "Wordless, guttural little growls and snarls; an ominous, menacing presence rather than real speech."
+      },
+      "28960": {
+        "name": "Smol heredit",
+        "style": "Tiny but swaggering little gladiator. Boastful and gruff in a small, scrappy way."
+      },
+      "28962": {
+        "name": "Quetzin",
+        "style": "A small bird's wordless chirps and trills, with no real speech at all."
+      },
+      "30152": {
+        "name": "Huberte",
+        "style": "Polite and dainty; soft, well-mannered little voice."
+      },
+      "30154": {
+        "name": "Moxi",
+        "style": "Tiny, chirpy, curious creature-like vocalisations; high and playful."
+      },
+      "30970": {
+        "name": "Humphrey Dumphrey",
+        "style": "Mostly silent and bashful, a shy, sunny little presence reluctant to come out of its shell."
+      },
+      "31130": {
+        "name": "Dom",
+        "style": "Tiny, impish and otherworldly, playful little growls and chirps with a hint of menace."
+      },
+      "7780": {
+        "name": "Islwyn",
+        "style": "A courteous, measured elven bowyer; speaks with the calm pride of a master craftsman attending to his trade."
+      },
+      "8675": {
+        "name": "Islwyn",
+        "style": "A courteous, measured elven bowyer; speaks with the calm pride of a master craftsman attending to his trade."
+      },
+      "8808": {
+        "name": "Lord Baxtorian Cadarn",
+        "style": "Speaks with the grave, commanding authority of a former king; stately and dignified, every word weighted with old-world gravitas."
+      },
+      "8809": {
+        "name": "Lord Baxtorian Cadarn",
+        "style": "Speaks with the grave, commanding authority of a former king; stately and dignified, every word weighted with old-world gravitas."
+      },
+      "8810": {
+        "name": "Lord Baxtorian Cadarn",
+        "style": "Speaks with the grave, commanding authority of a former king; stately and dignified, every word weighted with old-world gravitas."
+      },
+      "8811": {
+        "name": "Lord Baxtorian Cadarn",
+        "style": "Speaks with the grave, commanding authority of a former king; stately and dignified, every word weighted with old-world gravitas."
+      },
+      "8812": {
+        "name": "Lord Baxtorian Cadarn",
+        "style": "Speaks with the grave, commanding authority of a former king; stately and dignified, every word weighted with old-world gravitas."
+      },
+      "8813": {
+        "name": "Lord Baxtorian Cadarn",
+        "style": "Speaks with the grave, commanding authority of a former king; stately and dignified, every word weighted with old-world gravitas."
+      },
+      "8818": {
+        "name": "Islwyn",
+        "style": "A courteous, measured elven bowyer; speaks with the calm pride of a master craftsman attending to his trade."
+      },
+      "8819": {
+        "name": "Islwyn",
+        "style": "A courteous, measured elven bowyer; speaks with the calm pride of a master craftsman attending to his trade."
+      },
+      "8821": {
+        "name": "Islwyn",
+        "style": "A courteous, measured elven bowyer; speaks with the calm pride of a master craftsman attending to his trade."
+      },
+      "8822": {
+        "name": "Islwyn",
+        "style": "A courteous, measured elven bowyer; speaks with the calm pride of a master craftsman attending to his trade."
+      },
+      "8823": {
+        "name": "Islwyn",
+        "style": "A courteous, measured elven bowyer; speaks with the calm pride of a master craftsman attending to his trade."
+      },
+      "9120": {
+        "name": "Lord Baxtorian Cadarn",
+        "style": "Speaks with the grave, commanding authority of a former king; stately and dignified, every word weighted with old-world gravitas."
+      },
+      "9146": {
+        "name": "Islwyn",
+        "style": "A courteous, measured elven bowyer; speaks with the calm pride of a master craftsman attending to his trade."
+      },
+      "13876": {
+        "name": "Seer",
+        "style": "Speaks in clipped, aloof tones; a secretive mystic who answers in as few words as possible and wants to be left in peace."
+      },
+      "13910": {
+        "name": "Cabbage Farmer",
+        "style": "An earnest, hearty farmer who speaks with cheerful gusto about his crops, prone to loud, dramatic exclamation."
+      },
+      "14227": {
+        "name": "Hugh",
+        "style": "Speaks in a weak, strained voice, breaking in haltingly and short of breath; an ordinary working man."
+      },
+      "14228": {
+        "name": "Hugh",
+        "style": "Speaks in a weak, strained voice, breaking in haltingly and short of breath; an ordinary working man."
+      },
+      "14229": {
+        "name": "Hugh",
+        "style": "Speaks in a weak, strained voice, breaking in haltingly and short of breath; an ordinary working man."
+      },
+      "14346": {
+        "name": "Highlord Katlo",
+        "style": "Speaks as a proud, authoritative ruler of his people; gruff and dignified, with the measured weight of one used to being obeyed."
+      },
+      "14347": {
+        "name": "Highlord Katlo",
+        "style": "Speaks as a proud, authoritative ruler of his people; gruff and dignified, with the measured weight of one used to being obeyed."
+      },
+      "14348": {
+        "name": "Highlord Katlo",
+        "style": "Speaks as a proud, authoritative ruler of his people; gruff and dignified, with the measured weight of one used to being obeyed."
       }
     }
   },
@@ -22014,12 +25885,11 @@
     "2040": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "tirannwn"
+      "ethnicity": "kandarin"
     },
     "2041": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "2042": {
       "race": "Human",
@@ -27605,7 +31475,8 @@
     },
     "3413": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kandarin"
     },
     "3414": {
       "race": "Elf",
@@ -45094,7 +48965,7 @@
     "7911": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "varlamore"
+      "ethnicity": "kourend"
     },
     "7912": {
       "race": "Human",
@@ -48338,54 +52209,44 @@
       "ethnicity": "tirannwn"
     },
     "8775": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8776": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8777": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8778": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8779": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8780": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8781": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8782": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8783": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8784": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "race": "Elf",
+      "gender": "Female"
     },
     "8791": {
       "race": "Human",
@@ -49180,7 +53041,8 @@
     },
     "8976": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kandarin"
     },
     "8978": {
       "race": "Human",
@@ -49188,38 +53050,31 @@
     },
     "8979": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "8980": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "8981": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "8982": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "8983": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "8984": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "8985": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "8986": {
       "race": "Human",
@@ -49245,8 +53100,7 @@
     },
     "8991": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "tirannwn"
+      "gender": "Female"
     },
     "8992": {
       "race": "Human",
@@ -50224,8 +54078,7 @@
     },
     "9196": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "tirannwn"
+      "gender": "Male"
     },
     "9197": {
       "race": "Human",
@@ -63446,13 +67299,13 @@
     },
     "12644": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "fremennik"
+      "gender": "Female",
+      "ethnicity": "misthalin"
     },
     "12645": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "fremennik"
+      "gender": "Female",
+      "ethnicity": "misthalin"
     },
     "12646": {
       "race": "Human",
@@ -63990,7 +67843,7 @@
     },
     "12766": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "12767": {
@@ -64176,7 +68029,7 @@
     },
     "12809": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "12810": {
@@ -64378,12 +68231,12 @@
     },
     "12862": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "12865": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "12869": {
@@ -64780,8 +68633,7 @@
     },
     "12955": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "12956": {
       "race": "Human",
@@ -64790,8 +68642,7 @@
     },
     "12957": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "12958": {
       "race": "Human",
@@ -65610,12 +69461,12 @@
     },
     "13135": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13136": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13137": {
@@ -65736,22 +69587,22 @@
     "13160": {
       "race": "Human",
       "gender": "Female",
-      "ethnicity": "varlamore"
+      "ethnicity": "fremennik"
     },
     "13161": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "varlamore"
+      "ethnicity": "fremennik"
     },
     "13162": {
       "race": "Human",
       "gender": "Female",
-      "ethnicity": "varlamore"
+      "ethnicity": "fremennik"
     },
     "13163": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "varlamore"
+      "ethnicity": "fremennik"
     },
     "13164": {
       "race": "Human",
@@ -65965,23 +69816,19 @@
     },
     "13206": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "13207": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "13208": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "13209": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "13210": {
       "race": "Human",
@@ -65990,8 +69837,7 @@
     },
     "13211": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "13212": {
       "race": "Human",
@@ -66549,7 +70395,7 @@
     },
     "13332": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13333": {
@@ -66589,7 +70435,7 @@
     },
     "13340": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13341": {
@@ -66726,17 +70572,17 @@
     },
     "13421": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13423": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13424": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13425": {
@@ -68808,7 +72654,7 @@
     },
     "13926": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "13927": {
@@ -69517,14 +73363,12 @@
       "gender": "Male"
     },
     "14144": {
-      "race": "Demon",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "race": "Wizard",
+      "gender": "Male"
     },
     "14145": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "14146": {
       "race": "Demon",
@@ -70288,18 +74132,15 @@
     },
     "14475": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "14476": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "14477": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "gender": "Male"
     },
     "14487": {
       "race": "Human",
@@ -70338,7 +74179,7 @@
     },
     "14496": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14503": {
@@ -70404,9 +74245,8 @@
       "ethnicity": "varlamore"
     },
     "14519": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "race": "Demon",
+      "gender": "Male"
     },
     "14520": {
       "race": "Human",
@@ -70894,17 +74734,17 @@
     },
     "14676": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14677": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14678": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14679": {
@@ -71098,27 +74938,27 @@
     },
     "14725": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14726": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14727": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14728": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14729": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14730": {
@@ -71133,7 +74973,7 @@
     },
     "14736": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "14737": {
@@ -71363,9 +75203,8 @@
       "ethnicity": "varlamore"
     },
     "14785": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "race": "Demon",
+      "gender": "Male"
     },
     "14788": {
       "race": "Demon",
@@ -74187,12 +78026,12 @@
     },
     "15606": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "15607": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "varlamore"
     },
     "15609": {
@@ -75425,9 +79264,8 @@
       "ethnicity": "varlamore"
     },
     "31130": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "varlamore"
+      "race": "Demon",
+      "gender": "Male"
     },
     "31225": {
       "race": "Human",
