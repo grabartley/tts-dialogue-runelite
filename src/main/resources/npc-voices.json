@@ -25,20 +25,20 @@
     "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key, so regenerating the table preserves it. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise, and nothing should ever sound American. Resolution is LAYERED and each layer overrides only the fields it specifies, deepest layer wins: default -> byRace[race] -> first byCategory whose keyword matches the display name -> byId[npcId]. 'default' must be complete (all four fields); every other layer is sparse. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character (usually 'name' + 'style'); accent/pace are inherited unless the character genuinely differs. byId is filled in over successive batches; unmatched NPCs still get a solid profile from the category/race/default layers.",
     "default": {
       "name": "Gielinor Commoner",
-      "accent": "British English, Received Pronunciation, as heard in southern England.",
+      "accent": "Common British English, the plain, earthy speech of an ordinary medieval peasant or townsperson, not posh or refined.",
       "style": "A grounded medieval fantasy townsperson. Plain, sincere, and natural, with the easy warmth of someone going about their day.",
       "pace": "Steady and conversational, with natural pauses at the punctuation."
     },
     "player": {
       "name": "Adventurer",
-      "accent": "British English, Received Pronunciation, as heard in southern England.",
-      "style": "A seasoned medieval fantasy adventurer: brave, resolute, and well-spoken, carrying the quiet confidence of someone who has seen the whole of Gielinor.",
+      "accent": "Common British English, the plain, down-to-earth speech of an ordinary adventurer, not posh or refined.",
+      "style": "A seasoned medieval fantasy adventurer: brave and resolute, carrying the quiet confidence of someone who has seen the whole of Gielinor.",
       "pace": "Even and assured, unhurried but purposeful."
     },
     "byRace": {
       "Human": {
         "name": "Gielinor Townsfolk",
-        "accent": "British English, Received Pronunciation, as heard in southern England.",
+        "accent": "Common British English, the plain, earthy speech of an ordinary medieval commoner, not posh or refined.",
         "style": "An ordinary citizen of Gielinor. Down-to-earth, sincere, and approachable.",
         "pace": "Steady and conversational."
       },
@@ -132,8 +132,8 @@
           "peer the seer"
         ],
         "name": "Fremennik",
-        "accent": "Scandinavian English, a Norwegian accent.",
-        "style": "A hardy Fremennik warrior of the frozen north. Proud, hearty, and weathered, bred to sea, axe, and saga.",
+        "accent": "A fantasy Norse accent, a Scandinavian-flavoured English in the manner of a Viking warrior from the old sagas.",
+        "style": "A hardy Fremennik Viking of the frozen north. Proud, hearty, and weathered, bred to longship, axe, and saga.",
         "pace": "Strong and steady, robust and deliberate."
       },
       {
@@ -277,17 +277,35 @@
         "id": "knight",
         "keywords": [
           "knight",
-          "guard",
-          "soldier",
-          "sergeant",
-          "captain",
           "paladin",
-          "squire"
+          "squire",
+          "templar",
+          "sir"
         ],
-        "name": "Man-at-Arms",
-        "accent": "Stern, clipped British English, a disciplined military bearing.",
-        "style": "A hardened soldier or knight. Firm, dutiful, and to the point, used to giving and taking orders.",
-        "pace": "Brisk and clipped, crisp and businesslike."
+        "name": "Knight",
+        "accent": "Stern, well-bred British English (Received Pronunciation), the proper accent of a chivalric officer.",
+        "style": "A noble knight of the realm. Honourable, disciplined, and gallant, every word weighted with chivalric duty.",
+        "pace": "Firm and measured, crisp and commanding."
+      },
+      {
+        "id": "noble",
+        "keywords": [
+          "lord",
+          "lady",
+          "baron",
+          "baroness",
+          "count",
+          "countess",
+          "advisor",
+          "chancellor",
+          "steward",
+          "dame",
+          "noble"
+        ],
+        "name": "Noble",
+        "accent": "Refined, well-bred British English (Received Pronunciation), the polished accent of the aristocracy.",
+        "style": "A highborn aristocrat of the realm. Polished, urbane, and self-assured, accustomed to deference.",
+        "pace": "Measured and composed."
       }
     ],
     "byId": {
