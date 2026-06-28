@@ -98,7 +98,7 @@ local-only correction, or to pin a talkable monster the wiki splits into
 ```
 
 The optional `name` field is documentation only. `ethnicity` is also optional (set a byEthnicity key, or omit to clear a wrong one). Find
-an NPC's id with the RuneLite developer tools, the wiki, or **Debug Mode** in the
+an NPC's id with the RuneLite developer tools, the wiki, or **Debug Logging** in the
 plugin (it logs the id and chosen voice/profile per line).
 
 ## Character voice profiles (cloud)

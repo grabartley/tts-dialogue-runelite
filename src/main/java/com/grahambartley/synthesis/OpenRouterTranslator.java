@@ -19,7 +19,7 @@ import okhttp3.ResponseBody;
  * OpenRouter's chat-completions endpoint and the Gemini Flash Lite model.
  *
  * <p>This is the optional first hop of the cloud pipeline: {@link OpenRouterTtsBackend} calls it
- * only when {@link TTSDialogueConfig#targetLanguage()} is not English, so the common case pays no
+ * only when {@link TTSDialogueConfig#cloudLanguage()} is not English, so the common case pays no
  * extra request. The system prompt is a fixed per-language constant (all per-line variance lives in
  * the user message) so the cacheable prefix is byte-identical across calls and the model's implicit
  * prompt cache hits; the instruction preserves proper nouns, place names, item names, and OSRS

@@ -61,6 +61,6 @@ tool like [zwyz/osrs-cache](https://github.com/zwyz/osrs-cache).
 
 ### Verifying an id in the field
 
-Enable **Debug Mode**; each line logs `resolved emotion <E> for head animation <id>`. Cross-check the
+Enable **Debug Logging**; each line logs `resolved emotion <E> for head animation <id>`. Cross-check the
 `<id>` against `seqtypes.txt`: if its name carries an emotion word that isn't mapped yet, add it.
 `mcp-osrs`'s `search_seqtypes` (or a plain `grep '^<id>\t' seqtypes.txt`) confirms what any id is.

@@ -205,7 +205,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     if (speed != 100) {
       variant.append("|s").append(speed);
     }
-    int cap = config.maxCloudCharsPerLine();
+    int cap = config.cloudMaxChars();
     String text = request.text();
     if (cap > 0 && text != null && text.length() > cap) {
       variant.append("|c").append(cap);
@@ -244,13 +244,13 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
    * English; the no-op quirk leaves the language untouched.
    */
   String effectiveSpokenLanguage() {
-    return combineLanguage(config.targetLanguage(), config.globalQuirk());
+    return combineLanguage(config.cloudLanguage(), config.cloudSpeakingStyle());
   }
 
   /**
    * Appends a non-empty quirk phrase to the (blank-safe) base language, e.g. "French pirate speak".
    */
-  static String combineLanguage(String language, TTSDialogueConfig.GlobalQuirk quirk) {
+  static String combineLanguage(String language, TTSDialogueConfig.SpeakingStyle quirk) {
     String base = language == null || language.trim().isEmpty() ? "English" : language.trim();
     if (quirk == null || quirk.isNone()) {
       return base;
@@ -266,7 +266,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     }
     String key = config.openRouterApiKey().trim();
     String voice = voiceMap.voiceFor(request.voice());
-    String cappedText = capLength(request.text(), config.maxCloudCharsPerLine());
+    String cappedText = capLength(request.text(), config.cloudMaxChars());
     // Optional first hop: a non-English target language (or a global quirk) routes the (already
     // capped) line through the translation model before it is voiced, so the spoken transcript is
     // the transformed text. A failed translation fails the line rather than voicing the wrong
@@ -313,10 +313,10 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
       }
       if (cappedText.length() != request.text().length()) {
         log.info(
-            "[TTS cloud] line capped {} -> {} chars (maxCloudCharsPerLine={})",
+            "[TTS cloud] line capped {} -> {} chars (cloudMaxChars={})",
             request.text().length(),
             cappedText.length(),
-            config.maxCloudCharsPerLine());
+            config.cloudMaxChars());
       }
     }
 
@@ -339,7 +339,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     // and
     // lets the model detect language from the transcript.
     if (translating) {
-      String code = LanguageCodes.codeFor(config.targetLanguage());
+      String code = LanguageCodes.codeFor(config.cloudLanguage());
       if (code != null) {
         payload.addProperty("language_code", code);
       }
@@ -471,7 +471,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   /** The configured pace as a percentage of normal, clamped to the supported 50-200 range. */
   private int speedPercent() {
-    int percent = config.cloudSpeedPercent();
+    int percent = config.cloudPace();
     if (percent < 50) {
       return 50;
     }
