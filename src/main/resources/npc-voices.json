@@ -6,38 +6,38 @@
     "npc_pages": 5899,
     "count": 13661,
     "name_matched_ids": 713,
-    "overrides_applied": 119,
+    "overrides_applied": 257,
     "race_counts": {
       "Demon": 751,
       "Dwarf": 517,
-      "Elf": 314,
+      "Elf": 323,
       "Gnome": 263,
-      "Goblin": 236,
-      "Human": 10341,
-      "Troll": 434,
-      "Undead": 800,
-      "Wizard": 5
+      "Goblin": 309,
+      "Human": 10241,
+      "Troll": 438,
+      "Undead": 813,
+      "Wizard": 6
     },
     "gender_counts": {
       "Female": 1821,
       "Male": 11840
     },
     "ethnicity_counts": {
-      "asgarnia": 578,
-      "easternlands": 1,
-      "fremennik": 645,
-      "kandarin": 1071,
-      "karamja": 196,
-      "kharidian": 554,
-      "kourend": 819,
+      "asgarnia": 567,
+      "easternlands": 2,
+      "fremennik": 649,
+      "kandarin": 1072,
+      "karamja": 197,
+      "kharidian": 557,
+      "kourend": 820,
       "menaphite": 117,
-      "misthalin": 909,
-      "morytania": 1056,
+      "misthalin": 783,
+      "morytania": 1057,
       "tirannwn": 343,
       "varlamore": 1000,
       "wilderness": 124
     },
-    "profiles_bespoke": 372
+    "profiles_bespoke": 914
   },
   "profiles": {
     "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise. Resolution combines every matching layer: default -> byRace[race] -> byEthnicity[ethnicity] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
@@ -1896,6 +1896,2219 @@
         "name": "Drain Pipe",
         "style": "Gruff voice carrying up from below, muffled and echoing as if through a pipe.",
         "accent": "muffled and echoing, as if heard through a pipe"
+      },
+      "297": {
+        "name": "Thordur",
+        "style": "Weary, retired and laconic; speaks in unhurried, world-worn drawl content with solitude."
+      },
+      "298": {
+        "name": "Thordur",
+        "style": "Weary, retired and laconic; speaks in unhurried, world-worn drawl content with solitude."
+      },
+      "403": {
+        "name": "Vannaka",
+        "style": "Battle-hardened slayer master who speaks in clipped, businesslike commands; gruff, no-nonsense veteran with a commanding edge."
+      },
+      "640": {
+        "name": "Ug",
+        "style": "Speaks in simple, blunt, childlike phrasing, slow and earnest."
+      },
+      "641": {
+        "name": "Aga",
+        "style": "Speaks in simple, blunt, childlike phrasing, slow and earnest."
+      },
+      "644": {
+        "name": "Ug",
+        "style": "Speaks in simple, blunt, childlike phrasing, slow and earnest."
+      },
+      "696": {
+        "name": "Troll child",
+        "style": "A young troll; simple, blunt and childlike, with halting, literal-minded speech."
+      },
+      "697": {
+        "name": "Troll child",
+        "style": "A young troll; simple, blunt and childlike, with halting, literal-minded speech."
+      },
+      "698": {
+        "name": "Ice troll",
+        "style": "Lumbering and simple-minded; slow, heavy, dim-witted delivery with blunt menace.",
+        "pace": "slow, heavy"
+      },
+      "706": {
+        "name": "Ice block",
+        "style": "Slow, dim-witted and lumbering; thick guttural grunts of a frozen troll."
+      },
+      "707": {
+        "name": "Ice block",
+        "style": "Slow, dim-witted and lumbering; thick guttural grunts of a frozen troll."
+      },
+      "708": {
+        "name": "Troll father",
+        "style": "Speaks in simple, blunt, childlike phrasing, slow and literal-minded."
+      },
+      "709": {
+        "name": "Troll mother",
+        "style": "Speaks in simple, blunt, childlike phrasing, slow and literal-minded."
+      },
+      "757": {
+        "name": "Tool Leprechaun",
+        "style": "A cheery, chatty tool-keeper; brisk and singsong in delivery.",
+        "accent": "lilting Irish brogue"
+      },
+      "759": {
+        "name": "Drunken Dwarf's Leg",
+        "style": "Dim, lumbering mountain troll. Slow, simple, blunt speech with little grasp of what's going on."
+      },
+      "760": {
+        "name": "Drunken Dwarf's Leg",
+        "style": "Dim, lumbering mountain troll. Slow, simple, blunt speech with little grasp of what's going on."
+      },
+      "814": {
+        "name": "Guildmaster",
+        "style": "Gruff, proud gatekeeper; firm and self-assured authority."
+      },
+      "821": {
+        "name": "Oracle",
+        "style": "A cryptic, knowing seer; speaks in riddles and veiled hints with a mysterious, measured calm."
+      },
+      "825": {
+        "name": "Cabin Boy Jenkins",
+        "style": "A young, eager deckhand; bright, quick and boyish in delivery."
+      },
+      "826": {
+        "name": "Cabin Boy Jenkins",
+        "style": "A young, eager deckhand; bright, quick and boyish in delivery."
+      },
+      "995": {
+        "name": "Guard",
+        "style": "Gruff, suspicious and curt; the clipped bark of a wary cult sentry on duty."
+      },
+      "996": {
+        "name": "Nardok",
+        "style": "A shifty, furtive weapon peddler; hushed and conspiratorial, hawking his wares like contraband."
+      },
+      "1053": {
+        "name": "Mac",
+        "style": "Gruff, reclusive master smith. Curt and to the point, with the no-nonsense growl of a solitary craftsman."
+      },
+      "1054": {
+        "name": "Launa",
+        "style": "An elderly mother; soft-spoken and fretful, with the worn, anxious tone of someone who has searched a long time."
+      },
+      "1055": {
+        "name": "Launa",
+        "style": "An elderly mother; soft-spoken and fretful, with the worn, anxious tone of someone who has searched a long time."
+      },
+      "1056": {
+        "name": "Brana",
+        "style": "An elderly father; warm, earnest and weary, speaking gently and apologetically."
+      },
+      "1057": {
+        "name": "Tolna",
+        "style": "An ordinary working man, world-weary and strained; speaks plainly but tormented and on edge, voice frayed by inner turmoil."
+      },
+      "1058": {
+        "name": "Tolna",
+        "style": "An ordinary working man, world-weary and strained; speaks plainly but tormented and on edge, voice frayed by inner turmoil."
+      },
+      "1059": {
+        "name": "Tolna",
+        "style": "An ordinary working man, world-weary and strained; speaks plainly but tormented and on edge, voice frayed by inner turmoil."
+      },
+      "1075": {
+        "name": "Tolna",
+        "style": "An ordinary working man, world-weary and strained; speaks plainly but tormented and on edge, voice frayed by inner turmoil."
+      },
+      "1076": {
+        "name": "Tolna",
+        "style": "An ordinary working man, world-weary and strained; speaks plainly but tormented and on edge, voice frayed by inner turmoil."
+      },
+      "1077": {
+        "name": "Tolna",
+        "style": "An ordinary working man, world-weary and strained; speaks plainly but tormented and on edge, voice frayed by inner turmoil."
+      },
+      "1146": {
+        "name": "Chemist",
+        "style": "A preoccupied, technical-minded man of science who speaks in a distracted, fussy way about his apparatus."
+      },
+      "1164": {
+        "name": "Cave monk",
+        "style": "Serene, soft-spoken and devout; measured, calming cadence of a cloistered holy man."
+      },
+      "1259": {
+        "name": "Odd Old Man",
+        "style": "Eccentric, evasive and shifty old man; mutters and dodges questions, speaking as if prompted by something only he can hear."
+      },
+      "1323": {
+        "name": "Tarquin",
+        "style": "A Champions' Guild warrior; proud and formal, carrying himself with a touch of self-importance."
+      },
+      "1324": {
+        "name": "Sigurd",
+        "style": "A gruff barbarian canoe-builder; hearty and boastful, fond of telling tales of his own deeds."
+      },
+      "1335": {
+        "name": "Jack Seagull",
+        "style": "Grizzled, unwashed pirate slouched at the bar. Slovenly and gruff, mostly interested in drinking.",
+        "accent": "gruff, salty pirate"
+      },
+      "1336": {
+        "name": "Longbow Ben",
+        "style": "Salty old pirate spinning tall tales. Rambling, boastful and rough-tongued.",
+        "accent": "gruff, salty pirate"
+      },
+      "1337": {
+        "name": "Ahab",
+        "style": "Boozy, blustering old sailor with a wooden leg. Slurred, loud and prone to yelling over his beer.",
+        "accent": "slurred, salty drunken seadog"
+      },
+      "1351": {
+        "name": "Seth Groats",
+        "style": "Weary, grumbling farmer; plain and earthy, complaining about his work in a rough country drawl."
+      },
+      "1352": {
+        "name": "Tassie Slipcast",
+        "style": "Down-to-earth potter; plain and practical, speaking simply about her craft and wares."
+      },
+      "1353": {
+        "name": "Hammerspike Stoutbeard",
+        "style": "Dwarf gangster boss; gruff, aggressive and threatening, hard business-like swagger."
+      },
+      "1361": {
+        "name": "Jimmy the Chisel",
+        "style": "Ordinary working-class fellow; plain and grounded, a bit hapless."
+      },
+      "1397": {
+        "name": "Brother Althric",
+        "style": "Soft-spoken, devout monk; calm, patient and humble."
+      },
+      "1400": {
+        "name": "Nulodion",
+        "style": "Sturdy dwarven engineer; direct and proud of his cannon-work, speaking with blunt practical confidence."
+      },
+      "1614": {
+        "name": "Phials",
+        "style": "A dull, businesslike banknote merchant; flat and transactional with little warmth."
+      },
+      "1755": {
+        "name": "Void Knight",
+        "style": "A disciplined warrior-monk of balance; austere, measured and solemn in devotion."
+      },
+      "1756": {
+        "name": "Void Knight",
+        "style": "A disciplined warrior-monk of balance; austere, measured and solemn in devotion."
+      },
+      "1757": {
+        "name": "Void Knight",
+        "style": "A disciplined warrior-monk of balance; austere, measured and solemn in devotion."
+      },
+      "1758": {
+        "name": "Void Knight",
+        "style": "A disciplined warrior-monk of balance; austere, measured and solemn in devotion."
+      },
+      "1760": {
+        "name": "Squire",
+        "style": "Plain, dutiful young attendant; earnest and respectful, grounded everyday speech."
+      },
+      "1762": {
+        "name": "Squire",
+        "style": "Plain, dutiful young attendant; earnest and respectful, grounded everyday speech."
+      },
+      "1764": {
+        "name": "Squire",
+        "style": "Earnest, dutiful and eager-to-please; the brisk politeness of a junior attendant."
+      },
+      "1765": {
+        "name": "Squire",
+        "style": "Plain shop attendant; brisk, helpful, matter-of-fact."
+      },
+      "1766": {
+        "name": "Squire",
+        "style": "Plain shop attendant; brisk, helpful, matter-of-fact."
+      },
+      "1767": {
+        "name": "Squire",
+        "style": "Plain shop attendant; brisk, helpful, matter-of-fact."
+      },
+      "1768": {
+        "name": "Squire",
+        "style": "Plain shop attendant; brisk, helpful, matter-of-fact."
+      },
+      "1769": {
+        "name": "Squire",
+        "style": "Plain, dutiful young attendant; earnest and respectful, grounded everyday speech."
+      },
+      "1770": {
+        "name": "Squire",
+        "style": "Plain, dutiful young attendant; earnest and respectful, grounded everyday speech."
+      },
+      "1771": {
+        "name": "Squire",
+        "style": "Plain young attendant; earnest and dutiful, grounded everyday speech."
+      },
+      "1772": {
+        "name": "Squire",
+        "style": "Plain young attendant; earnest and dutiful, grounded everyday speech."
+      },
+      "1773": {
+        "name": "Squire",
+        "style": "Plain attendant; steady, dutiful, grounded everyday speech."
+      },
+      "1789": {
+        "name": "Grum",
+        "style": "A prosperous, status-conscious merchant who loves his gold. Smooth and mercantile, grounded townsfolk delivery."
+      },
+      "1791": {
+        "name": "Wydin",
+        "style": "A plain, no-nonsense shopkeeper, particular about his fresh food and straightforward in business."
+      },
+      "1835": {
+        "name": "Cosmic Being",
+        "style": "Detached, otherworldly and ponderous; muses aloud on abstract riddles in a slow, abstracted tone, barely registering the listener."
+      },
+      "1843": {
+        "name": "Centaur",
+        "style": "Proud, measured and noble in bearing; speaks with calm, formal gravity."
+      },
+      "1844": {
+        "name": "Centaur",
+        "style": "Proud, measured and noble in bearing; speaks with calm, formal gravity."
+      },
+      "1846": {
+        "name": "Wood Dryad",
+        "style": "A shy, gentle tree spirit; soft, airy and ethereal, speaking in a light otherworldly hush."
+      },
+      "1847": {
+        "name": "Fairy Very Wise",
+        "style": "Stern, condescending and arrogant; sharp, sarcastic and disdainful, fond of pointed philosophical jabs."
+      },
+      "1848": {
+        "name": "Fairy",
+        "style": "Hushed, earnest and conspiratorial; airy lilting voice kept low."
+      },
+      "1849": {
+        "name": "Fairy",
+        "style": "Hushed, earnest and conspiratorial; airy lilting voice kept low."
+      },
+      "1850": {
+        "name": "Fairy",
+        "style": "Hushed, earnest and conspiratorial; airy lilting voice kept low."
+      },
+      "1851": {
+        "name": "Fairy",
+        "style": "Hushed, earnest and conspiratorial; airy lilting voice kept low."
+      },
+      "1934": {
+        "name": "Barge workman",
+        "style": "Busy labourer tarring the barge, no time to chat; clipped, dismissive one-liners."
+      },
+      "1935": {
+        "name": "Barge workman",
+        "style": "Busy labourer tarring the barge, no time to chat; clipped, dismissive one-liners."
+      },
+      "1936": {
+        "name": "Barge workman",
+        "style": "Busy labourer tarring the barge, no time to chat; clipped, dismissive one-liners."
+      },
+      "1937": {
+        "name": "Barge workman",
+        "style": "Busy labourer tarring the barge, no time to chat; clipped, dismissive one-liners."
+      },
+      "1938": {
+        "name": "Barge foreman",
+        "style": "Varrock Museum's site supervisor, brisk and practical, talks over blueprints with a bossy edge."
+      },
+      "1939": {
+        "name": "Ed Wood",
+        "style": "Brusque, territorial lumberjack. Curt and put-upon, grumbling that he's busy working."
+      },
+      "2053": {
+        "name": "Fritz the Glassblower",
+        "style": "Plain, workaday tradesman. Speaks matter-of-factly about his glassblowing craft."
+      },
+      "2060": {
+        "name": "Dodgy Squire",
+        "style": "Shifty, furtive dealer with a briefcase. Speaks in a hushed, evasive, fast-talking back-alley patter."
+      },
+      "2104": {
+        "name": "Ork",
+        "style": "Brutish, hostile and primitive; grunts and short crude insults, threatening outsiders with minimal vocabulary."
+      },
+      "2105": {
+        "name": "Ork",
+        "style": "Brutish, hostile and primitive; grunts and short crude insults, threatening outsiders with minimal vocabulary."
+      },
+      "2106": {
+        "name": "Ork",
+        "style": "Brutish, hostile and primitive; grunts and short crude insults, threatening outsiders with minimal vocabulary."
+      },
+      "2107": {
+        "name": "Ork",
+        "style": "Brutish, hostile and primitive; grunts and short crude insults, threatening outsiders with minimal vocabulary."
+      },
+      "2135": {
+        "name": "Lorelai",
+        "style": "A confident combat trainer; firm and direct with a no-nonsense instructive edge."
+      },
+      "2136": {
+        "name": "Rory",
+        "style": "A young cyclops with a child's mind; blurts short, simple demands and whiny one-word outbursts."
+      },
+      "2148": {
+        "name": "Grand Exchange Clerk",
+        "style": "Plain, efficient counter staff; brisk and impersonal, all business at the trading desk."
+      },
+      "2149": {
+        "name": "Grand Exchange Clerk",
+        "style": "Plain, efficient counter staff; brisk and impersonal, all business at the trading desk."
+      },
+      "2150": {
+        "name": "Grand Exchange Clerk",
+        "style": "Plain, efficient counter staff; brisk and impersonal, all business at the trading desk."
+      },
+      "2151": {
+        "name": "Grand Exchange Clerk",
+        "style": "Plain, efficient counter staff; brisk and impersonal, all business at the trading desk."
+      },
+      "2152": {
+        "name": "Brugsen Bursen",
+        "style": "Formal, authoritative director of the Exchange; measured and proprietary, speaks with the weight of running the place."
+      },
+      "2268": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2269": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2271": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2272": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2273": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2274": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2277": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2278": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2280": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2281": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2282": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2283": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2284": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2286": {
+        "name": "Ur-zek",
+        "style": "A dignified council elder; measured, formal and deliberate in speech."
+      },
+      "2287": {
+        "name": "Ur-vass",
+        "style": "Dorgesh-Kaan council elder; measured, dignified, deliberate cave goblin speech."
+      },
+      "2288": {
+        "name": "Ur-taal",
+        "style": "Dorgesh-Kaan council elder; measured, dignified, deliberate cave goblin speech."
+      },
+      "2289": {
+        "name": "Ur-meg",
+        "style": "Dorgesh-Kaan council elder; measured, dignified, deliberate cave goblin speech."
+      },
+      "2290": {
+        "name": "Ur-lun",
+        "style": "City councillor. Measured, deliberate, faintly formal manner of speaking."
+      },
+      "2291": {
+        "name": "Ur-pel",
+        "style": "City councillor. Composed and formal, speaks with quiet authority."
+      },
+      "2292": {
+        "name": "Banker",
+        "style": "Plain, businesslike bank clerk. Clipped and helpful, no frills."
+      },
+      "2293": {
+        "name": "Banker",
+        "style": "Plain, businesslike bank clerk. Clipped and helpful, no frills."
+      },
+      "2294": {
+        "name": "Bartak",
+        "style": "Workmanlike furnace-keeper. Plain, practical, matter-of-fact about his trade."
+      },
+      "2296": {
+        "name": "Reldak",
+        "style": "Small, eager cave-goblin shopkeeper. Pipes up brightly, chatty and quick about his frog-leather wares."
+      },
+      "2297": {
+        "name": "Miltog",
+        "style": "A plain, practical shopkeeper, polite and straightforward about her lamps."
+      },
+      "2298": {
+        "name": "Mernik",
+        "style": "Patient nursery-keeper who minds the little ones. Soft, doting, motherly delivery."
+      },
+      "2300": {
+        "name": "Crate goblin",
+        "style": "Harried cave goblin courier, always on the move. Distracted and brief, fixated on his deliveries."
+      },
+      "2301": {
+        "name": "Cave goblin",
+        "style": "Ordinary underground townsfolk. Timid and curious, plain and unassuming."
+      },
+      "2302": {
+        "name": "Goblin scribe",
+        "style": "Bookish, precise cave goblin; fussy and meticulous in a clipped, busy little voice."
+      },
+      "2303": {
+        "name": "Oldak",
+        "style": "Inquisitive, scholarly cave-goblin inventor; treats magic as science, speaking with curious, precise enthusiasm."
+      },
+      "2304": {
+        "name": "Gourmet",
+        "style": "A fussy food connoisseur; discerning and a touch superior as he appraises every dish."
+      },
+      "2305": {
+        "name": "Gourmet",
+        "style": "A fussy food connoisseur; discerning and a touch superior as he appraises every dish."
+      },
+      "2306": {
+        "name": "Gourmet",
+        "style": "A fussy food connoisseur; discerning and a touch superior as he appraises every dish."
+      },
+      "2307": {
+        "name": "Gourmet",
+        "style": "A fussy food connoisseur; discerning and a touch superior as he appraises every dish."
+      },
+      "2308": {
+        "name": "Turgok",
+        "style": "Dorgesh-Kaan market stallholder; talkative, curious cave goblin vendor."
+      },
+      "2309": {
+        "name": "Markog",
+        "style": "Dorgesh-Kaan market stallholder; talkative, curious cave goblin vendor."
+      },
+      "2310": {
+        "name": "Durgok",
+        "style": "Cave goblin market trader hawking frogburgers; eager, talkative stall patter."
+      },
+      "2311": {
+        "name": "Tindar",
+        "style": "Dorgesh-Kaan market stallholder; chatty, eager cave goblin vendor."
+      },
+      "2312": {
+        "name": "Gundik",
+        "style": "Dorgesh-Kaan market stallholder; chatty, eager cave goblin vendor."
+      },
+      "2313": {
+        "name": "Zenkog",
+        "style": "Dorgesh-Kaan market stallholder; chatty, eager cave goblin vendor."
+      },
+      "2314": {
+        "name": "Lurgon",
+        "style": "Dorgesh-Kaan market stallholder; talkative, curious cave goblin vendor."
+      },
+      "2319": {
+        "name": "Young 'un",
+        "style": "Little nursery child. Small, squeaky, childlike voice."
+      },
+      "2320": {
+        "name": "Tyke",
+        "style": "Little nursery child. Small, squeaky, childlike voice."
+      },
+      "2321": {
+        "name": "Nipper",
+        "style": "Tiny nursery infant. Babbling, high-pitched, childlike."
+      },
+      "2322": {
+        "name": "Nipper",
+        "style": "Tiny nursery infant. Babbling, high-pitched, childlike."
+      },
+      "2323": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2324": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2325": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2326": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2327": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2328": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2329": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2330": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2331": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2332": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2333": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2334": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2335": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2336": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2337": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2338": {
+        "name": "Cave goblin child",
+        "style": "Small underground child. High, squeaky, playful chatter."
+      },
+      "2339": {
+        "name": "Spit goblin",
+        "style": "Simple cave goblin tending a roast; eager, chattering, plain little voice."
+      },
+      "2344": {
+        "name": "Barlak",
+        "style": "Eager cave goblin collector; quirky and fixated on bones and shells, speaking with odd enthusiasm about his trade."
+      },
+      "2391": {
+        "name": "Cart conductor",
+        "style": "Routine, businesslike conductor; flat and procedural as he runs the cart."
+      },
+      "2459": {
+        "name": "Gamfred",
+        "style": "Gruff, practical dwarf who runs the catapult activity; brisk and no-frills."
+      },
+      "2460": {
+        "name": "Ajjat",
+        "style": "A hardened, disciplined master swordsman and former knight, speaking with gruff, no-nonsense authority."
+      },
+      "2461": {
+        "name": "Kamfreena",
+        "style": "A blademistress who speaks in cryptic zen koans; calm, measured and unhurried, almost meditative.",
+        "pace": "slow and deliberate"
+      },
+      "2462": {
+        "name": "Shanomi",
+        "style": "Cryptic warrior-mage who speaks in calm, aphoristic riddles with inverted word order; serene and sage-like.",
+        "accent": "speaks with object-first inverted syntax delivering terse proverbs",
+        "pace": "slow and deliberate"
+      },
+      "2469": {
+        "name": "Lidio",
+        "style": "Workaday guild cook; plain and grounded, matter-of-fact about kitchen wares."
+      },
+      "2470": {
+        "name": "Lilly",
+        "style": "A friendly, helpful attendant; warm and approachable, speaking plainly and pleasantly."
+      },
+      "2471": {
+        "name": "Anton",
+        "style": "Plain, grounded warrior of the guild; straightforward and matter-of-fact."
+      },
+      "2472": {
+        "name": "Jade",
+        "style": "Plain, grounded guild attendant; direct and businesslike."
+      },
+      "2494": {
+        "name": "Gate of War",
+        "style": "Booming, commanding and martial; an imposing magical guardian that demands answers."
+      },
+      "2495": {
+        "name": "Rickety door",
+        "style": "Creaky, weary and dry; a worn old guardian that grudgingly poses its questions."
+      },
+      "2496": {
+        "name": "Oozing barrier",
+        "style": "A disembodied living head that guards the way; deep, ominous, sepulchral delivery, intoning grave warnings and security questions."
+      },
+      "2497": {
+        "name": "Portal of Death",
+        "style": "A portal crafted from the bones of the dead; deep, ominous, sepulchral delivery intoning grave warnings and security questions."
+      },
+      "2535": {
+        "name": "Johanhus Ulsbrecht",
+        "style": "Pompous, self-important cult leader; preachy and zealous yet cautious demagogue."
+      },
+      "2542": {
+        "name": "H.A.M. Member",
+        "style": "Zealous, suspicious commoner; mutters anti-creature dogma with wary conviction."
+      },
+      "2543": {
+        "name": "H.A.M. Member",
+        "style": "Zealous, suspicious commoner; mutters anti-creature dogma with wary conviction."
+      },
+      "2551": {
+        "name": "Brambickle",
+        "style": "Chatty, weather-beaten explorer far from home; perky and a bit forlorn on his frozen perch."
+      },
+      "2556": {
+        "name": "Ambassador Spanfipple",
+        "style": "Diplomatic and talkative; polite, official tone with a gnome's chattiness."
+      },
+      "2560": {
+        "name": "Professor Onglewip",
+        "style": "An inquisitive scholar absorbed in study; eager, academic and fast-thinking as he probes how human magic works."
+      },
+      "2569": {
+        "name": "Captain Ninto",
+        "style": "A drunken, off-duty glider pilot; rambling and slurred, boastful and bleary in his cups."
+      },
+      "2577": {
+        "name": "Abbot Langley",
+        "style": "Gentle, pious clergyman; warm, measured and kindly with a formal religious register."
+      },
+      "2578": {
+        "name": "Brother Jered",
+        "style": "Calm, devout monk; gentle and measured, speaking with quiet pious composure."
+      },
+      "2658": {
+        "name": "Head chef",
+        "style": "A fussy, exacting kitchen master, brisk and particular about culinary standards."
+      },
+      "2667": {
+        "name": "Francis",
+        "style": "Serene, devout monk. Soft-spoken, measured and gentle, dedicated to Saradomin on his holy island."
+      },
+      "2674": {
+        "name": "Dreven",
+        "style": "A plain, grounded shopkeeper, brisk and businesslike with customers."
+      },
+      "2675": {
+        "name": "Taria",
+        "style": "Plain, homely village woman who tends the local bush patch. Warm, ordinary and unhurried."
+      },
+      "2784": {
+        "name": "Holoy",
+        "style": "Gruff, terse dwarven merchant. Blunt and businesslike, hawking crossbow parts in his tunnel shop."
+      },
+      "2785": {
+        "name": "Hura",
+        "style": "A dwarven crossbow merchant; gruff and businesslike, terse trade talk."
+      },
+      "2823": {
+        "name": "Shop keeper",
+        "style": "Plain, friendly shopkeep; routine sales-counter patter."
+      },
+      "2824": {
+        "name": "Shop assistant",
+        "style": "Plain, helpful and grounded; ordinary counter-help delivery."
+      },
+      "2829": {
+        "name": "Fairy",
+        "style": "Light, lilting, whimsical; airy and quick in delivery."
+      },
+      "2870": {
+        "name": "Valaine",
+        "style": "Brisk, capable shopkeeper; plain and grounded, straightforward about her wares."
+      },
+      "2871": {
+        "name": "Scavvo",
+        "style": "A plain, easygoing armoury shopkeeper, casual and matter-of-fact about his wares."
+      },
+      "2872": {
+        "name": "Peksa",
+        "style": "Rough barbarian armourer; gruff and terse, blunt about his helmets and gear."
+      },
+      "2895": {
+        "name": "Cook",
+        "style": "A plain tavern cook; grounded and brisk, talks shop about the kitchen."
+      },
+      "2896": {
+        "name": "Cook",
+        "style": "A plain, grounded inn cook; brisk and unremarkable everyday speech."
+      },
+      "2949": {
+        "name": "Squire",
+        "style": "Plain, dutiful young attendant; earnest and respectful, grounded everyday speech."
+      },
+      "3063": {
+        "name": "Hunding",
+        "style": "A gruff, cold barbarian; clipped and stern toward strangers, warming only to talk of a good fight."
+      },
+      "3092": {
+        "name": "Banker",
+        "style": "Light, lilting and crisply professional; brisk courteous teller manner."
+      },
+      "3115": {
+        "name": "Farid Morrisane",
+        "style": "Young, eager and slightly boastful merchant; quick to insist he is an accomplished trader despite his age."
+      },
+      "3189": {
+        "name": "Brian O'Richard",
+        "style": "Smooth, theatrical maze host. Patter is playful, grandiose and showman-like, savouring every line.",
+        "accent": "flamboyant game-show host flourish, drawn-out and self-amused"
+      },
+      "3193": {
+        "name": "Martin Thwait",
+        "style": "A sly, streetwise rogue with a smooth, knowing patter and an easy confidence about his trade."
+      },
+      "3194": {
+        "name": "Emerald Benedict",
+        "style": "A banker among thieves in the Rogues' Den; sly, low-key and guarded in manner."
+      },
+      "3204": {
+        "name": "Fairy",
+        "style": "Light, lilting and airy; quick melodic delivery."
+      },
+      "3215": {
+        "name": "Frincos",
+        "style": "A calm, serene monk; gentle and unhurried, speaks softly with quiet good humour."
+      },
+      "3232": {
+        "name": "Wizard Jalarast",
+        "style": "A learned mage-armourer; matter-of-fact and instructive, explaining crafting with precise patience."
+      },
+      "3246": {
+        "name": "Wizard Frumscone",
+        "style": "Eccentric, distracted academic mage; mutters and rambles with scholarly self-absorption."
+      },
+      "3305": {
+        "name": "Master Chef",
+        "style": "Proud, slightly fussy kitchen instructor; brisk and self-assured, walking you through steps with a touch of culinary vanity."
+      },
+      "3306": {
+        "name": "Henja",
+        "style": "A young boy; lively and innocent, speaking in a child's high, eager voice."
+      },
+      "3307": {
+        "name": "Vannaka",
+        "style": "Battle-hardened slayer master who speaks in clipped, businesslike commands; gruff, no-nonsense veteran with a commanding edge."
+      },
+      "3309": {
+        "name": "Magic Instructor",
+        "style": "Encouraging, clear teacher; patient and instructive."
+      },
+      "3310": {
+        "name": "Account Guide",
+        "style": "A clear, patient instructor; steady and helpful, explaining things plainly step by step."
+      },
+      "3311": {
+        "name": "Mining Instructor",
+        "style": "Practical, hands-on workman; plain and matter-of-fact instructional delivery."
+      },
+      "3312": {
+        "name": "Quest Guide",
+        "style": "Helpful, welcoming guide; clear and encouraging instructional tone."
+      },
+      "3318": {
+        "name": "Banker",
+        "style": "Courteous, precise and professional; the measured patience of a teller explaining the basics."
+      },
+      "3319": {
+        "name": "Brother Brace",
+        "style": "Calm, patient monk; gentle, devout and reassuring instructional tone."
+      },
+      "3321": {
+        "name": "Larxus",
+        "style": "A formal organiser of the Champions' Challenge; composed and ceremonious, announcing combats with measured authority."
+      },
+      "3362": {
+        "name": "Litara",
+        "style": "A barbarian explorer; hardy and direct, speaking plainly and a little restlessly."
+      },
+      "3369": {
+        "name": "Angel",
+        "style": "A young girl; bright, innocent and chatty in a child's high register."
+      },
+      "3513": {
+        "name": "Scout",
+        "style": "A ghostly military scout reporting in; clipped, soldierly and matter-of-fact."
+      },
+      "3532": {
+        "name": "Beggar",
+        "style": "Pitiful, wheedling vagrant. Whining and pleading, begging for a scrap of bread."
+      },
+      "3629": {
+        "name": "Doug Deeping",
+        "style": "A plain-spoken digsite labourer; gruff, down-to-earth and matter-of-fact."
+      },
+      "3632": {
+        "name": "Student",
+        "style": "A young academic at the dig; studious and earnest, plainly spoken."
+      },
+      "3633": {
+        "name": "Student",
+        "style": "A young academic at the dig; studious and earnest, plainly spoken."
+      },
+      "3634": {
+        "name": "Student",
+        "style": "A young academic at the dig; studious and earnest, plainly spoken."
+      },
+      "3635": {
+        "name": "Examiner",
+        "style": "Stern academic at the Exam Centre. Speaks in a dry, scholarly, slightly officious tone."
+      },
+      "3636": {
+        "name": "Examiner",
+        "style": "Stern academic at the Exam Centre. Speaks in a dry, scholarly, slightly officious tone."
+      },
+      "3637": {
+        "name": "Examiner",
+        "style": "Stern academic at the Exam Centre. Speaks in a dry, scholarly, slightly officious tone."
+      },
+      "3638": {
+        "name": "Researcher",
+        "style": "A scholarly, focused academic; precise and measured, absorbed in study."
+      },
+      "3639": {
+        "name": "Terry Balando",
+        "style": "A stuffy, officious examiner; dry, pedantic and self-important, delivering instructions with bureaucratic primness."
+      },
+      "3640": {
+        "name": "Panning guide",
+        "style": "A folksy gold-panning specialist; patient and chatty, walking you through the technique."
+      },
+      "4062": {
+        "name": "High Priest",
+        "style": "A devout Saradominist cleric who speaks in a calm, measured, formal register with pious gravity."
+      },
+      "4063": {
+        "name": "Crone",
+        "style": "An old woman; wizened and knowing, speaking slowly with the rasp and wandering cadence of great age."
+      },
+      "4092": {
+        "name": "Soldier",
+        "style": "Wounded, weary Imperial Guard soldier. Pained and strained, gruffly warning travellers back."
+      },
+      "4093": {
+        "name": "Saba",
+        "style": "A dishevelled old hermit; grumbling, curt and irritable, grudging every word and craving quiet."
+      },
+      "4094": {
+        "name": "Tenzing",
+        "style": "A humble, helpful mountain guide; calm, modest and steady, speaking with the patience of a seasoned sherpa."
+      },
+      "4118": {
+        "name": "Eadgar",
+        "style": "Mad, rambling hermit; cantankerous and cryptic, cackling out eccentric tangents."
+      },
+      "4119": {
+        "name": "Godric",
+        "style": "Earnest young Imperial Guard soldier. Speaks plainly and dutifully, a grounded recruit's manner."
+      },
+      "4157": {
+        "name": "Burntmeat",
+        "style": "Crude, dim-witted troll cook; slow and lumbering speech, blunt and simple-minded about his grim kitchen.",
+        "pace": "slow, lumbering"
+      },
+      "4164": {
+        "name": "Mishkal'un Dorn",
+        "style": "Serene and knowing; anticipates your words and answers before you speak, calm and unhurried with an eerie certainty.",
+        "pace": "slow and deliberate"
+      },
+      "4165": {
+        "name": "Dakh'thoulan Aegis",
+        "style": "Calm, articulate and philosophical; measured, persuasive and reasonable, unbothered by his order's dark reputation."
+      },
+      "4330": {
+        "name": "Johanhus Ulsbrecht",
+        "style": "Pompous, self-important cult leader; preachy and zealous yet cautious demagogue."
+      },
+      "4516": {
+        "name": "Guard",
+        "style": "Gruff, suspicious and curt; the clipped bark of a wary cult sentry on duty."
+      },
+      "4517": {
+        "name": "Guard",
+        "style": "Gruff, suspicious and curt; the clipped bark of a wary cult sentry on duty."
+      },
+      "4518": {
+        "name": "Guard",
+        "style": "Gruff, suspicious and curt; the clipped bark of a wary cult sentry on duty."
+      },
+      "4519": {
+        "name": "Guard",
+        "style": "Gruff, suspicious and curt; the clipped bark of a wary cult sentry on duty."
+      },
+      "4520": {
+        "name": "Guard",
+        "style": "Gruff, suspicious and curt; the clipped bark of a wary cult sentry on duty."
+      },
+      "4521": {
+        "name": "Guard",
+        "style": "Gruff, suspicious and curt; the clipped bark of a wary cult sentry on duty."
+      },
+      "4563": {
+        "name": "Monk",
+        "style": "Hushed, measured and secretive hooded monk; quiet, even delivery with a guarded undertone."
+      },
+      "4565": {
+        "name": "High Priest",
+        "style": "A devout Saradominist cleric who speaks in a calm, measured, formal register with pious gravity."
+      },
+      "4627": {
+        "name": "Millie Miller",
+        "style": "Plain rural miller; homely, down-to-earth, unhurried country speech."
+      },
+      "4679": {
+        "name": "Sir Spishyus",
+        "style": "Stern, watchful Temple Knight examiner. Measured and formal, lays out his test with knightly authority."
+      },
+      "4680": {
+        "name": "Lady Table",
+        "style": "Poised, refined Temple Knight examiner. Speaks formally and crisply, presenting her puzzle with noble composure."
+      },
+      "4681": {
+        "name": "Sir Kuam Ferentse",
+        "style": "Disciplined Temple Knight observer. Speaks with grave, measured formality as he sets his challenge."
+      },
+      "4683": {
+        "name": "Sir Tinley",
+        "style": "Patient, precise Temple Knight examiner. Speaks in a clear, formal register while setting his timed test."
+      },
+      "4684": {
+        "name": "Sir Ren Itchood",
+        "style": "Even-toned Temple Knight examiner. Calm, deliberate and formal, guiding the recruit through his puzzle."
+      },
+      "4685": {
+        "name": "Miss Cheevers",
+        "style": "Composed Temple Knight examiner. Speaks precisely and instructively, posing logic tests with a clipped, professional poise."
+      },
+      "4686": {
+        "name": "Ms. Hynn Terprett",
+        "style": "Articulate Temple Knight examiner. Speaks precisely and formally, explaining her test with measured clarity."
+      },
+      "4715": {
+        "name": "Auguste",
+        "style": "Eccentric, enthusiastic inventor and balloonist; animated and excitable about his flying contraptions, prone to rambling tangents."
+      },
+      "4716": {
+        "name": "Auguste",
+        "style": "Eccentric, enthusiastic inventor and balloonist; animated and excitable about his flying contraptions, prone to rambling tangents."
+      },
+      "4717": {
+        "name": "Auguste",
+        "style": "Eccentric, enthusiastic inventor and balloonist; animated and excitable about his flying contraptions, prone to rambling tangents."
+      },
+      "4718": {
+        "name": "Auguste",
+        "style": "Eccentric, enthusiastic inventor and balloonist; animated and excitable about his flying contraptions, prone to rambling tangents."
+      },
+      "4720": {
+        "name": "Assistant Brock",
+        "style": "Deadpan, precise balloon attendant; flat, logical, matter-of-fact delivery (Spock homage)."
+      },
+      "4737": {
+        "name": "Squire",
+        "style": "An eager, dutiful young squire; deferential and earnest, speaking with respectful keenness toward his knightly betters."
+      },
+      "4777": {
+        "name": "Black Knight Captain",
+        "style": "A stern, commanding officer; clipped and authoritative with a hard, intimidating military register."
+      },
+      "4804": {
+        "name": "Sir Tinley",
+        "style": "Patient, precise Temple Knight examiner. Speaks in a clear, formal register while setting his timed test."
+      },
+      "4850": {
+        "name": "Goblin Cook",
+        "style": "Crude, blustering goblin; loud, squabbling and proud of his cooking."
+      },
+      "4851": {
+        "name": "Goblin Cook",
+        "style": "Crude, blustering goblin; loud, squabbling and proud of his cooking."
+      },
+      "4852": {
+        "name": "Goblin Cook",
+        "style": "Crude, blustering goblin; loud, squabbling and proud of his cooking."
+      },
+      "4894": {
+        "name": "Rolad",
+        "style": "Bookish dwarf scholar; muddled and absent-minded, trails off and forgets things while insisting he hasn't."
+      },
+      "4923": {
+        "name": "Achietties",
+        "style": "Authoritative and professional gatekeeper of the Heroes' Guild; speaks with a measured, heroic bearing that conveys rank without warmth."
+      },
+      "4924": {
+        "name": "Helemos",
+        "style": "A jovial retired adventurer turned shopkeeper; warm and welcoming, with the easy confidence of an old hero."
+      },
+      "4958": {
+        "name": "Woman",
+        "style": "Plain, grounded commoner; ordinary unremarkable delivery."
+      },
+      "4984": {
+        "name": "Dimintheis",
+        "style": "Genteel and formal with the airs of nobility; prideful and self-important, slipping into a pleading desperation when his pretence is challenged."
+      },
+      "4985": {
+        "name": "Boot",
+        "style": "Gruff, short-tempered and irritable; clipped grumbling delivery, quick to bristle."
+      },
+      "5006": {
+        "name": "Wizard Grayzag",
+        "style": "A scheming, spiteful necromancer; muttering and resentful, nursing a petty grudge against a rival."
+      },
+      "5119": {
+        "name": "Grimgnash",
+        "style": "A surly, dismissive predator with blunt, clipped speech, contemptuous of lesser creatures and perpetually hungry and irritable.",
+        "accent": "refers to himself in the third person in broken, simple phrasing"
+      },
+      "5120": {
+        "name": "Rupert the Beard",
+        "style": "Friendly, eccentric and jolly; speaks in a fruity, plummy upper-class fashion, fond of theatrical, old-fashioned turns of phrase.",
+        "accent": "posh, plummy upper-class gentleman manner"
+      },
+      "5121": {
+        "name": "Rupert the Beard",
+        "style": "Friendly, eccentric and jolly; speaks in a fruity, plummy upper-class fashion, fond of theatrical, old-fashioned turns of phrase.",
+        "accent": "posh, plummy upper-class gentleman manner"
+      },
+      "5123": {
+        "name": "Rupert the Beard",
+        "style": "Friendly, eccentric and jolly; speaks in a fruity, plummy upper-class fashion, fond of theatrical, old-fashioned turns of phrase.",
+        "accent": "posh, plummy upper-class gentleman manner"
+      },
+      "5124": {
+        "name": "Rupert the Beard",
+        "style": "Friendly, eccentric and jolly; speaks in a fruity, plummy upper-class fashion, fond of theatrical, old-fashioned turns of phrase.",
+        "accent": "posh, plummy upper-class gentleman manner"
+      },
+      "5125": {
+        "name": "Miazrqa",
+        "style": "Haughty, imperious princess with an unhinged, erratic edge; lofty and demanding in manner."
+      },
+      "5138": {
+        "name": "Elissa",
+        "style": "Older archaeologist; scholarly, weary, measured speech with a learned, matter-of-fact tone."
+      },
+      "5169": {
+        "name": "Ticket goblin",
+        "style": "Train ticket seller. Brisk, routine, service-counter delivery."
+      },
+      "5177": {
+        "name": "Ambassador Alvijar",
+        "style": "Formal, measured dwarven diplomat; careful and statesmanlike in delivery."
+      },
+      "5178": {
+        "name": "Builder",
+        "style": "Gruff dwarven labourer on the tunnel works. Blunt, plain-spoken and workmanlike."
+      },
+      "5179": {
+        "name": "Builder",
+        "style": "Gruff dwarven labourer on the tunnel works. Blunt, plain-spoken and workmanlike."
+      },
+      "5180": {
+        "name": "Builder",
+        "style": "Gruff dwarven labourer on the tunnel works. Blunt, plain-spoken and workmanlike."
+      },
+      "5181": {
+        "name": "Builder",
+        "style": "Gruff dwarven labourer on the tunnel works. Blunt, plain-spoken and workmanlike."
+      },
+      "5182": {
+        "name": "Tegdak",
+        "style": "An eager, scholarly archaeologist who chatters about his digs with bookish enthusiasm and a curious, detail-obsessed manner."
+      },
+      "5328": {
+        "name": "Mistag",
+        "style": "A polite, curious cave goblin leader; earnest and measured, speaking carefully and a little formally."
+      },
+      "5386": {
+        "name": "Mazion",
+        "style": "Plain-spoken, even-tempered working monk; grounded and unhurried."
+      },
+      "5443": {
+        "name": "Johnathon",
+        "style": "Refined, businesslike nobleman enchanter; measured and professional with a courteous polish."
+      },
+      "5445": {
+        "name": "Johnathon",
+        "style": "Refined, businesslike nobleman enchanter; measured and professional with a courteous polish."
+      },
+      "5449": {
+        "name": "Bob Barter",
+        "style": "Genial, helpful market guide; easygoing and patient, happy to quote herb prices and decant potions."
+      },
+      "5450": {
+        "name": "Murky Matt",
+        "style": "Furtive, hushed and conspiratorial; talks like a shady back-alley dealer letting you in on the rune prices."
+      },
+      "5451": {
+        "name": "Relobo Blinyo",
+        "style": "Keen, enterprising trader; enthusiastic and knowledgeable about logs, proud to have travelled far to sell them."
+      },
+      "5452": {
+        "name": "Hofuthand",
+        "style": "Terse and contemplative; perpetually deep in thought, reveals little about himself, keeps to the numbers."
+      },
+      "5513": {
+        "name": "Elite Void Knight",
+        "style": "A seasoned warrior-monk of balance; austere, measured and solemn, with quiet authority."
+      },
+      "5562": {
+        "name": "Mercy",
+        "style": "Chatty, motherly older woman; warm, talkative, down-to-earth retired engineer."
+      },
+      "5785": {
+        "name": "Juna",
+        "style": "Ancient serpent guardian; slow, measured and solemn, speaking in cryptic, ceremonious riddles with timeless gravity.",
+        "pace": "slow, deliberate"
+      },
+      "5809": {
+        "name": "Tanner",
+        "style": "Plain, workmanlike tradesman; matter-of-fact and grounded."
+      },
+      "5810": {
+        "name": "Master Crafter",
+        "style": "Oversees the Crafting Guild; speaks with the measured, assured authority of a master tradesman addressing apprentices."
+      },
+      "5811": {
+        "name": "Master Crafter",
+        "style": "Oversees the Crafting Guild; speaks with the measured, assured authority of a master tradesman addressing apprentices."
+      },
+      "5812": {
+        "name": "Master Crafter",
+        "style": "Oversees the Crafting Guild; speaks with the measured, assured authority of a master tradesman addressing apprentices."
+      },
+      "5841": {
+        "name": "Zandar Horfyre",
+        "style": "A sinister dark wizard; menacing and grandiose, speaking with cold, scornful contempt."
+      },
+      "5895": {
+        "name": "Drogo",
+        "style": "Gruff, practical dwarven shopkeeper; short and grumbly, all business about picks and mining gear."
+      },
+      "5904": {
+        "name": "Dwarf",
+        "style": "Gruff, blunt mine shopkeeper, pickaxe always in hand. Curt transactional patter."
+      },
+      "5919": {
+        "name": "Grace",
+        "style": "Brisk, light and sporty shopkeeper; plain, grounded delivery."
+      },
+      "5929": {
+        "name": "Sir Gerry",
+        "style": "A mortally wounded knight giving his last account; faint, breathless and faltering between gasps.",
+        "pace": "slow, halting"
+      },
+      "6072": {
+        "name": "Jimmy",
+        "style": "Plain, easygoing guild attendant; casual and unpretentious."
+      },
+      "6073": {
+        "name": "Ref",
+        "style": "Officious, clipped referee; speaks in short rule-bound calls."
+      },
+      "6074": {
+        "name": "Ref",
+        "style": "Officious, clipped referee; speaks in short rule-bound calls."
+      },
+      "6509": {
+        "name": "Squire",
+        "style": "Earnest, dutiful and eager-to-please; the brisk politeness of a junior attendant."
+      },
+      "6530": {
+        "name": "Rommik",
+        "style": "Down-to-earth craftsman shopkeeper. Friendly, brisk and practical about his crafting wares."
+      },
+      "6533": {
+        "name": "Romily Weaklax",
+        "style": "Hearty, plain-talking family baker; warm and matter-of-fact about his trade.",
+        "accent": "broad, warm Northern English working-class"
+      },
+      "6561": {
+        "name": "Guard",
+        "style": "Gruff, terse mine guard; plain and no-nonsense."
+      },
+      "6562": {
+        "name": "Prospector Percy",
+        "style": "A keen mine prospector; plain-spoken and brisk, with the practical patter of an overseer."
+      },
+      "6631": {
+        "name": "Pet kree'arra",
+        "style": "Non-speaking miniature aviansie follower; screeches and squawks rather than words."
+      },
+      "6632": {
+        "name": "Pet general graardor",
+        "style": "Non-speaking miniature ourg follower; grunts and growls rather than words."
+      },
+      "6633": {
+        "name": "Pet zilyana",
+        "style": "Non-speaking miniature icyene follower; minimal vocalisation."
+      },
+      "6634": {
+        "name": "Pet k'ril tsutsaroth",
+        "style": "Non-speaking miniature demon follower; snarls and hisses rather than words."
+      },
+      "6643": {
+        "name": "Pet kree'arra",
+        "style": "Non-speaking miniature aviansie follower; screeches and squawks rather than words."
+      },
+      "6644": {
+        "name": "Pet general graardor",
+        "style": "Non-speaking miniature ourg follower; grunts and growls rather than words."
+      },
+      "6646": {
+        "name": "Pet zilyana",
+        "style": "Non-speaking miniature icyene follower; minimal vocalisation."
+      },
+      "6647": {
+        "name": "Pet k'ril tsutsaroth",
+        "style": "Non-speaking miniature demon follower; snarls and hisses rather than words."
+      },
+      "6801": {
+        "name": "Pieve",
+        "style": "Cheeky, no-nonsense slayer guardian who bars you from the wyverns. Casual and a touch smug."
+      },
+      "7219": {
+        "name": "Scurry",
+        "style": "Cheeky, chattery little rat; quick, scrappy comedic patter with a streetwise swagger.",
+        "accent": "cheeky cockney street patter"
+      },
+      "7297": {
+        "name": "Mistag",
+        "style": "A polite, curious cave goblin leader; earnest and measured, speaking carefully and a little formally."
+      },
+      "7298": {
+        "name": "Mistag",
+        "style": "A polite, curious cave goblin leader; earnest and measured, speaking carefully and a little formally."
+      },
+      "7299": {
+        "name": "Mistag",
+        "style": "A polite, curious cave goblin leader; earnest and measured, speaking carefully and a little formally."
+      },
+      "7456": {
+        "name": "Perdu",
+        "style": "Gruff, businesslike travelling merchant; clipped and matter-of-fact about returning lost property for a fee."
+      },
+      "7616": {
+        "name": "Scurry",
+        "style": "Cheeky, chattery little rat; quick, scrappy comedic patter with a streetwise swagger.",
+        "accent": "cheeky cockney street patter"
+      },
+      "7623": {
+        "name": "Abigale",
+        "style": "Young woman with a sweet, helpful surface manner masking a cold, sinister edge."
+      },
+      "7624": {
+        "name": "Hewey",
+        "style": "Casual, easygoing young man; chatty and offhand in conversation."
+      },
+      "7632": {
+        "name": "Killer",
+        "style": "Masked slasher; menacing, low raspy whisper, taunting and predatory.",
+        "accent": "sinister rasping whisper"
+      },
+      "7633": {
+        "name": "Abigale",
+        "style": "Young woman with a sweet, helpful surface manner masking a cold, sinister edge."
+      },
+      "7635": {
+        "name": "Abigale",
+        "style": "Young woman with a sweet, helpful surface manner masking a cold, sinister edge."
+      },
+      "7636": {
+        "name": "Killer",
+        "style": "Masked slasher; menacing, low raspy whisper, taunting and predatory.",
+        "accent": "sinister rasping whisper"
+      },
+      "7637": {
+        "name": "Hewey",
+        "style": "Casual, easygoing young man; chatty and offhand in conversation."
+      },
+      "7638": {
+        "name": "Killer",
+        "style": "Masked slasher; menacing, low raspy whisper, taunting and predatory.",
+        "accent": "sinister rasping whisper"
+      },
+      "7673": {
+        "name": "Solztun",
+        "style": "Gruff barbarian spirit, bluff and indignant; insists he is a spirit, not a ghost."
+      },
+      "7712": {
+        "name": "Dwarf",
+        "style": "A gruff, hardworking miner, terse and grounded with a working-class bluntness."
+      },
+      "7713": {
+        "name": "Dwarf",
+        "style": "A gruff, hardworking miner, terse and grounded with a working-class bluntness."
+      },
+      "7714": {
+        "name": "Dwarf",
+        "style": "A gruff, hardworking miner, terse and grounded with a working-class bluntness."
+      },
+      "7715": {
+        "name": "Dwarf",
+        "style": "A gruff, hardworking miner, terse and grounded with a working-class bluntness."
+      },
+      "7716": {
+        "name": "Gadrin",
+        "style": "Plain working guild dwarf. Gruff and grounded."
+      },
+      "7717": {
+        "name": "Hendor",
+        "style": "Boastful ore-shop owner, brash and full of salesman's bluster."
+      },
+      "7718": {
+        "name": "Yarsul",
+        "style": "Gruff pickaxe shopkeeper, proud of his stock and quick to make a sale."
+      },
+      "7719": {
+        "name": "Belona",
+        "style": "Brisk, no-nonsense mineral trader. Curt and businesslike."
+      },
+      "7720": {
+        "name": "Utrec",
+        "style": "Plain working guild dwarf. Gruff and grounded."
+      },
+      "7721": {
+        "name": "Dwarf",
+        "style": "Gruff, blunt and no-nonsense; the terse grumble of a working miner."
+      },
+      "7746": {
+        "name": "Wizard Mizgog",
+        "style": "Crotchety, irritable old mage; testy and impatient, grumbling about imps and stolen beads."
+      },
+      "7747": {
+        "name": "Wizard Mizgog",
+        "style": "Crotchety, irritable old mage; testy and impatient, grumbling about imps and stolen beads."
+      },
+      "7748": {
+        "name": "Fairy",
+        "style": "Light, lilting, whimsical; airy and quick in delivery."
+      },
+      "7754": {
+        "name": "Squirrel",
+        "style": "Chipper, chattery talking squirrel who insists it's smarter than it looks; quick and cheeky."
+      },
+      "7755": {
+        "name": "Squirrel",
+        "style": "Chipper, chattery talking squirrel who insists it's smarter than it looks; quick and cheeky."
+      },
+      "7756": {
+        "name": "Squirrel",
+        "style": "Chipper, chattery talking squirrel who insists it's smarter than it looks; quick and cheeky."
+      },
+      "7758": {
+        "name": "Mernia",
+        "style": "Mermaid who tends seaweed patches and sells farm tools; plain, businesslike caretaker tone."
+      },
+      "7761": {
+        "name": "Lead Navigator",
+        "style": "A weathered, seasoned navigator; confident and gruff with the easy authority of long experience at sea."
+      },
+      "7762": {
+        "name": "Lead Navigator",
+        "style": "A weathered, seasoned navigator; confident and gruff with the easy authority of long experience at sea."
+      },
+      "7763": {
+        "name": "Junior Navigator",
+        "style": "An eager, deferential junior crewman; keen and a touch green, looking up to his senior."
+      },
+      "7764": {
+        "name": "Junior Navigator",
+        "style": "An eager, deferential junior crewman; keen and a touch green, looking up to his senior."
+      },
+      "7765": {
+        "name": "John",
+        "style": "Expedition crewman now dozing on a camp bench; sluggish, laid-back, half-asleep delivery."
+      },
+      "7766": {
+        "name": "David",
+        "style": "Easygoing expedition crewman, playful and a bit silly, fond of sing-song repetitive back-and-forth."
+      },
+      "7768": {
+        "name": "Barge guard",
+        "style": "A plain, dutiful guard; terse and grounded, watching over the canal barge without ceremony."
+      },
+      "7769": {
+        "name": "Shop keeper",
+        "style": "A plain, businesslike merchant; brisk and grounded, dealing in goods without fuss."
+      },
+      "7770": {
+        "name": "Fossil Collector",
+        "style": "Plain, workaday museum hand who tallies fossils; matter-of-fact and grounded."
+      },
+      "7772": {
+        "name": "Peter",
+        "style": "Museum camp researcher, plain and grounded, helpful and unhurried."
+      },
+      "7773": {
+        "name": "Charles",
+        "style": "Aged natural historian, learned and measured; lecturing, donnish, fascinated by specimens."
+      },
+      "7774": {
+        "name": "John",
+        "style": "A plain, grounded camp hand; casual and unremarkable in manner."
+      },
+      "7776": {
+        "name": "Petrified Pete",
+        "style": "Gruff volcanic-mine ore seller manning his shop; terse, no-nonsense miner's patter."
+      },
+      "7777": {
+        "name": "Weve",
+        "style": "A young boy who darts between wyverns; piping, eager, boastful child's chatter."
+      },
+      "7778": {
+        "name": "Irene",
+        "style": "An analytical chemist, matter-of-fact and curious; explains her experiments precisely and methodically."
+      },
+      "7783": {
+        "name": "Ceto",
+        "style": "Mermaid gatekeeper who blurts groan-worthy sea puns; wry, playful, joking delivery."
+      },
+      "7784": {
+        "name": "Mairin",
+        "style": "Mermaid market trader; brisk, salesy patter pitching her underwater wares."
+      },
+      "7787": {
+        "name": "Mattimeo",
+        "style": "Bird-watching enthusiast, gushing and absorbed in spotting exotic birds; keen, rambling delivery."
+      },
+      "7790": {
+        "name": "John",
+        "style": "Expedition crewman now dozing on a camp bench; sluggish, laid-back, half-asleep delivery."
+      },
+      "7791": {
+        "name": "David",
+        "style": "Easygoing expedition crewman, playful and a bit silly, fond of sing-song repetitive back-and-forth."
+      },
+      "8012": {
+        "name": "Barge guard",
+        "style": "A plain, dutiful guard; terse and grounded, watching over the canal barge without ceremony."
+      },
+      "8013": {
+        "name": "Barge guard",
+        "style": "A plain, dutiful guard; terse and grounded, watching over the canal barge without ceremony."
+      },
+      "8054": {
+        "name": "Achietties",
+        "style": "Authoritative and professional gatekeeper of the Heroes' Guild; speaks with a measured, heroic bearing that conveys rank without warmth."
+      },
+      "8135": {
+        "name": "Zorgoth",
+        "style": "An ancient, cold and calculating intellect; speaks with measured grandeur and restrained menace, unbroken by his kin's rage."
+      },
+      "8136": {
+        "name": "Zorgoth",
+        "style": "An ancient, cold and calculating intellect; speaks with measured grandeur and restrained menace, unbroken by his kin's rage."
+      },
+      "8156": {
+        "name": "Achietties",
+        "style": "Authoritative and professional gatekeeper of the Heroes' Guild; speaks with a measured, heroic bearing that conveys rank without warmth."
+      },
+      "8164": {
+        "name": "Achietties",
+        "style": "Authoritative and professional gatekeeper of the Heroes' Guild; speaks with a measured, heroic bearing that conveys rank without warmth."
+      },
+      "8167": {
+        "name": "Zorgoth",
+        "style": "An ancient, cold and calculating intellect; speaks with measured grandeur and restrained menace, unbroken by his kin's rage."
+      },
+      "8172": {
+        "name": "Achietties",
+        "style": "Authoritative and professional gatekeeper of the Heroes' Guild; speaks with a measured, heroic bearing that conveys rank without warmth."
+      },
+      "8175": {
+        "name": "Zorgoth",
+        "style": "An ancient, cold and calculating intellect; speaks with measured grandeur and restrained menace, unbroken by his kin's rage."
+      },
+      "8176": {
+        "name": "Zorgoth",
+        "style": "An ancient, cold and calculating intellect; speaks with measured grandeur and restrained menace, unbroken by his kin's rage."
+      },
+      "8193": {
+        "name": "James",
+        "style": "Friendly, informative tutor; clear and welcoming, walks newcomers through membership and bonds."
+      },
+      "8368": {
+        "name": "Abigaila",
+        "style": "A world-weary refugee turned scryer; quiet, haunted and knowing, speaking in low measured tones."
+      },
+      "8419": {
+        "name": "Drunken Dwarf's Leg",
+        "style": "Dim, lumbering mountain troll. Slow, simple, blunt speech with little grasp of what's going on."
+      },
+      "8424": {
+        "name": "Wolfbone",
+        "style": "A slow, dim-witted troll; blunt and simple, thinking out loud in short heavy thoughts."
+      },
+      "8503": {
+        "name": "Survival Expert",
+        "style": "Patient, encouraging outdoors instructor; clear and steady, explaining basics plainly like a guide showing a newcomer the ropes."
+      },
+      "8631": {
+        "name": "Seaman Morris",
+        "style": "Eager, breezy young sailor; chatty and casual with a dockhand's lilt."
+      },
+      "8644": {
+        "name": "Saradominist recruiter",
+        "style": "Earnest, righteous recruiter; rallies players to Castle Wars with steady, dutiful conviction."
+      },
+      "8686": {
+        "name": "Nurmof",
+        "style": "A blunt, businesslike pickaxe seller; terse and gruff with a tradesman's no-nonsense manner."
+      },
+      "8694": {
+        "name": "Brian",
+        "style": "Plain, workaday shopkeeper. Matter-of-fact and unremarkable, just pitches his ranging stock."
+      },
+      "9477": {
+        "name": "Survival Expert",
+        "style": "Patient, encouraging outdoors instructor; clear and steady, explaining basics plainly like a guide showing a newcomer the ropes."
+      },
+      "9480": {
+        "name": "Quest Guide",
+        "style": "Helpful, welcoming guide; clear and encouraging instructional tone."
+      },
+      "9481": {
+        "name": "Mining Instructor",
+        "style": "Practical, hands-on workman; plain and matter-of-fact instructional delivery."
+      },
+      "9485": {
+        "name": "Brother Brace",
+        "style": "Calm, patient monk; gentle, devout and reassuring instructional tone."
+      },
+      "9487": {
+        "name": "Magic Instructor",
+        "style": "Encouraging, clear teacher; patient and instructive."
+      },
+      "10368": {
+        "name": "Squire",
+        "style": "A dutiful, eager young servant tidying the crypt; earnest and deferential, a touch weary of the menial work."
+      },
+      "10459": {
+        "name": "Captain Bleemadge",
+        "style": "Easygoing, chatty glider pilot; breezy and casual with a flyer's confidence."
+      },
+      "10461": {
+        "name": "Captain Bleemadge",
+        "style": "Easygoing, chatty glider pilot; breezy and casual with a flyer's confidence."
+      },
+      "10462": {
+        "name": "Captain Bleemadge",
+        "style": "Easygoing, chatty glider pilot; breezy and casual with a flyer's confidence."
+      },
+      "10463": {
+        "name": "Captain Bleemadge",
+        "style": "Easygoing, chatty glider pilot; breezy and casual with a flyer's confidence."
+      },
+      "10464": {
+        "name": "Captain Bleemadge",
+        "style": "Easygoing, chatty glider pilot; breezy and casual with a flyer's confidence."
+      },
+      "10465": {
+        "name": "Captain Bleemadge",
+        "style": "Easygoing, chatty glider pilot; breezy and casual with a flyer's confidence."
+      },
+      "10466": {
+        "name": "Captain Bleemadge",
+        "style": "Easygoing, chatty glider pilot; breezy and casual with a flyer's confidence."
+      },
+      "10517": {
+        "name": "Zimberfizz",
+        "style": "A captive imp minion; quick, cheeky and chattery, grumbling about his lot.",
+        "accent": "Cockney"
+      },
+      "10518": {
+        "name": "Zimberfizz",
+        "style": "A captive imp minion; quick, cheeky and chattery, grumbling about his lot.",
+        "accent": "Cockney"
+      },
+      "10519": {
+        "name": "Zimberfizz",
+        "style": "A captive imp minion; quick, cheeky and chattery, grumbling about his lot.",
+        "accent": "Cockney"
+      },
+      "10528": {
+        "name": "Nomad",
+        "style": "A powerful warrior-mage and self-styled host; commanding, grandiose and faintly menacing, every line delivered with theatrical authority."
+      },
+      "10529": {
+        "name": "Nomad",
+        "style": "A powerful warrior-mage and self-styled host; commanding, grandiose and faintly menacing, every line delivered with theatrical authority."
+      },
+      "10530": {
+        "name": "Zimberfizz",
+        "style": "A captive imp minion; quick, cheeky and chattery, grumbling about his lot.",
+        "accent": "Cockney"
+      },
+      "10560": {
+        "name": "Garl",
+        "style": "A lone adventurer camped on the island; grounded and wary, speaking with cautious unease about something sinister."
+      },
+      "10630": {
+        "name": "Dusuri",
+        "style": "A dwarf shopkeeper running the star reward shop; plain, businesslike and matter-of-fact."
+      },
+      "10631": {
+        "name": "Dusuri",
+        "style": "A dwarf shopkeeper running the star reward shop; plain, businesslike and matter-of-fact."
+      },
+      "10655": {
+        "name": "Willow",
+        "style": "A grave robber posing as an archaeologist; smooth, persuasive and manipulative, sweet-talking until her cover slips."
+      },
+      "10656": {
+        "name": "Marley",
+        "style": "A down-on-his-luck thief; shifty, streetwise and a bit hangdog."
+      },
+      "10658": {
+        "name": "Atlas",
+        "style": "A hulking barbarian fitness trainer; hearty, gruff and loudly motivational, all gusto."
+      },
+      "10659": {
+        "name": "Burntof",
+        "style": "A boozy dwarf explosives enthusiast; boisterous, slurred and overeager about blowing things up."
+      },
+      "10660": {
+        "name": "Burntof",
+        "style": "A boozy dwarf explosives enthusiast; boisterous, slurred and overeager about blowing things up."
+      },
+      "10661": {
+        "name": "Willow",
+        "style": "A grave robber posing as an archaeologist; smooth, persuasive and manipulative, sweet-talking until her cover slips."
+      },
+      "10664": {
+        "name": "Burntof",
+        "style": "A boozy dwarf explosives enthusiast; boisterous, slurred and overeager about blowing things up."
+      },
+      "10684": {
+        "name": "Ramarno",
+        "style": "An old, blind dwarf who believes himself the last of his kind; weary and measured, speaking with quiet age.",
+        "pace": "slow, measured"
+      },
+      "10685": {
+        "name": "Ramarno",
+        "style": "An old, blind dwarf who believes himself the last of his kind; weary and measured, speaking with quiet age.",
+        "pace": "slow, measured"
+      },
+      "10697": {
+        "name": "Ghost",
+        "style": "A long-dead spirit stuck in time; hollow, mournful and otherworldly, recounting a forgotten age."
+      },
+      "10698": {
+        "name": "Ghost",
+        "style": "A long-dead spirit stuck in time; hollow, mournful and otherworldly, recounting a forgotten age."
+      },
+      "10699": {
+        "name": "Ghost",
+        "style": "A long-dead spirit stuck in time; hollow, mournful and otherworldly, recounting a forgotten age."
+      },
+      "10732": {
+        "name": "Zamorakian recruiter",
+        "style": "Fervent, combative recruiter; pushes Castle Wars with martial zeal and goading enthusiasm."
+      },
+      "10733": {
+        "name": "Meredith",
+        "style": "Friendly, patient host of the Games Zone; chatty and clear, walks players through the board games."
+      },
+      "10734": {
+        "name": "Banker",
+        "style": "Courteous, professional bank clerk; plain, efficient and even-toned."
+      },
+      "10735": {
+        "name": "Banker",
+        "style": "Courteous, professional bank clerk; plain, efficient and even-toned."
+      },
+      "10736": {
+        "name": "Banker",
+        "style": "Courteous, professional bank clerk; plain, efficient and even-toned."
+      },
+      "10737": {
+        "name": "Banker",
+        "style": "Courteous, professional bank clerk; plain, efficient and even-toned."
+      },
+      "10739": {
+        "name": "Raqueel",
+        "style": "Warm, chatty barmaid with easy pub banter and a teasing, familiar tone."
+      },
+      "10740": {
+        "name": "Raqueel",
+        "style": "Warm, chatty barmaid with easy pub banter and a teasing, familiar tone."
+      },
+      "10741": {
+        "name": "Raqueel",
+        "style": "Warm, chatty barmaid with easy pub banter and a teasing, familiar tone."
+      },
+      "10742": {
+        "name": "Raqueel",
+        "style": "Warm, chatty barmaid with easy pub banter and a teasing, familiar tone."
+      },
+      "10743": {
+        "name": "Raqueel",
+        "style": "Warm, chatty barmaid with easy pub banter and a teasing, familiar tone."
+      },
+      "10744": {
+        "name": "Raqueel",
+        "style": "Warm, chatty barmaid with easy pub banter and a teasing, familiar tone."
+      },
+      "10745": {
+        "name": "Raqueel",
+        "style": "Warm, chatty barmaid with easy pub banter and a teasing, familiar tone."
+      },
+      "10746": {
+        "name": "Raqueel",
+        "style": "Warm, chatty barmaid with easy pub banter and a teasing, familiar tone."
+      },
+      "10748": {
+        "name": "Gem",
+        "style": "Relaxed, sociable pub regular; casual and friendly in delivery."
+      },
+      "10749": {
+        "name": "Gem",
+        "style": "Relaxed, sociable pub regular; casual and friendly in delivery."
+      },
+      "10750": {
+        "name": "Gem",
+        "style": "Relaxed, sociable pub regular; casual and friendly in delivery."
+      },
+      "10751": {
+        "name": "Gem",
+        "style": "Relaxed, sociable pub regular; casual and friendly in delivery."
+      },
+      "10752": {
+        "name": "Gem",
+        "style": "Relaxed, sociable pub regular; casual and friendly in delivery."
+      },
+      "10753": {
+        "name": "Gem",
+        "style": "Relaxed, sociable pub regular; casual and friendly in delivery."
+      },
+      "10754": {
+        "name": "Gem",
+        "style": "Relaxed, sociable pub regular; casual and friendly in delivery."
+      },
+      "10755": {
+        "name": "Gem",
+        "style": "Relaxed, sociable pub regular; casual and friendly in delivery."
+      },
+      "10756": {
+        "name": "Gardener Jay Jr.",
+        "style": "Gruff and curt; snappish, dismissive, prefers his flowers to talking to people."
+      },
+      "10757": {
+        "name": "Gardener Jay Jr.",
+        "style": "Gruff and curt; snappish, dismissive, prefers his flowers to talking to people."
+      },
+      "10758": {
+        "name": "Gardener Jay Jr.",
+        "style": "Gruff and curt; snappish, dismissive, prefers his flowers to talking to people."
+      },
+      "10759": {
+        "name": "Clerk",
+        "style": "An administrative clerk; officious, businesslike and helpful in a clipped, procedural way."
+      },
+      "11225": {
+        "name": "D3ad1i F15her",
+        "style": "Laid-back, casual player-parody fisher; offhand and breezy."
+      },
+      "11226": {
+        "name": "Boar31337Killer",
+        "style": "Brash, boastful player-parody; eager and a bit cocky."
+      },
+      "11230": {
+        "name": "Group Storage tutor",
+        "style": "Clear, helpful, instructional; patient and matter-of-fact."
+      },
+      "11231": {
+        "name": "Group Ironman tutor",
+        "style": "Confident, upbeat instructor; explains things plainly and assuredly."
+      },
+      "11265": {
+        "name": "Oldak",
+        "style": "Inquisitive, scholarly cave-goblin inventor; treats magic as science, speaking with curious, precise enthusiasm."
+      },
+      "11266": {
+        "name": "Oldak",
+        "style": "Inquisitive, scholarly cave-goblin inventor; treats magic as science, speaking with curious, precise enthusiasm."
+      },
+      "11288": {
+        "name": "Ashuelot Reis",
+        "style": "Calm, serene nature spirit; measured, hushed, otherworldly delivery."
+      },
+      "11289": {
+        "name": "Ashuelot Reis",
+        "style": "Calm, serene nature spirit; measured, hushed, otherworldly delivery."
+      },
+      "11384": {
+        "name": "Oldak",
+        "style": "Inquisitive, scholarly cave-goblin inventor; treats magic as science, speaking with curious, precise enthusiasm."
+      },
+      "11385": {
+        "name": "Oldak",
+        "style": "Inquisitive, scholarly cave-goblin inventor; treats magic as science, speaking with curious, precise enthusiasm."
+      },
+      "11409": {
+        "name": "Rick",
+        "style": "Young, earnest wizard student; casual and a little eager in delivery."
+      },
+      "11410": {
+        "name": "Rick",
+        "style": "Young, earnest wizard student; casual and a little eager in delivery."
+      },
+      "11432": {
+        "name": "Archmage Sedridor",
+        "style": "Learned, grave head wizard; measured and authoritative with scholarly formality."
+      },
+      "11433": {
+        "name": "Archmage Sedridor",
+        "style": "Learned, grave head wizard; measured and authoritative with scholarly formality."
+      },
+      "11450": {
+        "name": "Archmage Sedridor",
+        "style": "Learned, grave head wizard; measured and authoritative with scholarly formality."
+      },
+      "11579": {
+        "name": "Prince Ali",
+        "style": "A young prince; earnest and a little helpless, speaks with the manner of pampered nobility."
+      },
+      "11580": {
+        "name": "Prince Ali",
+        "style": "A young prince; earnest and a little helpless, speaks with the manner of pampered nobility."
+      },
+      "11658": {
+        "name": "Gilbert",
+        "style": "Lively, cheery leprechaun; bright, sing-song, welcoming chatter."
+      },
+      "12121": {
+        "name": "Sir Pear Visor",
+        "style": "Formal, measured White Knight overseeing works; dutiful and officious in register."
+      },
+      "12122": {
+        "name": "Sir Pear Visor",
+        "style": "Formal, measured White Knight overseeing works; dutiful and officious in register."
+      },
+      "12139": {
+        "name": "Zorgoth",
+        "style": "An ancient, cold and calculating intellect; speaks with measured grandeur and restrained menace, unbroken by his kin's rage."
+      },
+      "12153": {
+        "name": "Wisp",
+        "style": "Soft, sibilant, ethereal whisper; otherworldly and hushed, words drift and trail.",
+        "accent": "breathy whispering siren tone"
+      },
+      "12157": {
+        "name": "Wisp",
+        "style": "Soft, sibilant, ethereal whisper; otherworldly and hushed, words drift and trail.",
+        "accent": "breathy whispering siren tone"
+      },
+      "12230": {
+        "name": "Helena",
+        "style": "Studious, curious archaeologist; brisk and detail-focused, speaks plainly and professionally."
+      },
+      "12231": {
+        "name": "Prescott",
+        "style": "Keen, methodical archaeologist; speaks in a practical, inquisitive, professional manner."
+      },
+      "12232": {
+        "name": "Ketla",
+        "style": "Reclusive, wary dwarf; reserved and guarded, speaks softly and keeps to herself."
+      },
+      "12233": {
+        "name": "Ketla",
+        "style": "Reclusive, wary dwarf; reserved and guarded, speaks softly and keeps to herself."
+      },
+      "12235": {
+        "name": "Me?",
+        "style": "Ominous, hollow echo of the player; speaks in eerie, unsettling, detached fragments."
+      },
+      "12236": {
+        "name": "Me?",
+        "style": "Ominous, hollow echo of the player; speaks in eerie, unsettling, detached fragments."
+      },
+      "12293": {
+        "name": "Dr Banikan",
+        "style": "Erudite, measured archaeologist; scholarly and articulate, speaks with quiet authority and fascination for ancient history."
+      },
+      "12294": {
+        "name": "Dr Banikan",
+        "style": "Erudite, measured archaeologist; scholarly and articulate, speaks with quiet authority and fascination for ancient history."
+      },
+      "12512": {
+        "name": "Hagus",
+        "style": "Secretive, cagey Zamorakian mage; guarded and evasive, speaks in low, withholding tones."
+      },
+      "12599": {
+        "name": "Key Master",
+        "style": "Blind, cursed keeper who hears whispering voices. Speaks haltingly and otherworldly, muttering of the voices in his head."
+      },
+      "12629": {
+        "name": "Dimintheis",
+        "style": "Genteel and formal with the airs of nobility; prideful and self-important, slipping into a pleading desperation when his pretence is challenged."
+      },
+      "12649": {
+        "name": "Pet kree'arra",
+        "style": "Non-speaking miniature aviansie follower; screeches and squawks rather than words."
+      },
+      "12650": {
+        "name": "Pet general graardor",
+        "style": "Non-speaking miniature ourg follower; grunts and growls rather than words."
+      },
+      "12651": {
+        "name": "Pet zilyana",
+        "style": "Non-speaking miniature icyene follower; minimal vocalisation."
+      },
+      "12652": {
+        "name": "Pet k'ril tsutsaroth",
+        "style": "Non-speaking miniature demon follower; snarls and hisses rather than words."
+      },
+      "12884": {
+        "name": "Regulus Cento",
+        "style": "Flamboyant, fancy showman; flowery and theatrical, dotes proudly on his prized bird."
+      },
+      "12885": {
+        "name": "Regulus Cento",
+        "style": "Flamboyant, fancy showman; flowery and theatrical, dotes proudly on his prized bird."
+      },
+      "13442": {
+        "name": "Kit Breaker",
+        "style": "Earnest, eager young aspirant; hopeful and determined, speaks with bright sincerity."
+      },
+      "13511": {
+        "name": "Thaerisk",
+        "style": "Wise, worldly druid elder; calm and measured, speaks thoughtfully with seasoned authority."
+      },
+      "13512": {
+        "name": "Thaerisk",
+        "style": "Wise, worldly druid elder; calm and measured, speaks thoughtfully with seasoned authority."
+      },
+      "13513": {
+        "name": "Thaerisk",
+        "style": "Wise, worldly druid elder; calm and measured, speaks thoughtfully with seasoned authority."
+      },
+      "13519": {
+        "name": "Silif",
+        "style": "Smooth, composed operative; sharp and self-assured, speaks with a polished, confident ease."
+      },
+      "13520": {
+        "name": "Silif",
+        "style": "Smooth, composed operative; sharp and self-assured, speaks with a polished, confident ease."
+      },
+      "13521": {
+        "name": "Silif",
+        "style": "Smooth, composed operative; sharp and self-assured, speaks with a polished, confident ease."
+      },
+      "13524": {
+        "name": "Silif",
+        "style": "Smooth, composed operative; sharp and self-assured, speaks with a polished, confident ease."
+      },
+      "13543": {
+        "name": "Akrisae",
+        "style": "Solemn, devout priest-knight; measured and formal, speaks with grave Saradominist conviction."
+      },
+      "13544": {
+        "name": "Akrisae",
+        "style": "Solemn, devout priest-knight; measured and formal, speaks with grave Saradominist conviction."
+      },
+      "13545": {
+        "name": "Shady stranger",
+        "style": "Furtive, paranoid spy; shifty and evasive, mutters in guarded, watchful tones."
+      },
+      "13546": {
+        "name": "Shady stranger",
+        "style": "Furtive, paranoid spy; shifty and evasive, mutters in guarded, watchful tones."
+      },
+      "13547": {
+        "name": "Shady stranger",
+        "style": "Furtive, paranoid spy; shifty and evasive, mutters in guarded, watchful tones."
+      },
+      "13566": {
+        "name": "Elite Black Knight",
+        "style": "A stern, duty-bound gatekeeper. Curt and commanding, enforces access with cold authority and no patience."
+      },
+      "13613": {
+        "name": "Ghommal",
+        "style": "Imposing, booming guardsman; commanding and terse, speaks with blunt authority."
+      },
+      "13614": {
+        "name": "Laidee Gnonock",
+        "style": "Gruff, no-nonsense doorman; tough and blunt despite small stature, terse bouncer's manner."
+      },
+      "13615": {
+        "name": "Harrallak Menarous",
+        "style": "Refined, self-assured guildmaster and master duelist; measured and confident with a touch of pride."
+      },
+      "13616": {
+        "name": "Sloane",
+        "style": "A seasoned guild warrior, direct and businesslike with a tough, matter-of-fact manner."
+      },
+      "13617": {
+        "name": "Yadech Strongarm",
+        "style": "A gruff, stoic barbarian warrior. Speaks plainly and heavily, bound by codes of friendship and honour, weighty and unhurried."
+      },
+      "15253": {
+        "name": "Jobless Jim",
+        "style": "A down-on-his-luck dockside crewman who talks in dense Cockney rhyming slang that baffles everyone around him.",
+        "accent": "Cockney rhyming slang, working-class dockside patter"
+      },
+      "15254": {
+        "name": "Jobless Jim",
+        "style": "A down-on-his-luck dockside crewman who talks in dense Cockney rhyming slang that baffles everyone around him.",
+        "accent": "Cockney rhyming slang, working-class dockside patter"
+      },
+      "15256": {
+        "name": "Jobless Jim",
+        "style": "A down-on-his-luck dockside crewman who talks in dense Cockney rhyming slang that baffles everyone around him.",
+        "accent": "Cockney rhyming slang, working-class dockside patter"
+      },
+      "15257": {
+        "name": "Jobless Jim",
+        "style": "A down-on-his-luck dockside crewman who talks in dense Cockney rhyming slang that baffles everyone around him.",
+        "accent": "Cockney rhyming slang, working-class dockside patter"
+      },
+      "15258": {
+        "name": "Jobless Jim",
+        "style": "A down-on-his-luck dockside crewman who talks in dense Cockney rhyming slang that baffles everyone around him.",
+        "accent": "Cockney rhyming slang, working-class dockside patter"
+      },
+      "15259": {
+        "name": "Jobless Jim",
+        "style": "A down-on-his-luck dockside crewman who talks in dense Cockney rhyming slang that baffles everyone around him.",
+        "accent": "Cockney rhyming slang, working-class dockside patter"
+      },
+      "15260": {
+        "name": "Jobless Jim",
+        "style": "A down-on-his-luck dockside crewman who talks in dense Cockney rhyming slang that baffles everyone around him.",
+        "accent": "Cockney rhyming slang, working-class dockside patter"
+      },
+      "15632": {
+        "name": "Cassius",
+        "style": "An eager, fast-talking aspiring entrepreneur, all sales pitch and grand ambition until his schemes collapse, then sharply indignant."
+      },
+      "17009": {
+        "name": "Rickety door",
+        "style": "Creaky, weary and dry; a worn old guardian that grudgingly poses its questions."
+      },
+      "17100": {
+        "name": "Rickety door",
+        "style": "Creaky, weary and dry; a worn old guardian that grudgingly poses its questions."
+      },
+      "18964": {
+        "name": "Rickety door",
+        "style": "Creaky, weary and dry; a worn old guardian that grudgingly poses its questions."
+      },
+      "18965": {
+        "name": "Rickety door",
+        "style": "Creaky, weary and dry; a worn old guardian that grudgingly poses its questions."
+      },
+      "19206": {
+        "name": "Gate of War",
+        "style": "Booming, commanding and martial; an imposing magical guardian that demands answers."
+      },
+      "19207": {
+        "name": "Gate of War",
+        "style": "Booming, commanding and martial; an imposing magical guardian that demands answers."
+      },
+      "19209": {
+        "name": "Gate of War",
+        "style": "Booming, commanding and martial; an imposing magical guardian that demands answers."
+      },
+      "19210": {
+        "name": "Gate of War",
+        "style": "Booming, commanding and martial; an imposing magical guardian that demands answers."
+      },
+      "23653": {
+        "name": "Oozing barrier",
+        "style": "A disembodied living head that guards the way; deep, ominous, sepulchral delivery, intoning grave warnings and security questions."
+      },
+      "23654": {
+        "name": "Oozing barrier",
+        "style": "A disembodied living head that guards the way; deep, ominous, sepulchral delivery, intoning grave warnings and security questions."
+      },
+      "23656": {
+        "name": "Oozing barrier",
+        "style": "A disembodied living head that guards the way; deep, ominous, sepulchral delivery, intoning grave warnings and security questions."
+      },
+      "23727": {
+        "name": "Portal of Death",
+        "style": "A portal crafted from the bones of the dead; deep, ominous, sepulchral delivery intoning grave warnings and security questions."
+      },
+      "23728": {
+        "name": "Portal of Death",
+        "style": "A portal crafted from the bones of the dead; deep, ominous, sepulchral delivery intoning grave warnings and security questions."
+      },
+      "23729": {
+        "name": "Portal of Death",
+        "style": "A portal crafted from the bones of the dead; deep, ominous, sepulchral delivery intoning grave warnings and security questions."
+      },
+      "23730": {
+        "name": "Portal of Death",
+        "style": "A portal crafted from the bones of the dead; deep, ominous, sepulchral delivery intoning grave warnings and security questions."
+      },
+      "24839": {
+        "name": "Grimgnash",
+        "style": "A surly, dismissive predator with blunt, clipped speech, contemptuous of lesser creatures and perpetually hungry and irritable.",
+        "accent": "refers to himself in the third person in broken, simple phrasing"
+      },
+      "26383": {
+        "name": "Sir Gerry",
+        "style": "A mortally wounded knight giving his last account; faint, breathless and faltering between gasps.",
+        "pace": "slow, halting"
+      },
+      "28246": {
+        "name": "Wisp",
+        "style": "Soft, sibilant, ethereal whisper; otherworldly and hushed, words drift and trail.",
+        "accent": "breathy whispering siren tone"
+      },
+      "28801": {
+        "name": "Scurry",
+        "style": "Cheeky, chattery little rat; quick, scrappy comedic patter with a streetwise swagger.",
+        "accent": "cheeky cockney street patter"
+      },
+      "28928": {
+        "name": "Juna",
+        "style": "Ancient serpent guardian; slow, measured and solemn, speaking in cryptic, ceremonious riddles with timeless gravity.",
+        "pace": "slow, deliberate"
+      },
+      "28929": {
+        "name": "Juna",
+        "style": "Ancient serpent guardian; slow, measured and solemn, speaking in cryptic, ceremonious riddles with timeless gravity.",
+        "pace": "slow, deliberate"
       }
     }
   },
@@ -5931,9 +8144,8 @@
       "ethnicity": "misthalin"
     },
     "996": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "997": {
       "race": "Goblin",
@@ -7255,7 +9467,7 @@
     "1324": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "fremennik"
     },
     "1325": {
       "race": "Human",
@@ -9415,9 +11627,8 @@
       "gender": "Male"
     },
     "1835": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "1838": {
       "race": "Human",
@@ -9441,47 +11652,39 @@
     },
     "1843": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "1844": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "1845": {
       "race": "Human",
       "gender": "Male"
     },
     "1846": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "1847": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "gender": "Female"
     },
     "1848": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "1849": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "1850": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "1851": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "1852": {
       "race": "Human",
@@ -10350,24 +12553,20 @@
       "gender": "Male"
     },
     "2104": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Troll",
+      "gender": "Male"
     },
     "2105": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Troll",
+      "gender": "Male"
     },
     "2106": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Troll",
+      "gender": "Male"
     },
     "2107": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Troll",
+      "gender": "Male"
     },
     "2108": {
       "race": "Human",
@@ -11024,14 +13223,12 @@
       "gender": "Male"
     },
     "2268": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2269": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2270": {
       "race": "Human",
@@ -11039,24 +13236,20 @@
       "ethnicity": "misthalin"
     },
     "2271": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2272": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2273": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2274": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2275": {
       "race": "Human",
@@ -11069,14 +13262,12 @@
       "ethnicity": "misthalin"
     },
     "2277": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2278": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2279": {
       "race": "Human",
@@ -11084,29 +13275,24 @@
       "ethnicity": "misthalin"
     },
     "2280": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2281": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2282": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2283": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2284": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2285": {
       "race": "Human",
@@ -11114,68 +13300,56 @@
       "ethnicity": "misthalin"
     },
     "2286": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2287": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2288": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2289": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2290": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2291": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2292": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2293": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2294": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2295": {
       "race": "Human",
       "gender": "Male"
     },
     "2296": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2297": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2298": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2299": {
       "race": "Human",
@@ -11183,79 +13357,64 @@
       "ethnicity": "misthalin"
     },
     "2300": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2301": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2302": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2303": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2304": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2305": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2306": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2307": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2308": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2309": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2310": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2311": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2312": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2313": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "2314": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2315": {
       "race": "Human",
@@ -11276,109 +13435,88 @@
       "ethnicity": "misthalin"
     },
     "2319": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2320": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2321": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2322": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2323": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2324": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2325": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2326": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2327": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2328": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2329": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2330": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2331": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2332": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2333": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2334": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2335": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2336": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2337": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2338": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2339": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2340": {
       "race": "Human",
@@ -11398,9 +13536,8 @@
       "gender": "Male"
     },
     "2344": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "2345": {
       "race": "Human",
@@ -11970,7 +14107,7 @@
     "2462": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "asgarnia"
+      "ethnicity": "easternlands"
     },
     "2463": {
       "race": "Troll",
@@ -12094,23 +14231,19 @@
     },
     "2494": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "2495": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "2496": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "2497": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "2498": {
       "race": "Human",
@@ -13471,9 +15604,8 @@
       "gender": "Female"
     },
     "2829": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "2830": {
       "race": "Human",
@@ -14401,7 +16533,7 @@
     "3063": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "fremennik"
     },
     "3064": {
       "race": "Human",
@@ -14518,9 +16650,8 @@
       "ethnicity": "kharidian"
     },
     "3092": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "3093": {
       "race": "Human",
@@ -14615,7 +16746,7 @@
     "3115": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "kharidian"
     },
     "3116": {
       "race": "Demon",
@@ -14983,9 +17114,8 @@
       "gender": "Male"
     },
     "3204": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "3205": {
       "race": "Human",
@@ -15161,9 +17291,8 @@
       "ethnicity": "misthalin"
     },
     "3246": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Wizard",
+      "gender": "Male"
     },
     "3247": {
       "race": "Human",
@@ -15663,7 +17792,7 @@
     "3362": {
       "race": "Human",
       "gender": "Female",
-      "ethnicity": "misthalin"
+      "ethnicity": "fremennik"
     },
     "3364": {
       "race": "Dwarf",
@@ -22968,9 +25097,8 @@
       "gender": "Male"
     },
     "5169": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "5170": {
       "race": "Dwarf",
@@ -23027,9 +25155,8 @@
       "ethnicity": "misthalin"
     },
     "5182": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "5184": {
       "race": "Human",
@@ -23602,9 +25729,8 @@
       "gender": "Male"
     },
     "5328": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "5329": {
       "race": "Human",
@@ -24122,7 +26248,7 @@
     "5451": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "karamja"
     },
     "5452": {
       "race": "Dwarf",
@@ -27918,8 +30044,7 @@
     },
     "6533": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "6549": {
       "race": "Human",
@@ -30961,19 +33086,16 @@
       "gender": "Male"
     },
     "7297": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "7298": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "7299": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "7300": {
       "race": "Goblin",
@@ -32727,9 +34849,8 @@
       "gender": "Male"
     },
     "7748": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Elf",
+      "gender": "Female"
     },
     "7750": {
       "race": "Human",
@@ -32909,7 +35030,7 @@
     "7787": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "kandarin"
     },
     "7788": {
       "race": "Human",
@@ -35037,7 +37158,7 @@
     "8368": {
       "race": "Human",
       "gender": "Female",
-      "ethnicity": "misthalin"
+      "ethnicity": "morytania"
     },
     "8369": {
       "race": "Undead",
@@ -43559,13 +45680,11 @@
     },
     "10528": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "10529": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "10530": {
       "race": "Demon",
@@ -43649,8 +45768,7 @@
     },
     "10560": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "10561": {
       "race": "Human",
@@ -44202,19 +46320,16 @@
       "gender": "Male"
     },
     "10697": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "asgarnia"
+      "race": "Undead",
+      "gender": "Male"
     },
     "10698": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "asgarnia"
+      "race": "Undead",
+      "gender": "Male"
     },
     "10699": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "asgarnia"
+      "race": "Undead",
+      "gender": "Male"
     },
     "10700": {
       "race": "Human",
@@ -46406,14 +48521,12 @@
       "ethnicity": "misthalin"
     },
     "11265": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "11266": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "11267": {
       "race": "Goblin",
@@ -46923,14 +49036,12 @@
       "ethnicity": "kandarin"
     },
     "11384": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "11385": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Male"
     },
     "11399": {
       "race": "Human",
@@ -47712,12 +49823,12 @@
     "11579": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "kharidian"
     },
     "11580": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "misthalin"
+      "ethnicity": "kharidian"
     },
     "11581": {
       "race": "Human",
@@ -49773,8 +51884,7 @@
     },
     "12153": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "asgarnia"
+      "gender": "Female"
     },
     "12154": {
       "race": "Undead",
@@ -49793,8 +51903,7 @@
     },
     "12157": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "asgarnia"
+      "gender": "Female"
     },
     "12158": {
       "race": "Undead",
@@ -50066,7 +52175,7 @@
     },
     "12230": {
       "race": "Human",
-      "gender": "Male",
+      "gender": "Female",
       "ethnicity": "asgarnia"
     },
     "12231": {
@@ -50076,13 +52185,11 @@
     },
     "12232": {
       "race": "Dwarf",
-      "gender": "Male",
-      "ethnicity": "asgarnia"
+      "gender": "Female"
     },
     "12233": {
       "race": "Dwarf",
-      "gender": "Male",
-      "ethnicity": "asgarnia"
+      "gender": "Female"
     },
     "12234": {
       "race": "Human",
@@ -50326,13 +52433,11 @@
     },
     "12293": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "12294": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "12295": {
       "race": "Human",
@@ -51122,8 +53227,7 @@
     },
     "12512": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "12513": {
       "race": "Human",
@@ -51490,7 +53594,7 @@
     "12599": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "asgarnia"
+      "ethnicity": "kourend"
     },
     "12600": {
       "race": "Dwarf",
@@ -55767,7 +57871,7 @@
     "13617": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "asgarnia"
+      "ethnicity": "fremennik"
     },
     "13618": {
       "race": "Human",
@@ -62708,13 +64812,11 @@
     },
     "17009": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "17100": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "17953": {
       "race": "Human",
@@ -62738,33 +64840,27 @@
     },
     "18964": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "18965": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "19206": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "19207": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "19209": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "19210": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "gender": "Male"
     },
     "19730": {
       "race": "Human",
@@ -63207,39 +65303,32 @@
       "ethnicity": "kourend"
     },
     "23653": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "23654": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "23656": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "23727": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "23728": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "23729": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "23730": {
-      "race": "Human",
-      "gender": "Male",
-      "ethnicity": "misthalin"
+      "race": "Undead",
+      "gender": "Male"
     },
     "23757": {
       "race": "Human",
@@ -63538,8 +65627,7 @@
     },
     "28246": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "asgarnia"
+      "gender": "Female"
     },
     "28248": {
       "race": "Undead",
