@@ -17,6 +17,14 @@ public class LanguageCodesTest {
   }
 
   @Test
+  public void mapsMultiWordAndRegionalVariants() {
+    assertEquals("pt-BR", LanguageCodes.codeFor("Brazilian Portuguese"));
+    assertEquals("pt-PT", LanguageCodes.codeFor("European Portuguese"));
+    assertEquals("es-419", LanguageCodes.codeFor("Latin American Spanish"));
+    assertEquals("zh-TW", LanguageCodes.codeFor("Traditional Chinese"));
+  }
+
+  @Test
   public void passesThroughAnExplicitBcp47Code() {
     assertEquals("a user-typed code is accepted as-is", "pt-BR", LanguageCodes.codeFor("pt-BR"));
     assertEquals("en", LanguageCodes.codeFor("en"));

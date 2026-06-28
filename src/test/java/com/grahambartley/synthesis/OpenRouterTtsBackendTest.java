@@ -34,7 +34,7 @@ public class OpenRouterTtsBackendTest {
     String key = "";
     int maxChars = 600;
     int speedPercent = 100;
-    String region = "";
+    TTSDialogueConfig.CloudRegion region = TTSDialogueConfig.CloudRegion.AUTO;
     String language = "English";
 
     @Override
@@ -53,7 +53,7 @@ public class OpenRouterTtsBackendTest {
     }
 
     @Override
-    public String providerRegion() {
+    public TTSDialogueConfig.CloudRegion providerRegion() {
       return region;
     }
 
@@ -470,7 +470,7 @@ public class OpenRouterTtsBackendTest {
         "a blank region adds no region field",
         defaultBody.getAsJsonObject("provider").has("region"));
 
-    config.region = "eu";
+    config.region = TTSDialogueConfig.CloudRegion.EU;
     server.enqueue(
         new MockResponse()
             .setResponseCode(200)
@@ -603,6 +603,42 @@ public class OpenRouterTtsBackendTest {
 
     assertNull("a non-2xx fails the line gracefully", pcm);
     assertEquals("the failure surfaces a one-time notice", 1, notices[0]);
+  }
+
+  @Test
+  public void transientEmptyBodyIsRetriedOnceAndRecovers() throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    // First call comes back as an empty 200 (the transient glitch); the immediate retry succeeds.
+    server.enqueue(new MockResponse().setResponseCode(200).setBody(""));
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1, 2, 3}))));
+
+    int[] notices = {0};
+    OpenRouterTtsBackend backend = backend(config);
+    backend.setNotice(msg -> notices[0]++);
+
+    assertNotNull("a single empty 200 is recovered by the retry", backend.synthesize(req()));
+    assertEquals("the line was attempted twice", 2, server.getRequestCount());
+    assertEquals("a recovered line surfaces no failure notice", 0, notices[0]);
+  }
+
+  @Test
+  public void repeatedEmptyBodyFailsAfterOneRetry() {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    server.enqueue(new MockResponse().setResponseCode(200).setBody(""));
+    server.enqueue(new MockResponse().setResponseCode(200).setBody(""));
+
+    int[] notices = {0};
+    OpenRouterTtsBackend backend = backend(config);
+    backend.setNotice(msg -> notices[0]++);
+
+    assertNull("two empty bodies in a row fail the line", backend.synthesize(req()));
+    assertEquals("it retries exactly once, never storms", 2, server.getRequestCount());
+    assertEquals("the persistent failure surfaces one notice", 1, notices[0]);
   }
 
   @Test

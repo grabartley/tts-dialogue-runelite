@@ -42,6 +42,38 @@ public interface TTSDialogueConfig extends Config {
     CLOUD
   }
 
+  /**
+   * Geographic bias for OpenRouter provider routing, offered as a fixed dropdown. {@link #AUTO}
+   * sends no preference (the default, OpenRouter picks the provider); every other value is injected
+   * into the request's provider preferences as its {@link #code()}.
+   */
+  enum CloudRegion {
+    AUTO("", "Auto (no preference)"),
+    US("us", "United States"),
+    EU("eu", "European Union"),
+    UK("uk", "United Kingdom"),
+    CANADA("ca", "Canada"),
+    ASIA_PACIFIC("apac", "Asia Pacific");
+
+    private final String code;
+    private final String label;
+
+    CloudRegion(String code, String label) {
+      this.code = code;
+      this.label = label;
+    }
+
+    /** The region token sent to OpenRouter, or blank for {@link #AUTO} (no preference). */
+    public String code() {
+      return code;
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
+  }
+
   @ConfigItem(
       keyName = "voiceBackend",
       name = "Voice Backend",
@@ -130,13 +162,13 @@ public interface TTSDialogueConfig extends Config {
       keyName = "providerRegion",
       name = "Provider Region",
       description =
-          "Optional geographic bias for OpenRouter provider routing, injected into the request's"
-              + " provider preferences when set. Leave blank (default) to let OpenRouter pick the"
-              + " best provider automatically. Used only by the Cloud backend.",
+          "Optional geographic bias for OpenRouter provider routing, injected into the request when"
+              + " set. Leave on Auto (default) to let OpenRouter pick the best provider"
+              + " automatically. Used only by the Cloud backend.",
       position = 3,
       section = cloudOpenRouterSection)
-  default String providerRegion() {
-    return "";
+  default CloudRegion providerRegion() {
+    return CloudRegion.AUTO;
   }
 
   @ConfigItem(

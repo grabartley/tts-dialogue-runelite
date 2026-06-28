@@ -7,7 +7,7 @@ import com.grahambartley.tts.Pcm;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,10 +85,13 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
    */
   private static final Duration READ_TIMEOUT = Duration.ofSeconds(15);
 
-  /** Idle connections kept warm so back-to-back lines reuse a pooled HTTP/2 connection. */
+  /** Idle connections kept warm so back-to-back lines reuse a pooled connection. */
   private static final int MAX_IDLE_CONNECTIONS = 8;
 
   private static final Duration KEEP_ALIVE = Duration.ofMinutes(5);
+
+  /** One speech call plus a single retry, only ever for a transient empty 200 body. */
+  private static final int MAX_SPEECH_ATTEMPTS = 2;
 
   /** Base 429 back-off; doubled per consecutive limit hit and capped so prefetch never storms. */
   private static final long BACKOFF_BASE_MILLIS = 1_000;
@@ -133,14 +136,19 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
       OkHttpClient httpClient, TTSDialogueConfig config, Gson gson, String endpoint) {
     // Derive a long-lived keepalive client from the injected one (Hub rule: never new an
     // OkHttpClient). newBuilder() shares the dispatcher cheaply; we give it our own warm connection
-    // pool and HTTP/2 ALPN so back-to-back lines skip the TCP/TLS handshake, and our own
-    // connect/read/call timeouts without mutating the shared client's globals. Built once and
-    // reused
-    // for the process lifetime (and the translation hop below).
+    // pool so back-to-back lines skip the TCP/TLS handshake, and our own connect/read/call timeouts
+    // without mutating the shared client's globals. Pinned to HTTP/1.1 deliberately: the speech
+    // endpoint streams raw PCM, and HTTP/2 multiplexes concurrent calls (the prefetch pool plus the
+    // live line) onto one connection, where a concurrent streamed body can come back truncated as
+    // an
+    // empty 200. HTTP/1.1 gives each concurrent call its own pooled connection, so they never
+    // contend; sequential lines still reuse a warm connection. Built once and reused for the
+    // process
+    // lifetime (and the translation hop below).
     this.httpClient =
         httpClient
             .newBuilder()
-            .protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
+            .protocols(Collections.singletonList(Protocol.HTTP_1_1))
             .connectionPool(
                 new ConnectionPool(MAX_IDLE_CONNECTIONS, KEEP_ALIVE.toMinutes(), TimeUnit.MINUTES))
             .connectTimeout(CONNECT_TIMEOUT)
@@ -317,7 +325,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     }
     // Route every call to the fastest provider (throughput sort, the :nitro equivalent) and apply
     // the optional region bias. Identical block on the translation hop, so routing is consistent.
-    OpenRouterProvider.apply(payload, config.providerRegion());
+    OpenRouterProvider.apply(payload, config.providerRegion().code());
 
     Request httpRequest =
         new Request.Builder()
@@ -329,55 +337,66 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
                     JSON_MEDIA_TYPE, gson.toJson(payload).getBytes(StandardCharsets.UTF_8)))
             .build();
 
-    try (Response response = httpClient.newCall(httpRequest).execute()) {
-      ResponseBody body = response.body();
-      // Read the bytes once; on any failure they are the diagnostic payload (an OpenRouter/Gemini
-      // error is usually returned as a JSON/text body, sometimes even with HTTP 200), so capturing
-      // them is the only way to see why a line was rejected rather than guessing.
-      byte[] bytes = body == null ? new byte[0] : body.bytes();
-      String contentType = headerOrEmpty(response, "Content-Type");
-      String generationId = headerOrEmpty(response, "X-Generation-Id");
+    // A 200 with a zero-byte body is a transient server-side glitch (the generation id is present
+    // but no audio came back), so one immediate retry recovers the line; the byte[]-backed request
+    // body is reusable across calls. Any other failure is not retried here.
+    for (int attempt = 1; attempt <= MAX_SPEECH_ATTEMPTS; attempt++) {
+      try (Response response = httpClient.newCall(httpRequest).execute()) {
+        ResponseBody body = response.body();
+        // Read the bytes once; on any failure they are the diagnostic payload (an OpenRouter/Gemini
+        // error is usually returned as a JSON/text body, sometimes even with HTTP 200), so
+        // capturing
+        // them is the only way to see why a line was rejected rather than guessing.
+        byte[] bytes = body == null ? new byte[0] : body.bytes();
+        String contentType = headerOrEmpty(response, "Content-Type");
+        String generationId = headerOrEmpty(response, "X-Generation-Id");
 
-      if (!response.isSuccessful()) {
-        if (response.code() == 429) {
-          enterBackoff();
+        if (!response.isSuccessful()) {
+          if (response.code() == 429) {
+            enterBackoff();
+          }
+          warnOnce(
+              "OpenRouter TTS request failed (HTTP "
+                  + response.code()
+                  + "); check your API key. Falling back to the local voice.");
+          logFailure(
+              "non-2xx", response.code(), response.message(), contentType, generationId, bytes);
+          return null;
         }
+        // A clean call clears any rate-limit back-off so prefetch can resume.
+        clearBackoff();
+        if (bytes.length == 0) {
+          logFailure(
+              "empty-body", response.code(), response.message(), contentType, generationId, bytes);
+          if (attempt < MAX_SPEECH_ATTEMPTS) {
+            log.debug("[TTS cloud] empty 200 body; retrying once");
+            continue;
+          }
+          warnOnce("OpenRouter TTS returned an empty response; falling back to the local voice.");
+          return null;
+        }
+        Pcm pcm = RawPcmDecoder.decode(bytes, SAMPLE_RATE);
+        if (pcm == null) {
+          warnOnce(
+              "OpenRouter TTS returned audio that could not be decoded; falling back to the local"
+                  + " voice.");
+          logFailure(
+              "undecodable", response.code(), response.message(), contentType, generationId, bytes);
+          return null;
+        }
+        return pcm;
+      } catch (IOException e) {
         warnOnce(
-            "OpenRouter TTS request failed (HTTP "
-                + response.code()
-                + "); check your API key. Falling back to the local voice.");
-        logFailure(
-            "non-2xx", response.code(), response.message(), contentType, generationId, bytes);
+            "OpenRouter TTS request could not reach the network; falling back to the local voice.");
+        log.debug("OpenRouter TTS network error: {}", e.getMessage());
+        return null;
+      } catch (RuntimeException e) {
+        warnOnce("OpenRouter TTS request failed unexpectedly; falling back to the local voice.");
+        log.debug("OpenRouter TTS unexpected error: {}", e.getMessage());
         return null;
       }
-      // A clean call clears any rate-limit back-off so prefetch can resume.
-      clearBackoff();
-      if (bytes.length == 0) {
-        warnOnce("OpenRouter TTS returned an empty response; falling back to the local voice.");
-        logFailure(
-            "empty-body", response.code(), response.message(), contentType, generationId, bytes);
-        return null;
-      }
-      Pcm pcm = RawPcmDecoder.decode(bytes, SAMPLE_RATE);
-      if (pcm == null) {
-        warnOnce(
-            "OpenRouter TTS returned audio that could not be decoded; falling back to the local"
-                + " voice.");
-        logFailure(
-            "undecodable", response.code(), response.message(), contentType, generationId, bytes);
-        return null;
-      }
-      return pcm;
-    } catch (IOException e) {
-      warnOnce(
-          "OpenRouter TTS request could not reach the network; falling back to the local voice.");
-      log.debug("OpenRouter TTS network error: {}", e.getMessage());
-      return null;
-    } catch (RuntimeException e) {
-      warnOnce("OpenRouter TTS request failed unexpectedly; falling back to the local voice.");
-      log.debug("OpenRouter TTS unexpected error: {}", e.getMessage());
-      return null;
     }
+    return null;
   }
 
   @Override

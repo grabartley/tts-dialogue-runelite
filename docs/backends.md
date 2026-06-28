@@ -55,9 +55,14 @@ Because the cloud backend is billed per character, several guards keep cost boun
 - **Speaking pace.** **Cloud Speaking Pace** is sent as the OpenRouter `speed` parameter only when it
   is not 100%, so the default request body is unchanged; the active model may ignore it.
 - **Keepalive connection.** The backend reuses one long-lived client derived from the injected one
-  (HTTP/2 ALPN, an 8-connection 5-minute keepalive pool, a 2s connect and 15s read budget), so
-  back-to-back lines reuse a warm connection instead of re-handshaking. The same client backs the
-  translation hop.
+  (an 8-connection 5-minute keepalive pool, a 2s connect and 15s read budget), so back-to-back lines
+  reuse a warm connection instead of re-handshaking. It is pinned to HTTP/1.1: the speech endpoint
+  streams raw PCM, and HTTP/2 would multiplex the prefetch pool and the live line onto one
+  connection where a concurrent streamed body can return truncated as an empty 200, so each
+  concurrent call instead gets its own pooled connection. The same client backs the translation hop.
+- **Empty-200 retry.** A 200 with a zero-byte body is a transient server glitch (the generation id
+  is present but no audio came back), so the line is retried once before falling back; any other
+  failure is not retried.
 - **Fastest-provider routing.** Every request carries a `provider` block with `sort: "throughput"`
   (the `:nitro` equivalent), so OpenRouter routes to the lowest-latency provider for the model. An
   optional **Provider Region** adds a geographic bias to the same block when set.
