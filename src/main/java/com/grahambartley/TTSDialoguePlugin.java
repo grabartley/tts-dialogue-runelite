@@ -56,10 +56,10 @@ public class TTSDialoguePlugin extends Plugin {
 
   /**
    * Config keys that change which backend is selected or whether it can become available. Changing
-   * any of these at runtime must re-run the active backend's off-thread install/spawn so a newly
-   * selected cloud backend warms up instead of pre-emptively falling back to local Kokoro. {@code
-   * voiceBackend} switches the selection; {@code openRouterApiKey} lets a previously-unavailable
-   * Cloud selection become available once a key is entered.
+   * any of these at runtime must re-run the newly selected backend's off-thread install/spawn so it
+   * is warm before the next line rather than starting cold on it. {@code voiceBackend} switches the
+   * selection; {@code openRouterApiKey} lets a previously-unavailable Cloud selection become
+   * available once a key is entered.
    */
   private static final java.util.Set<String> WARM_TRIGGER_KEYS =
       java.util.Set.of("voiceBackend", "openRouterApiKey");
@@ -136,15 +136,13 @@ public class TTSDialoguePlugin extends Plugin {
     EngineInstaller installer = new EngineInstaller(okHttpClient, gson, ttsDir.resolve("engines"));
     LocalKokoroBackend localKokoro =
         new LocalKokoroBackend(installer, launcher -> new ExternalEngineClient(launcher, gson));
-    // The cloud OpenRouter backend is registered alongside the local Kokoro fallback and selected
+    // The cloud OpenRouter backend is registered alongside the local Kokoro backend and selected
     // when Voice Backend is Cloud and an API key is set. It uses the injected OkHttpClient and Gson
-    // (Hub rule: never new them in plugin code).
-    // The provider routes every line, applies the emotion-downgrade rule, and falls back to local
-    // Kokoro (with a one-time notice) when the selected backend is unavailable.
+    // (Hub rule: never new them in plugin code). The provider routes every line to the selected
+    // backend and applies the emotion-downgrade rule; the two backends stay strictly separate.
     OpenRouterTtsBackend cloudBackend = new OpenRouterTtsBackend(okHttpClient, config, gson);
     cloudBackend.setNotice(this::notifyBackend);
     backendProvider = new BackendProvider(config, localKokoro, cloudBackend);
-    backendProvider.setAvailabilityNotice(this::notifyBackend);
     // Persistent on-disk cache lives under the same RuneLite dir as the engine; on by default so
     // repeated lines survive restarts and cloud backends are not re-billed. It sits in front of the
     // backend provider's synthesis regardless of which backend (local or cloud) runs. Opt-out via
@@ -161,12 +159,9 @@ public class TTSDialoguePlugin extends Plugin {
             CACHE_SIZE,
             QUEUE_CAPACITY,
             config::volume);
-    // Install + spawn the engine on the pipeline thread so the first line is not the one that pays
-    // the download/launch cost, and the game thread never blocks on it.
-    audioService.prewarm(backendProvider::warmUpLocal);
-    // Also warm the selected backend off the game thread so a Cloud selection prepares before the
-    // first line and becomes available instead of pre-emptively falling back. A no-op when the
-    // selection is already the local Kokoro fallback.
+    // Warm only the selected backend off the game thread so the first line is not the one that pays
+    // the install/spawn (Cloud) or model-load (Local) cost, and the game thread never blocks on it.
+    // Selecting Cloud never warms the local engine, and selecting Local never reaches the cloud.
     audioService.prewarm(backendProvider::warmUpActive);
     // Speculative prefetch warms the cache for the dialogue options the player can see; it shares
     // the audio service's dedup and both cache tiers, runs off the game thread, and is gated by the
@@ -197,9 +192,8 @@ public class TTSDialoguePlugin extends Plugin {
   }
 
   /**
-   * Surfaces a one-time backend notice (fallback or cloud failure) to the player. Logged at warn so
-   * it appears in the client log without a chat dependency; the message text is already
-   * user-facing.
+   * Surfaces a one-time cloud-backend failure notice to the player. Logged at warn so it appears in
+   * the client log without a chat dependency; the message text is already user-facing.
    */
   private void notifyBackend(String message) {
     log.warn(message);
@@ -378,8 +372,7 @@ public class TTSDialoguePlugin extends Plugin {
   /**
    * Warms up the newly selected backend off the game thread when a backend-affecting config key
    * changes at runtime, so switching Voice Backend (or entering an OpenRouter key) installs /
-   * spawns / handshakes the engine immediately instead of silently falling back to local Kokoro
-   * until the next client restart.
+   * spawns / handshakes the engine immediately rather than starting cold on the next line.
    *
    * <p>The decision of <em>whether</em> a given event should warm lives in the pure, unit-testable
    * {@link #affectsBackendWarmUp} so it can be verified without RuneLite injection. The actual work

@@ -245,7 +245,7 @@ public class VoiceManager {
   /**
    * Resolves a backend-neutral {@link VoiceSpec} for a line of dialogue. The player uses the gender
    * of the configured player voice; NPCs use their race/gender voice when automatic voices are
-   * enabled, otherwise the default NPC voice. Fallback semantics are unchanged.
+   * enabled, otherwise the default NPC voice.
    */
   public VoiceSpec resolveVoice(String speaker, String npcName) {
     if ("player".equalsIgnoreCase(speaker)) {
@@ -353,34 +353,19 @@ public class VoiceManager {
   private NpcVoice resolveNpcVoice(String npcName) {
     if (npcName == null || npcName.isEmpty()) {
       return tracedNpcVoice(
-          npcName,
-          null,
-          null,
-          NPCGender.UNKNOWN,
-          "blank-name",
-          getFallbackVoice(NPCGender.UNKNOWN));
+          npcName, null, null, NPCGender.UNKNOWN, "blank-name", getDefaultNPCVoice());
     }
 
     NPC npc = findNPCByName(npcName);
     if (npc == null) {
       return tracedNpcVoice(
-          npcName,
-          null,
-          null,
-          NPCGender.UNKNOWN,
-          "not-in-world",
-          getFallbackVoice(NPCGender.UNKNOWN));
+          npcName, null, null, NPCGender.UNKNOWN, "not-in-world", getDefaultNPCVoice());
     }
 
     NPCAttributes attributes = demographicAnalyzer.analyzeNPC(npc);
     if (attributes == null) {
       return tracedNpcVoice(
-          npcName,
-          npc.getId(),
-          null,
-          NPCGender.UNKNOWN,
-          "analysis-failed",
-          getFallbackVoice(NPCGender.UNKNOWN));
+          npcName, npc.getId(), null, NPCGender.UNKNOWN, "analysis-failed", getDefaultNPCVoice());
     }
 
     NPCRace race = convertToNPCRace(attributes.getRace());
@@ -388,16 +373,15 @@ public class VoiceManager {
     String source = "StaticTable".equals(attributes.getSource()) ? "table-hit" : "table-miss";
 
     // An NPC unknown to the bundled table (and the learned cache) triggers a one-off background
-    // wiki
-    // lookup when the fallback is enabled, so the next line voices it correctly. No-op otherwise.
+    // wiki lookup, so the next line voices it correctly. No-op when learning is off.
     if (race == NPCRace.UNKNOWN && learningService != null) {
       learningService.considerLearning(npc.getId(), npcName);
     }
 
-    // An unrecognised race falls back rather than silently borrowing the human voice, so the
-    // fallback toggle stays meaningful.
+    // An unrecognised race resolves to the single default voice; a recognised race takes its
+    // gender-correct race voice.
     VoiceProfile baseline =
-        race == NPCRace.UNKNOWN ? getFallbackVoice(gender) : getVoiceForRaceAndGender(race, gender);
+        race == NPCRace.UNKNOWN ? getDefaultNPCVoice() : getVoiceForRaceAndGender(race, gender);
     return tracedNpcVoice(npcName, npc.getId(), race, gender, source, baseline);
   }
 
@@ -478,8 +462,7 @@ public class VoiceManager {
    * differences between the dialogue name widget (which can carry {@code <col=...>} markup,
    * non-breaking spaces, and casing) and the raw composition name: both sides are stripped of any
    * {@code <...>} tags, have non-breaking spaces normalised, are trimmed, and compared
-   * case-insensitively. This stops cosmetic markup from forcing a false miss and the fallback
-   * voice.
+   * case-insensitively. This stops cosmetic markup from forcing a false miss and the default voice.
    */
   private NPC findNPCByName(String targetName) {
     if (client == null || client.getNpcs() == null) {
@@ -537,18 +520,8 @@ public class VoiceManager {
   }
 
   /**
-   * Voice used when race detection fails or the race is unrecognised. With fallbacks enabled the
-   * caller still gets a gender-appropriate human voice; with fallbacks disabled everything
-   * collapses to a single default voice.
+   * The single default NPC voice (Human Male), used when race detection fails or is unrecognised.
    */
-  private VoiceProfile getFallbackVoice(NPCGender gender) {
-    if (!config.enableFallbacks()) {
-      return getDefaultNPCVoice();
-    }
-    return gender == NPCGender.FEMALE ? VoiceProfile.HUMAN_FEMALE : VoiceProfile.HUMAN_MALE;
-  }
-
-  /** The single default NPC voice (Human Male). */
   private VoiceProfile getDefaultNPCVoice() {
     return VoiceProfile.HUMAN_MALE;
   }
@@ -590,7 +563,7 @@ public class VoiceManager {
         return NPCRace.WIZARD;
       }
 
-      log.debug("Unknown race '{}', using fallback voice", race);
+      log.debug("Unknown race '{}', using default voice", race);
       return NPCRace.UNKNOWN;
     }
   }

@@ -34,8 +34,9 @@ public interface TTSDialogueConfig extends Config {
 
   /**
    * Which synthesis backend dialogue routes through. {@code CLOUD} is the OpenRouter cloud backend
-   * (default, cloud-first): it falls back to the local engine and warns once when no API key is
-   * set. {@code LOCAL} is the offline, neutral-only Kokoro engine.
+   * (default, cloud-first): it warns once and leaves lines unvoiced when no API key is set. {@code
+   * LOCAL} is the offline, neutral-only Kokoro engine. The selected backend is the only one used;
+   * the two never fall back to each other.
    */
   enum VoiceBackend {
     LOCAL,
@@ -89,8 +90,9 @@ public interface TTSDialogueConfig extends Config {
       name = "Voice Backend",
       description =
           "Which synthesis engine to use. Cloud is the OpenRouter cloud backend (default): it needs"
-              + " an API key and falls back to the local voice with a one-time notice until you add"
-              + " one. Local is the offline, neutral-only Kokoro voice.",
+              + " an API key, and until you add one its lines stay silent with a one-time notice."
+              + " Local is the offline, neutral-only Kokoro voice. The selected backend is the only"
+              + " one used; the two never fall back to each other.",
       position = 0,
       section = synthesisSection)
   default VoiceBackend voiceBackend() {
@@ -144,14 +146,15 @@ public interface TTSDialogueConfig extends Config {
       name = "Max Cloud Characters",
       description =
           "Hard cap on how many characters of a single dialogue line are sent to the cloud backend."
-              + " Cloud TTS is billed per character, so an unusually long line is truncated at a"
-              + " sentence or word boundary before sending. OSRS lines are short, so this only bites"
-              + " pathological cases. Set to 0 to disable the cap.",
+              + " Cloud TTS is billed per character, so a positive cap truncates an unusually long"
+              + " line at a sentence or word boundary before sending. 0 (default) sends the whole"
+              + " line uncapped; OSRS lines are short, so set a cap only to bound pathological"
+              + " cases.",
       position = 1,
       section = cloudOpenRouterSection)
   @Range(min = 0, max = 5000)
   default int maxCloudCharsPerLine() {
-    return 600;
+    return 0;
   }
 
   @ConfigItem(
@@ -282,18 +285,6 @@ public interface TTSDialogueConfig extends Config {
       section = voiceSection)
   default String playerProfilePace() {
     return "Even and assured, unhurried but purposeful.";
-  }
-
-  @ConfigItem(
-      keyName = "enableFallbacks",
-      name = "Enable Voice Fallbacks",
-      description =
-          "When an NPC's race isn't in the voice table, fall back to a gender-appropriate human"
-              + " voice. When off, those NPCs use the single default voice.",
-      position = 3,
-      section = generalSection)
-  default boolean enableFallbacks() {
-    return true;
   }
 
   @ConfigItem(

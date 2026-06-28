@@ -97,9 +97,9 @@ public class NPCDemographicAnalyzerTest {
   }
 
   @Test
-  public void unknownFemaleNamedNpcGetsFemaleFallbackGender() {
-    // The lone runtime name check: an explicit female word picks the female fallback gender for
-    // missing-id NPCs, keeping the "gender-appropriate human voice" fallback meaningful.
+  public void unknownFemaleNamedNpcGetsBestGuessFemaleGender() {
+    // The lone runtime name check: an explicit female word reports a best-guess Female gender for
+    // missing-id NPCs. Race stays Unknown, which voices with the single default voice regardless.
     assertEquals("Female", analyzer.lookup(987654322, "Mysterious Woman").getGender());
     assertEquals("Female", analyzer.lookup(987654323, "Lost Princess").getGender());
     // No female signal stays Male; a substring inside a larger word must not trigger it.

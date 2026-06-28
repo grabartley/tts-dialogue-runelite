@@ -11,9 +11,9 @@ import lombok.extern.slf4j.Slf4j;
  * The local Kokoro engine exposed as a {@link SynthesisBackend}, backed by an external {@code
  * --stdio} process instead of an in-JVM model.
  *
- * <p>This is the default backend and the universal fallback. On {@link #warmUp()} it installs the
- * per-OS engine bundle (download + sha256 verify + extract, all off the game thread on the pipeline
- * thread) via {@link EngineInstaller} and spawns the child process via {@link
+ * <p>This is the offline backend, selected when Voice Backend is Local. On {@link #warmUp()} it
+ * installs the per-OS engine bundle (download + sha256 verify + extract, all off the game thread on
+ * the pipeline thread) via {@link EngineInstaller} and spawns the child process via {@link
  * ExternalEngineClient}. Each {@link #synthesize} writes the request to the engine and decodes the
  * returned PCM frame, which carries the engine-reported sample rate so playback never pitch-shifts.
  * The voice mapping is carried as {@code race}/{@code gender}/{@code player} on the wire; the
@@ -21,11 +21,10 @@ import lombok.extern.slf4j.Slf4j;
  * #36 drift test) turns it into a concrete speaker id.
  *
  * <p>Kokoro is deliberately neutral-only ({@link Emotion#NEUTRAL}); emotional delivery is reserved
- * for the GPU and cloud backends, so this backend advertises only neutral and {@link
- * BackendProvider} downgrades anything else before it reaches here. When the engine cannot be
- * installed (no release published yet, unsupported platform, download/verify failure) {@link
- * #isAvailable()} reports {@code false} after warm-up so {@link BackendProvider} falls back and
- * surfaces a one-time notice instead of crashing.
+ * for the cloud backend, so this backend advertises only neutral and {@link BackendProvider}
+ * downgrades anything else before it reaches here. When the engine cannot be installed (no release
+ * published yet, unsupported platform, download/verify failure) {@link #isAvailable()} reports
+ * {@code false} after warm-up and Local lines are left unvoiced instead of crashing.
  */
 @Slf4j
 public final class LocalKokoroBackend implements SynthesisBackend {
@@ -55,10 +54,10 @@ public final class LocalKokoroBackend implements SynthesisBackend {
   }
 
   /**
-   * Available optimistically until warm-up has run (so the provider does not fall back before the
-   * pipeline thread has had a chance to install/spawn the engine off the game thread), then
-   * reflects the real child-process health. After a failed install/spawn this returns {@code false}
-   * so the provider falls back with a one-time notice.
+   * Available optimistically until warm-up has run (so a line enqueued before the pipeline thread
+   * has installed/spawned the engine off the game thread is not pre-emptively treated as
+   * unavailable), then reflects the real child-process health. After a failed install/spawn this
+   * returns {@code false} and Local lines stay silent until the engine recovers.
    */
   @Override
   public boolean isAvailable() {
@@ -99,7 +98,7 @@ public final class LocalKokoroBackend implements SynthesisBackend {
     EngineInstaller.Installed installed = installer.install();
     if (installed == null) {
       log.info(
-          "Local Kokoro engine is not installed; backend unavailable, provider will fall back.");
+          "Local Kokoro engine is not installed; backend unavailable, Local lines stay silent.");
       return;
     }
     ExternalEngineClient c = clientFactory.create(installed.launcher());

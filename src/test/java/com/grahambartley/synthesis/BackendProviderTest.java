@@ -60,6 +60,43 @@ public class BackendProviderTest {
     }
   }
 
+  /** A backend that counts {@code warmUp} calls so warm-up routing can be asserted. */
+  private static final class WarmCountingBackend implements SynthesisBackend {
+    private final String id;
+    private final EnumSet<Emotion> emotions;
+    int warmCalls;
+
+    WarmCountingBackend(String id, EnumSet<Emotion> emotions) {
+      this.id = id;
+      this.emotions = emotions;
+    }
+
+    @Override
+    public String id() {
+      return id;
+    }
+
+    @Override
+    public boolean isAvailable() {
+      return true;
+    }
+
+    @Override
+    public EnumSet<Emotion> supportedEmotions() {
+      return emotions;
+    }
+
+    @Override
+    public Pcm synthesize(SynthesisRequest request) {
+      return new Pcm(new float[] {0f}, 24_000);
+    }
+
+    @Override
+    public void warmUp() {
+      warmCalls++;
+    }
+  }
+
   private static SynthesisRequest req(Emotion emotion) {
     return new SynthesisRequest("hi", VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE), emotion);
   }
@@ -73,7 +110,7 @@ public class BackendProviderTest {
   }
 
   @Test
-  public void unavailableSelectedBackendFallsBackToKokoro() {
+  public void unavailableSelectedBackendIsStillReturnedWithoutSwappingToKokoro() {
     TestConfig config = new TestConfig();
     config.backend = VoiceBackend.CLOUD;
     StubBackend kokoro =
@@ -81,7 +118,9 @@ public class BackendProviderTest {
     StubBackend cloud = new StubBackend("cloud-openrouter", false, EnumSet.allOf(Emotion.class));
     BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
-    assertEquals(BackendProvider.LOCAL_KOKORO_ID, provider.active().id());
+    // No fallback: an unavailable Cloud selection still resolves to Cloud (its lines stay silent),
+    // never to the local engine.
+    assertEquals("cloud-openrouter", provider.active().id());
   }
 
   @Test
@@ -139,37 +178,23 @@ public class BackendProviderTest {
   }
 
   @Test
-  public void availabilityNoticeFiresOnceOnFallback() {
+  public void warmUpActiveWarmsOnlyTheSelectedBackend() {
     TestConfig config = new TestConfig();
     config.backend = VoiceBackend.CLOUD;
-    StubBackend kokoro =
-        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, true, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend cloud = new StubBackend("cloud-openrouter", false, EnumSet.allOf(Emotion.class));
+    WarmCountingBackend kokoro =
+        new WarmCountingBackend(BackendProvider.LOCAL_KOKORO_ID, EnumSet.of(Emotion.NEUTRAL));
+    WarmCountingBackend cloud =
+        new WarmCountingBackend("cloud-openrouter", EnumSet.allOf(Emotion.class));
     BackendProvider provider = new BackendProvider(config, kokoro, cloud);
 
-    int[] notices = {0};
-    provider.setAvailabilityNotice(msg -> notices[0]++);
+    provider.warmUpActive();
+    assertEquals("Cloud selected warms Cloud", 1, cloud.warmCalls);
+    assertEquals("Cloud selected never warms the local engine", 0, kokoro.warmCalls);
 
-    provider.active();
-    provider.active();
-
-    assertEquals("fallback notice should fire once per unavailable backend", 1, notices[0]);
-  }
-
-  @Test
-  public void selectedAndFallbackBothUnavailableStillReturnsKokoroWithoutThrowing() {
-    TestConfig config = new TestConfig();
-    config.backend = VoiceBackend.CLOUD;
-    // The bundled fallback itself failed to load.
-    StubBackend kokoro =
-        new StubBackend(BackendProvider.LOCAL_KOKORO_ID, false, EnumSet.of(Emotion.NEUTRAL));
-    StubBackend cloud = new StubBackend("cloud-openrouter", false, EnumSet.allOf(Emotion.class));
-    BackendProvider provider = new BackendProvider(config, kokoro, cloud);
-
-    // active() must not throw and must return the local fallback even though it is unavailable; the
-    // one-time silent-failure warning is logged as a side effect. Calling twice proves idempotence.
-    assertEquals(BackendProvider.LOCAL_KOKORO_ID, provider.active().id());
-    assertEquals(BackendProvider.LOCAL_KOKORO_ID, provider.active().id());
+    config.backend = VoiceBackend.LOCAL;
+    provider.warmUpActive();
+    assertEquals("Local selected warms Kokoro", 1, kokoro.warmCalls);
+    assertEquals("Local selected makes no further cloud warm", 1, cloud.warmCalls);
   }
 
   @Test
@@ -195,6 +220,6 @@ public class BackendProviderTest {
     } catch (IllegalArgumentException e) {
       threw = true;
     }
-    assertTrue("a provider must always have the local-kokoro fallback", threw);
+    assertTrue("a provider must always have the local-kokoro backend registered", threw);
   }
 }

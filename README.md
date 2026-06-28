@@ -19,7 +19,7 @@ Install from the **RuneLite Plugin Hub**: open RuneLite, click the wrench (Confi
 
 ## Backends
 
-The plugin routes every line through one synthesis backend, chosen by the **Voice Backend** config. The default is the cloud backend (cloud-first); it falls back to the offline local voice with a one-time notice until you add an OpenRouter API key, and whenever the cloud backend is otherwise unavailable, so dialogue keeps speaking.
+The plugin routes every line through the one synthesis backend chosen by the **Voice Backend** config. The two backends are kept strictly separate: the selected backend is the only one that runs, and neither falls back to the other. The default is the cloud backend (cloud-first), which needs an OpenRouter API key; until you add one its lines stay silent and a one-time notice points you to the key or to the Local backend.
 
 | Backend | Config value | Where it runs | Emotion | Offline | Setup |
 |---------|--------------|---------------|---------|---------|-------|
@@ -30,13 +30,13 @@ See [docs/backends.md](docs/backends.md) for the full comparison.
 
 ### Cloud (OpenRouter), the default
 
-An opt-in cloud voice with near-zero setup beyond supplying a key. Create an OpenRouter API key, paste it into the config, and dialogue routes through Google's Gemini 3.1 Flash TTS over HTTPS, with a gender-correct voice picked per NPC by race and the line's detected emotion rendered as an inline style tag. On top of that, a **character profile** steers each speaker's accent, style, and pace (see [Character profiles](#character-profiles)). Until a key is set, the plugin logs a one-time notice and uses the free local voice instead.
+An opt-in cloud voice with near-zero setup beyond supplying a key. Create an OpenRouter API key, paste it into the config, and dialogue routes through Google's Gemini 3.1 Flash TTS over HTTPS, with a gender-correct voice picked per NPC by race and the line's detected emotion rendered as an inline style tag. On top of that, a **character profile** steers each speaker's accent, style, and pace (see [Character profiles](#character-profiles)). Until a key is set, cloud lines stay silent and the plugin logs a one-time notice; switch **Voice Backend** to Local for a free offline voice.
 
 > **Privacy:** with the Cloud backend active, the dialogue text being spoken is sent to OpenRouter over HTTPS using your API key. The local backend stays fully offline and sends nothing off your machine. The persistent cache means audio you have already heard is replayed from disk rather than re-billed.
 
 ### Local (Kokoro)
 
-A real neural voice that runs on your CPU, fully offline. Nothing about a dialogue line leaves your machine. The plugin manages the engine for you: it downloads the right build for your OS on first use, runs it as a separate background process, and keeps it warm across lines. Delivery is neutral by design, so the local voice stays clean neural output, and it is the universal fallback whenever the cloud backend cannot run.
+A real neural voice that runs on your CPU, fully offline. Nothing about a dialogue line leaves your machine. The plugin manages the engine for you: it downloads the right build for your OS on first use, runs it as a separate background process, and keeps it warm across lines. Delivery is neutral by design, so the local voice stays clean neural output.
 
 ## Emotion
 
@@ -91,7 +91,7 @@ Each NPC's voice is chosen by race and gender, and the player has a dedicated vo
 | **Demon** | `bm_daniel` | `af_river` |
 | **Wizard** | `bm_fable` | `af_alloy` |
 
-The Human voices double as the fallback for any NPC missing from the table, and as the default for every NPC when **Automatic NPC Voices** is off. The lookup table is generated offline and can be grown over time; see [docs/npc-voice-tooling.md](docs/npc-voice-tooling.md) for how it is built and how to add or correct entries.
+An NPC missing from the table uses the default Human voice, as does every NPC when **Automatic NPC Voices** is off. The lookup table is generated offline and can be grown over time; see [docs/npc-voice-tooling.md](docs/npc-voice-tooling.md) for how it is built and how to add or correct entries.
 
 The table above is the local Kokoro voice bank. The Cloud backend maps the same race and gender categories onto Google's Gemini voices, keeping each category gender-correct and spreading NPCs of the same race and gender across a sub-pool so they still sound distinct.
 
@@ -107,7 +107,7 @@ Cloud requests are tuned for latency. They reuse a long-lived keepalive connecti
 
 | Setting | Default | What it does |
 |---------|---------|--------------|
-| **Voice Backend** | `Cloud` | Selects the synthesis engine: `Cloud` (OpenRouter, falls back to local until a key is set) or `Local` (offline neutral Kokoro). |
+| **Voice Backend** | `Cloud` | Selects the synthesis engine: `Cloud` (OpenRouter, needs an API key) or `Local` (offline neutral Kokoro). The selected backend is the only one used; there is no fallback between them, so Cloud lines stay silent until a key is set. |
 | **Enable Emotion** | `On` | Carries the emotion detected from the speaker's chat-head animation through to synthesis. The Cloud voice renders happy, sad, angry, and scared delivery; the Local voice is neutral-only. Off voices every line as Neutral. |
 | **Enable Character Profiles** | `On` | Steers each speaker's delivery with a per-character profile (accent, style, pace), rendered as a direction block in front of the line. Emotion still layers on top. Cloud only; the Local voice ignores it. Off gives the plainest, cheapest delivery. |
 | **Persistent Audio Cache** | `On` | Saves synthesized dialogue to disk so repeated lines play instantly across sessions and cloud backends are not re-billed. |
@@ -118,11 +118,10 @@ Cloud requests are tuned for latency. They reuse a long-lived keepalive connecti
 | **Player Accent** | seasoned RP adventurer | Accent for your character's Cloud voice profile. Used only with Character Profiles on and the Cloud backend active. |
 | **Player Style** | seasoned RP adventurer | Persona and delivery style for your character's Cloud voice profile. Used only with Character Profiles on and the Cloud backend active. |
 | **Player Pace** | even and assured | Speaking pace for your character's Cloud voice profile. Used only with Character Profiles on and the Cloud backend active. |
-| **Enable Voice Fallbacks** | `On` | Falls back to a gender-appropriate human voice for NPCs missing from the table. When off, those NPCs use the single default voice. |
 | **Auto-learn New NPCs** | `Off` | For an NPC not in the bundled table (e.g. one added since the last plugin update), looks its race, gender and ethnicity up on the OSRS Wiki once and caches the result locally. The first line still uses the default voice while the lookup runs. When on, makes a one-time wiki request (the NPC's name); the Local backend stays fully offline regardless. |
 | **Debug Mode** | `Off` | Logs detailed NPC race/gender resolution and the chosen voice per NPC. |
 | **OpenRouter API Key** | empty | Your OpenRouter API key. Required for the Cloud backend; stored locally and never bundled with the plugin. |
-| **Max Cloud Characters** | `600` | Caps how many characters of a line are sent to the cloud backend, truncating at a sentence or word boundary. Bounds worst-case per-line cost. `0` disables the cap. |
+| **Max Cloud Characters** | `0` | Caps how many characters of a line are sent to the cloud backend, truncating at a sentence or word boundary. `0` (default) sends the whole line uncapped; set a positive value to bound worst-case per-line cost. |
 | **Cloud Speaking Pace** | `100` | Speaking pace for the cloud backend as a percent of normal. Sent as the OpenRouter speed parameter only when not `100`; the active model may ignore it. No effect on the local backend. |
 | **Spoken Language** | `English` | Language dialogue is spoken in: type any language name (e.g. `Brazilian Portuguese`, `Japanese`). `English` voices the original line directly; anything else translates each line first (preserving names, places, and item terms), then voices the translation. Adds a translation request per new line. Cloud only. |
 | **Global Quirk** | `None` | Optional delivery register layered onto every line on top of the language (Gen Z slang, pirate speak, formal, and so on). `None` changes nothing; any other value rewrites each line in that style via the translation model. Registers are language-agnostic, so they compose with any Spoken Language. Cloud only. |

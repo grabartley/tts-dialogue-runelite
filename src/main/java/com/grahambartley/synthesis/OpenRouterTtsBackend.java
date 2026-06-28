@@ -46,8 +46,7 @@ import okhttp3.ResponseBody;
  * <p>It is selected when {@link TTSDialogueConfig#voiceBackend()} is {@code CLOUD} and reports
  * {@link #isAvailable()} only when an API key is set. Every failure path (missing key, non-2xx,
  * network error, empty/undecodable body) returns {@code null} and surfaces a one-time notice rather
- * than throwing, so {@link BackendProvider} falls back to the local backend without crashing or
- * blocking the game thread.
+ * than throwing, so the line is left unvoiced without crashing or blocking the game thread.
  */
 @Slf4j
 public final class OpenRouterTtsBackend implements SynthesisBackend {
@@ -72,12 +71,12 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   /**
    * Per-call ceiling so a hung cloud request cannot pin the single synthesis thread indefinitely. A
-   * line that does not return within this window is abandoned (and the user falls back to the local
-   * voice for that line); OSRS lines are short, so a healthy synth finishes well inside it.
+   * line that does not return within this window is abandoned (left unvoiced); OSRS lines are
+   * short, so a healthy synth finishes well inside it.
    */
   private static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
 
-  /** TCP/TLS handshake budget. Short: a slow connect should fail fast onto the local fallback. */
+  /** TCP/TLS handshake budget. Short: a slow connect should fail the line fast rather than hang. */
   private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
 
   /**
@@ -261,8 +260,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   @Override
   public Pcm synthesize(SynthesisRequest request) {
     if (!isAvailable()) {
-      warnOnce(
-          "Add an OpenRouter API key for cloud voices; using the free local voice until then.");
+      warnOnce("Add an OpenRouter API key to use cloud voices, or switch Voice Backend to Local.");
       return null;
     }
     String key = config.openRouterApiKey().trim();
@@ -279,9 +277,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
       String translated = translator.translate(cappedText, language.trim(), key);
       if (translated == null) {
         warnOnce(
-            "OpenRouter translation to "
-                + language.trim()
-                + " failed; falling back to the local voice.");
+            "OpenRouter translation to " + language.trim() + " failed; this line was not voiced.");
         return null;
       }
       spokenText = translated;
@@ -380,7 +376,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
           warnOnce(
               "OpenRouter TTS request failed (HTTP "
                   + response.code()
-                  + "); check your API key. Falling back to the local voice.");
+                  + "); check your API key. This line was not voiced.");
           logFailure(
               "non-2xx", response.code(), response.message(), contentType, generationId, bytes);
           return null;
@@ -394,26 +390,24 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
             log.debug("[TTS cloud] empty 200 body; retrying once");
             continue;
           }
-          warnOnce("OpenRouter TTS returned an empty response; falling back to the local voice.");
+          warnOnce("OpenRouter TTS returned an empty response; this line was not voiced.");
           return null;
         }
         Pcm pcm = RawPcmDecoder.decode(bytes, SAMPLE_RATE);
         if (pcm == null) {
           warnOnce(
-              "OpenRouter TTS returned audio that could not be decoded; falling back to the local"
-                  + " voice.");
+              "OpenRouter TTS returned audio that could not be decoded; this line was not voiced.");
           logFailure(
               "undecodable", response.code(), response.message(), contentType, generationId, bytes);
           return null;
         }
         return pcm;
       } catch (IOException e) {
-        warnOnce(
-            "OpenRouter TTS request could not reach the network; falling back to the local voice.");
+        warnOnce("OpenRouter TTS request could not reach the network; this line was not voiced.");
         log.debug("OpenRouter TTS network error: {}", e.getMessage());
         return null;
       } catch (RuntimeException e) {
-        warnOnce("OpenRouter TTS request failed unexpectedly; falling back to the local voice.");
+        warnOnce("OpenRouter TTS request failed unexpectedly; this line was not voiced.");
         log.debug("OpenRouter TTS unexpected error: {}", e.getMessage());
         return null;
       }

@@ -21,11 +21,11 @@ import net.runelite.api.NPCComposition;
  * large downloads, no model-id guessing. The table is produced offline by {@code
  * tools/generate_npc_voices.py}; see the README for how to regenerate and expand it.
  *
- * <p>Ids missing from the table resolve to race {@code Unknown} so the configured voice fallback
- * applies (a gender-appropriate human voice, or the single default voice when fallbacks are off).
- * As a last-resort gender hint for those entries only, an explicit female title or word in the NPC
- * name picks the female fallback; everything else defaults to male. This is the lone runtime name
- * check and never affects race or table-backed NPCs.
+ * <p>Ids missing from the table resolve to race {@code Unknown}, which voices with the single
+ * default voice. A last-resort name check still reports a best-guess gender for such entries (an
+ * explicit female title or word in the name reads as female, everything else male) so the attribute
+ * is populated, but it does not change that default voice. This is the lone runtime name check and
+ * never affects race or table-backed NPCs.
  */
 @Slf4j
 public class NPCDemographicAnalyzer {
@@ -35,9 +35,9 @@ public class NPCDemographicAnalyzer {
   private static final String DEFAULT_GENDER = "Male";
 
   /**
-   * Explicit female titles/words used only to pick the gender of the fallback voice for NPCs
-   * missing from the table. Word-aware so it can't match inside larger words. Mirrors the offline
-   * generator's female keywords; keep the two in sync.
+   * Explicit female titles/words used only as a best-guess gender for NPCs missing from the table.
+   * Word-aware so it can't match inside larger words. Mirrors the offline generator's female
+   * keywords; keep the two in sync.
    */
   private static final Pattern FEMALE_NAME_HINT =
       Pattern.compile(
@@ -95,8 +95,8 @@ public class NPCDemographicAnalyzer {
 
   /**
    * Resolves race/gender for an NPC id by a single map lookup. Ids missing from the table get a
-   * deterministic default (race {@code Unknown}, gender from the female-name hint) so the
-   * configured fallback voice always applies.
+   * deterministic default (race {@code Unknown}, gender from the female-name hint), and race {@code
+   * Unknown} always voices with the single default voice.
    */
   public NPCAttributes lookup(int npcId, String npcName) {
     NPCAttributes known = lookupKnown(npcId);

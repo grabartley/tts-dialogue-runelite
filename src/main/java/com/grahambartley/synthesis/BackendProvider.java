@@ -3,21 +3,18 @@ package com.grahambartley.synthesis;
 import com.grahambartley.TTSDialogueConfig;
 import com.grahambartley.TTSDialogueConfig.VoiceBackend;
 import com.grahambartley.tts.Pcm;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Single point of truth for which {@link SynthesisBackend} is active and how emotion is downgraded.
  *
  * <p>The active backend is resolved from {@link TTSDialogueConfig#voiceBackend()} on every call, so
- * switching the backend in the config panel takes effect immediately without a client restart. When
- * the selected backend reports {@link SynthesisBackend#isAvailable()} {@code false} (engine
- * missing, key unset, GPU absent) the provider transparently falls back to the local Kokoro backend
- * so the plugin keeps speaking, surfacing that fallback once through an optional notice hook.
+ * switching the backend in the config panel takes effect immediately without a client restart. The
+ * two backends are kept strictly separate: the selected backend is the only one that ever runs.
+ * Cloud means cloud only and Local means local only; there is no cross-backend fallback. A line the
+ * selected backend cannot voice is simply not voiced.
  *
  * <p>The emotion-downgrade rule lives here and nowhere else: {@link #synthesize} rewrites a
  * request's emotion to {@link Emotion#NEUTRAL} whenever the active backend does not list it in
@@ -27,53 +24,30 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class BackendProvider {
 
-  /** The backend used whenever the selected one is unavailable. */
+  /** Id of the offline Kokoro backend, selected when Voice Backend is Local. */
   public static final String LOCAL_KOKORO_ID = "local-kokoro";
 
   private final TTSDialogueConfig config;
   private final Map<String, SynthesisBackend> backends = new LinkedHashMap<>();
-  private final SynthesisBackend localKokoro;
-
-  /** Notice hook fired once when a configured backend is unavailable and we fall back. */
-  private Consumer<String> availabilityNotice = msg -> {};
-
-  /**
-   * Ids of configured backends we have already warned about, so each unavailable backend surfaces a
-   * fallback notice at most once per session even when the user cycles through several of them.
-   */
-  private final Set<String> warnedFallbacks = new HashSet<>();
-
-  /**
-   * One-time guard for the scenario where the selected backend is unavailable <em>and</em> the
-   * local Kokoro fallback is itself unavailable, so {@link #active()} returns a failed engine that
-   * produces no audio. Logged once so the silence is explained.
-   */
-  private boolean warnedKokoroAlsoUnavailable;
 
   /**
    * @param config the live plugin config, read on every resolution so runtime switches apply
-   * @param backendList the registered backends; the one with id {@code local-kokoro} is the
-   *     fallback
+   * @param backendList the registered backends; one of them must have id {@code local-kokoro} so
+   *     the Local selection always resolves
    */
   public BackendProvider(TTSDialogueConfig config, SynthesisBackend... backendList) {
     this.config = config;
-    SynthesisBackend kokoro = null;
+    boolean hasLocalKokoro = false;
     for (SynthesisBackend backend : backendList) {
       backends.put(backend.id(), backend);
       if (LOCAL_KOKORO_ID.equals(backend.id())) {
-        kokoro = backend;
+        hasLocalKokoro = true;
       }
     }
-    if (kokoro == null) {
+    if (!hasLocalKokoro) {
       throw new IllegalArgumentException(
           "BackendProvider requires a '" + LOCAL_KOKORO_ID + "' backend");
     }
-    this.localKokoro = kokoro;
-  }
-
-  /** Registers a one-time notice hook (e.g. a chat or log message) for backend fallbacks. */
-  public void setAvailabilityNotice(Consumer<String> notice) {
-    this.availabilityNotice = notice == null ? msg -> {} : notice;
   }
 
   /** Maps the config selection to a backend id. */
@@ -88,31 +62,12 @@ public final class BackendProvider {
   }
 
   /**
-   * Resolves the active backend from config, falling back to local Kokoro when the selected backend
-   * is missing or unavailable.
+   * Resolves the backend the config currently selects. The selection is authoritative: an
+   * unavailable selected backend is still returned (its lines stay silent) rather than swapped for
+   * the other backend, so Cloud and Local never bleed into each other.
    */
   public SynthesisBackend active() {
-    String wantedId = backendIdFor(config.voiceBackend());
-    SynthesisBackend wanted = backends.get(wantedId);
-    if (wanted != null && wanted.isAvailable()) {
-      return wanted;
-    }
-    if (!LOCAL_KOKORO_ID.equals(wantedId) && warnedFallbacks.add(wantedId)) {
-      String msg =
-          "Voice backend '" + wantedId + "' is not available; using the local voice instead.";
-      log.info(msg);
-      availabilityNotice.accept(msg);
-    }
-    // If the bundled engine also failed, the fallback we are about to return cannot produce audio
-    // either, so lines will be silent. Explain that once instead of failing silently.
-    if (!localKokoro.isAvailable() && !warnedKokoroAlsoUnavailable) {
-      warnedKokoroAlsoUnavailable = true;
-      log.warn(
-          "Backend '{}' is unavailable and the local Kokoro fallback also failed to load; dialogue"
-              + " lines will produce no audio until a working backend is available.",
-          wantedId);
-    }
-    return localKokoro;
+    return backends.get(backendIdFor(config.voiceBackend()));
   }
 
   /**
@@ -147,22 +102,15 @@ public final class BackendProvider {
     return backend.synthesize(downgradeFor(backend, request));
   }
 
-  /** Warms up the local Kokoro backend (model load) on the pipeline thread. */
-  public void warmUpLocal() {
-    localKokoro.warmUp();
-  }
-
   /**
-   * Warms up the backend the config currently selects, on the pipeline thread, so a GPU backend
-   * gets its off-thread install/spawn/handshake before the first line and {@link #active()} can see
-   * it as available rather than falling back pre-emptively. The Kokoro fallback is warmed
-   * separately via {@link #warmUpLocal}; this is a no-op when the selection is already local
-   * Kokoro. Safe to call repeatedly: each backend's {@code warmUp} is idempotent.
+   * Warms up the selected backend on the pipeline thread, so a backend gets its off-thread
+   * install/spawn/handshake (or model load) before the first line. Only the selected backend is
+   * touched: selecting Cloud never warms the local engine, and selecting Local never reaches the
+   * cloud. Safe to call repeatedly: each backend's {@code warmUp} is idempotent.
    */
   public void warmUpActive() {
-    String wantedId = backendIdFor(config.voiceBackend());
-    SynthesisBackend wanted = backends.get(wantedId);
-    if (wanted != null && wanted != localKokoro) {
+    SynthesisBackend wanted = active();
+    if (wanted != null) {
       wanted.warmUp();
     }
   }

@@ -21,12 +21,10 @@ public class VoiceManagerTest {
    */
   private static final class TestConfig implements TTSDialogueConfig {
     private final boolean raceBased;
-    private final boolean fallbacks;
     private final VoiceProfile playerVoice;
 
-    TestConfig(boolean raceBased, boolean fallbacks, VoiceProfile playerVoice) {
+    TestConfig(boolean raceBased, VoiceProfile playerVoice) {
       this.raceBased = raceBased;
-      this.fallbacks = fallbacks;
       this.playerVoice = playerVoice;
     }
 
@@ -36,20 +34,15 @@ public class VoiceManagerTest {
     }
 
     @Override
-    public boolean enableFallbacks() {
-      return fallbacks;
-    }
-
-    @Override
     public VoiceProfile playerVoice() {
       return playerVoice;
     }
   }
 
-  private VoiceManager newManager(boolean raceBased, boolean fallbacks, VoiceProfile playerVoice) {
-    // A null client means findNPCByName returns null, so NPC lookups exercise the fallback paths
-    // without needing a live game world.
-    return new VoiceManager(new TestConfig(raceBased, fallbacks, playerVoice), null);
+  private VoiceManager newManager(boolean raceBased, VoiceProfile playerVoice) {
+    // A null client means findNPCByName returns null, so NPC lookups exercise the default-voice
+    // path without needing a live game world.
+    return new VoiceManager(new TestConfig(raceBased, playerVoice), null);
   }
 
   @Test
@@ -85,7 +78,7 @@ public class VoiceManagerTest {
 
   @Test
   public void playerResolvesToPlayerSpecWithConfiguredGender() {
-    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_FEMALE);
+    VoiceManager manager = newManager(true, VoiceProfile.PLAYER_FEMALE);
     VoiceSpec spec = manager.resolveVoice("player", null);
     assertTrue("player voice should be a player spec", spec.player());
     assertEquals(NPCGender.FEMALE, spec.gender());
@@ -94,14 +87,14 @@ public class VoiceManagerTest {
 
   @Test
   public void playerSpecMapsToConfiguredKokoroSpeaker() {
-    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_FEMALE);
+    VoiceManager manager = newManager(true, VoiceProfile.PLAYER_FEMALE);
     VoiceSpec spec = manager.resolveVoice("player", null);
     assertEquals(VoiceProfile.PLAYER_FEMALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
   }
 
   @Test
   public void playerSpeakerMatchingIsCaseInsensitive() {
-    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
+    VoiceManager manager = newManager(true, VoiceProfile.PLAYER_MALE);
     VoiceSpec spec = manager.resolveVoice("PLAYER", null);
     assertTrue(spec.player());
     assertEquals(VoiceProfile.PLAYER_MALE.getSpeakerId(), manager.kokoroSpeakerId(spec));
@@ -109,7 +102,7 @@ public class VoiceManagerTest {
 
   @Test
   public void npcUsesDefaultVoiceWhenAutomaticVoicesDisabled() {
-    VoiceManager manager = newManager(false, true, VoiceProfile.PLAYER_MALE);
+    VoiceManager manager = newManager(false, VoiceProfile.PLAYER_MALE);
     VoiceSpec spec = manager.resolveVoice("npc", "Some Goblin");
     assertFalse("an NPC resolves to a non-player spec", spec.player());
     assertEquals("npc:HUMAN:MALE", spec.key());
@@ -117,9 +110,9 @@ public class VoiceManagerTest {
   }
 
   @Test
-  public void undetectedNpcWithFallbacksResolvesToHumanMaleBaseline() {
-    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
-    // No client, so the NPC can't be found and detection falls back to the Human Male baseline.
+  public void undetectedNpcResolvesToTheDefaultVoice() {
+    VoiceManager manager = newManager(true, VoiceProfile.PLAYER_MALE);
+    // No client, so the NPC can't be found and detection resolves to the single default voice.
     assertEquals(VoiceProfile.HUMAN_MALE, manager.getVoiceForNPC("Hans"));
     VoiceSpec spec = manager.resolveVoice("npc", "Hans");
     // Still a human-male spec, but per-NPC variety (issue #78) stamps a stable male-pool speaker
@@ -127,7 +120,7 @@ public class VoiceManagerTest {
     // the cache key carries it.
     assertEquals(NPCRace.HUMAN, spec.race());
     assertEquals(NPCGender.MALE, spec.gender());
-    assertTrue("fallback NPC still gets a per-NPC speaker", spec.hasExplicitKokoroSpeakerId());
+    assertTrue("default-voice NPC still gets a per-NPC speaker", spec.hasExplicitKokoroSpeakerId());
     assertTrue(
         "chosen speaker must be from the male pool",
         contains(VoiceManager.MALE_SPEAKER_POOL, manager.kokoroSpeakerId(spec)));
@@ -136,7 +129,7 @@ public class VoiceManagerTest {
 
   @Test
   public void kokoroSpeakerIdRoundTripsEveryRaceGenderProfile() {
-    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
+    VoiceManager manager = newManager(true, VoiceProfile.PLAYER_MALE);
     for (VoiceProfile profile : VoiceProfile.values()) {
       if (profile == VoiceProfile.PLAYER_MALE || profile == VoiceProfile.PLAYER_FEMALE) {
         continue; // Player profiles share HUMAN race; covered by the player-spec tests.
@@ -150,14 +143,8 @@ public class VoiceManagerTest {
   }
 
   @Test
-  public void undetectedNpcWithFallbacksDisabledResolvesToDefaultVoice() {
-    VoiceManager manager = newManager(true, false, VoiceProfile.PLAYER_MALE);
-    assertEquals(VoiceProfile.HUMAN_MALE, manager.getVoiceForNPC("Hans"));
-  }
-
-  @Test
-  public void blankNpcNameResolvesToFallbackVoice() {
-    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
+  public void blankNpcNameResolvesToDefaultVoice() {
+    VoiceManager manager = newManager(true, VoiceProfile.PLAYER_MALE);
     assertEquals(VoiceProfile.HUMAN_MALE, manager.getVoiceForNPC(""));
     assertEquals(VoiceProfile.HUMAN_MALE, manager.getVoiceForNPC(null));
   }
@@ -290,7 +277,7 @@ public class VoiceManagerTest {
 
   @Test
   public void playerPathIgnoresPerNpcSpeakerAndIsUnchanged() {
-    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
+    VoiceManager manager = newManager(true, VoiceProfile.PLAYER_MALE);
     VoiceSpec spec = manager.resolveVoice("player", "ignored-name");
     assertTrue(spec.player());
     // No per-NPC speaker is ever stamped on the player; it maps to the configured player voice.
@@ -302,7 +289,7 @@ public class VoiceManagerTest {
 
   @Test
   public void explicitSpeakerOnSpecWinsInKokoroSpeakerId() {
-    VoiceManager manager = newManager(true, true, VoiceProfile.PLAYER_MALE);
+    VoiceManager manager = newManager(true, VoiceProfile.PLAYER_MALE);
     // An NPC spec stamped with an explicit speaker is honored verbatim, not recomputed from race.
     VoiceSpec spec = VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE, 17);
     assertEquals(17, manager.kokoroSpeakerId(spec));

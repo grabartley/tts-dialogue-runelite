@@ -1,9 +1,9 @@
 # Synthesis backends
 
 The plugin routes every dialogue line through one `SynthesisBackend`, chosen by the **Voice Backend**
-config. `BackendProvider` resolves the active backend on every line, applies the emotion-downgrade
-rule, and falls back to the local Kokoro voice (with a one-time notice) whenever the selected backend
-is unavailable.
+config. `BackendProvider` resolves the active backend on every line and applies the emotion-downgrade
+rule. The two backends are strictly separate: the selected backend is the only one that runs, and an
+unavailable selection leaves its lines silent rather than switching to the other backend.
 
 | Backend | Config value | Engine location | Emotion | Offline | Setup cost |
 |---------|--------------|-----------------|---------|---------|------------|
@@ -19,7 +19,8 @@ local Kokoro voice is neutral-only, so `BackendProvider` downgrades every line t
 
 The default (cloud-first). An OpenAI-compatible speech request over HTTPS to
 `https://openrouter.ai/api/v1/audio/speech`, selected when **Voice Backend** is `Cloud`. It needs an
-OpenRouter API key; until one is set it logs a one-time notice and falls back to the local voice. The
+OpenRouter API key; until one is set it logs a one-time notice and its lines stay silent (switch to
+the Local backend for a free offline voice). The
 model is fixed to Google's **Gemini 3.1 Flash TTS**, the one OpenRouter speech model with both a voice
 catalog rich enough to map every race and gender and full emotion support. Each NPC gets a
 gender-correct Gemini voice by race, and two NPCs of the same race and gender are spread across a
@@ -31,8 +32,9 @@ colours the moment; the local backend ignores it. The body requests `response_fo
 headerless 16-bit LE mono stream at 24 kHz decoded to the pipeline's native rate.
 
 With this backend active, dialogue text leaves your machine and is sent to OpenRouter. A missing key,
-an API error, or a network problem fails that line gracefully and falls back to the local voice with a
-one-time notice.
+an API error, or a network problem fails that line gracefully (it is left unvoiced) and surfaces a
+one-time notice. There is no automatic switch to the local voice; the backends stay strictly
+separate.
 
 ### Cost and latency controls
 
@@ -44,9 +46,10 @@ Because the cloud backend is billed per character, several guards keep cost boun
   voice, pace, profile, or language change therefore never replays the wrong audio, while a short
   English line stays on a stable key so changing a setting that cannot affect it does not force a
   needless re-bill.
-- **Per-line character cap.** Each line is truncated to **Max Cloud Characters** (default 600) at a
-  sentence boundary, or a word boundary if there is none, before sending. `0` disables it. OSRS lines
-  are short, so this only bounds pathological cases.
+- **Per-line character cap.** When **Max Cloud Characters** is a positive value, each line is
+  truncated to it at a sentence boundary, or a word boundary if there is none, before sending. `0`
+  (the default) sends the whole line uncapped. OSRS lines are short, so a cap only bounds pathological
+  cases.
 - **In-flight de-duplication.** If two tasks reach the synth step for the same cache key at once, only
   the first issues a cloud call; the second waits on and reuses its result (`synthesizeDeduped`).
 - **Timeout and stale-drop.** Cloud calls carry a 10-second `callTimeout` so a hung request cannot pin
@@ -112,5 +115,6 @@ ever re-bill a line.
 
 An external CPU engine reached over a process transport (one JSON request line per synthesis, one
 header line plus a raw float PCM frame back), spawned lazily off the game thread and kept alive across
-lines. Neutral-only by deliberate design so the local voice stays clean neural output. It is the
-universal fallback whenever the cloud backend is unavailable (no key, error, or offline).
+lines. Neutral-only by deliberate design so the local voice stays clean neural output. It runs only
+when **Voice Backend** is `Local`, and is then the only backend used: it is fully offline and makes no
+cloud calls.
