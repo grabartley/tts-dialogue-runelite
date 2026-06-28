@@ -163,7 +163,10 @@ public final class WikiNpcClient {
         ".*(demon|devil|\\bimp\\b|abyssal|dragon|wyvern|wyrm|drake|tzhaar|tztok|tzkal).*")) {
       return "Demon";
     }
-    if (t.matches(".*(gnome|goblin|hobgoblin).*")) {
+    if (t.matches(".*gnome.*")) {
+      return "Gnome";
+    }
+    if (t.matches(".*(goblin|hobgoblin).*")) {
       return "Goblin";
     }
     if (t.matches(".*(dwarf|dwarven).*")) {

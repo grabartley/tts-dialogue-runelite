@@ -52,7 +52,7 @@ DEFAULT_OUT = os.path.join("src", "main", "resources", "npc-voices.json")
 DEFAULT_OVERRIDES = os.path.join("tools", "overrides.json")
 DEFAULT_PROFILES = os.path.join("tools", "profiles.json")
 
-VALID_RACES = {"Human", "Elf", "Dwarf", "Goblin", "Troll", "Undead", "Demon", "Wizard"}
+VALID_RACES = {"Human", "Elf", "Dwarf", "Goblin", "Gnome", "Troll", "Undead", "Demon", "Wizard"}
 VALID_GENDERS = {"Male", "Female"}
 PROFILE_FIELDS = {"name", "accent", "style", "pace"}
 
@@ -64,7 +64,8 @@ RACE_BUCKET_RULES = [
     (r"vampyre|vampire|\bvyre\b|zombie|skeleton|ghost|ghoul|undead|wight|shade|"
      r"revenant|mummy|banshee|spectre|wraith|ankou|lich|reanimat", "Undead"),
     (r"demon|devil|\bimp\b|abyssal|dragon|wyvern|wyrm|drake|tzhaar|tztok|tzkal", "Demon"),
-    (r"gnome|goblin|hobgoblin", "Goblin"),
+    (r"gnome", "Gnome"),
+    (r"goblin|hobgoblin", "Goblin"),
     (r"dwarf|dwarven", "Dwarf"),
     (r"\belf\b|\belves\b|elven|gnome elf", "Elf"),
     (r"troll|\bgiant\b|cyclops|ogre|\bent\b|\bgolem\b|\bhuman.*giant", "Troll"),

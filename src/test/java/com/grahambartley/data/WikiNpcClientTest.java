@@ -67,9 +67,19 @@ public class WikiNpcClientTest {
   public void mapsLoreRaceOntoVoiceBucket() {
     server.enqueue(
         new MockResponse()
+            .setBody(pageBody("{{Infobox NPC\n|race=[[Ogre]]\n|gender=Male\n|id=1\n}}")));
+    assertEquals("an ogre voices from the Troll bucket", "Troll", client.lookup("Ogre").getRace());
+  }
+
+  @Test
+  public void gnomesAreTheirOwnRace() {
+    server.enqueue(
+        new MockResponse()
             .setBody(pageBody("{{Infobox NPC\n|race=[[Gnome]]\n|gender=Male\n|id=1\n}}")));
     assertEquals(
-        "a gnome voices from the Goblin bucket", "Goblin", client.lookup("Gnome").getRace());
+        "gnomes get their own race so they can sound Irish",
+        "Gnome",
+        client.lookup("Gnome").getRace());
   }
 
   @Test

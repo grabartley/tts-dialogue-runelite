@@ -38,7 +38,8 @@ public class NPCDemographicAnalyzerTest {
     // Real OSRS cache ids (the same ids the live client reports), spanning each
     // distinctive race bucket, with race/gender taken straight from the wiki.
     assertAttributes(385, "Human", "Male"); // Man
-    assertAttributes(12, "Goblin", "Male"); // Gnome
+    assertAttributes(12, "Goblin", "Male"); // Goblin
+    assertAttributes(14, "Gnome", "Male"); // Gnome
     assertAttributes(640, "Troll", "Male"); // Troll
     assertAttributes(1477, "Elf", "Male"); // Elf
     assertAttributes(229, "Demon", "Male"); // Demon

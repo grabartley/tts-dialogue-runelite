@@ -10,7 +10,8 @@
       "Demon": 140,
       "Dwarf": 474,
       "Elf": 248,
-      "Goblin": 283,
+      "Gnome": 215,
+      "Goblin": 68,
       "Human": 7416,
       "Troll": 230,
       "Undead": 370,
@@ -37,7 +38,7 @@
     "profiles_bespoke": 31
   },
   "profiles": {
-    "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise, and nothing sounds American. Resolution combines every matching layer: default -> byRace[race] -> byRegion[region] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
+    "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise. Resolution combines every matching layer: default -> byRace[race] -> byRegion[region] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
     "default": {
       "name": "Gielinor Commoner",
       "accent": "Common British English, the plain, earthy speech of an ordinary medieval peasant or townsperson, not posh or refined.",
@@ -74,6 +75,12 @@
         "accent": "Scrappy British English with an East London edge.",
         "style": "A small, crude, mischievous goblin. High-pitched, reedy, and nasal, sniggering and excitable, never quite trustworthy.",
         "pace": "Quick and jittery, words tumbling out in bursts."
+      },
+      "Gnome": {
+        "name": "Gnome",
+        "accent": "A country Irish accent, the warm rural lilt of the Irish countryside.",
+        "style": "A small, brisk, brainy gnome. Chatty, clever, and self-important, brimming with opinions and schemes.",
+        "pace": "Fast and animated, tripping along eagerly."
       },
       "Troll": {
         "name": "Troll",
@@ -197,16 +204,6 @@
         "accent": "Light, airy British English, bright and delicate.",
         "style": "A small, sparkling fairy. Sweet, breezy, and quick, flitting from thought to thought with childlike delight.",
         "pace": "Quick and light, with a fluttering, buoyant lilt."
-      },
-      {
-        "id": "gnome",
-        "keywords": [
-          "gnome"
-        ],
-        "name": "Gnome",
-        "accent": "Quick, clever British English with a West Country lilt.",
-        "style": "A small, brainy, faintly comical gnome. Brisk, chatty, and self-important, brimming with opinions and schemes.",
-        "pace": "Fast and animated, tripping along eagerly."
       },
       {
         "id": "ogre",
@@ -537,17 +534,17 @@
       "region": "wilderness"
     },
     "14": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "15": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "16": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -2231,7 +2228,7 @@
       "region": "kandarin"
     },
     "892": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -3155,11 +3152,11 @@
       "gender": "Male"
     },
     "1237": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "1238": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "1240": {
@@ -3663,17 +3660,17 @@
       "gender": "Male"
     },
     "1422": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1425": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1426": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -3687,82 +3684,82 @@
       "region": "karamja"
     },
     "1431": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kandarin"
     },
     "1434": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1435": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1436": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1437": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1438": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1439": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1440": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1441": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1442": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1444": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1445": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1446": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1453": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1454": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "1460": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
@@ -4339,7 +4336,7 @@
       "region": "kharidian"
     },
     "1616": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "tirannwn"
     },
@@ -5289,17 +5286,17 @@
       "region": "tirannwn"
     },
     "2035": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "tirannwn"
     },
     "2036": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "tirannwn"
     },
     "2037": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "tirannwn"
     },
@@ -5339,7 +5336,7 @@
       "region": "asgarnia"
     },
     "2061": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -6433,17 +6430,17 @@
       "region": "fremennik"
     },
     "2420": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "fremennik"
     },
     "2421": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "fremennik"
     },
     "2422": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "fremennik"
     },
@@ -6660,12 +6657,12 @@
       "region": "misthalin"
     },
     "2544": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2545": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "2546": {
@@ -6674,148 +6671,148 @@
       "region": "kandarin"
     },
     "2547": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2548": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2549": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2550": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2551": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "2552": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "2553": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
     "2554": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "2555": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2556": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "2557": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "misthalin"
     },
     "2558": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "fremennik"
     },
     "2559": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kandarin"
     },
     "2560": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "misthalin"
     },
     "2561": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2562": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2563": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kandarin"
     },
     "2564": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "2565": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female"
     },
     "2566": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2567": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2568": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "2569": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "2570": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "2571": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2572": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2573": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kandarin"
     },
     "2574": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2575": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2576": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -6928,12 +6925,12 @@
       "region": "morytania"
     },
     "2656": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "2657": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -7054,7 +7051,7 @@
       "region": "misthalin"
     },
     "2682": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -7064,22 +7061,22 @@
       "region": "kandarin"
     },
     "2684": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "2685": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "fremennik"
     },
     "2686": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
     "2687": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -8171,87 +8168,87 @@
       "region": "misthalin"
     },
     "3142": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3143": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3144": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3145": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3146": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3147": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3148": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3149": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3150": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3151": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3152": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3153": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3154": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3155": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3156": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3157": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "3158": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kandarin"
     },
@@ -11229,7 +11226,7 @@
       "region": "kandarin"
     },
     "4183": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -11387,11 +11384,11 @@
       "gender": "Male"
     },
     "4233": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female"
     },
     "4234": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female"
     },
     "4235": {
@@ -12648,22 +12645,22 @@
       "region": "kharidian"
     },
     "4644": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4645": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4646": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4647": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -12857,7 +12854,7 @@
       "region": "kandarin"
     },
     "4722": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -13466,27 +13463,27 @@
       "region": "kandarin"
     },
     "4907": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4908": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4909": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4910": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4911": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -13496,7 +13493,7 @@
       "region": "kandarin"
     },
     "4914": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -13594,32 +13591,32 @@
       "gender": "Male"
     },
     "4963": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4964": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4965": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4966": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4967": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4968": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -13629,32 +13626,32 @@
       "region": "morytania"
     },
     "4975": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4976": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4977": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4978": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4979": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "4980": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -14065,16 +14062,16 @@
       "region": "asgarnia"
     },
     "5130": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "5131": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "5132": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "5134": {
@@ -14564,7 +14561,7 @@
       "region": "kandarin"
     },
     "5309": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -15254,7 +15251,7 @@
       "region": "kandarin"
     },
     "5518": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -15754,7 +15751,7 @@
       "gender": "Male"
     },
     "5734": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "5735": {
@@ -16663,17 +16660,17 @@
       "region": "fremennik"
     },
     "6053": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "fremennik"
     },
     "6054": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "fremennik"
     },
     "6055": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "fremennik"
     },
@@ -16748,34 +16745,34 @@
       "region": "asgarnia"
     },
     "6080": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "6083": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "6084": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "6088": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "6091": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "6100": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "6101": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -17041,12 +17038,12 @@
       "gender": "Male"
     },
     "6531": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "6532": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -17449,7 +17446,7 @@
       "region": "kandarin"
     },
     "6675": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -17773,12 +17770,12 @@
       "gender": "Male"
     },
     "6806": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "6814": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kourend"
     },
@@ -18529,7 +18526,7 @@
       "region": "kourend"
     },
     "7013": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kourend"
     },
@@ -18579,7 +18576,7 @@
       "region": "kourend"
     },
     "7048": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kourend"
     },
@@ -18823,22 +18820,22 @@
       "gender": "Male"
     },
     "7100": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7101": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7102": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7103": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -18858,27 +18855,27 @@
       "region": "kandarin"
     },
     "7111": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7112": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7113": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7114": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7115": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -18903,7 +18900,7 @@
       "region": "kandarin"
     },
     "7154": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -18912,97 +18909,97 @@
       "gender": "Male"
     },
     "7156": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kandarin"
     },
     "7157": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kandarin"
     },
     "7158": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7159": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7160": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7161": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7162": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7163": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7164": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7165": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7166": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7167": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7168": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7169": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7170": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7171": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7172": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7173": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7174": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -19012,7 +19009,7 @@
       "region": "kandarin"
     },
     "7178": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
@@ -19758,12 +19755,12 @@
       "region": "kharidian"
     },
     "7516": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "7517": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -20772,7 +20769,7 @@
       "region": "kandarin"
     },
     "7953": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kandarin"
     },
@@ -20962,12 +20959,12 @@
       "region": "misthalin"
     },
     "8019": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "8020": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -22464,7 +22461,7 @@
       "region": "kourend"
     },
     "8537": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Female",
       "region": "kourend"
     },
@@ -22721,7 +22718,7 @@
       "region": "kourend"
     },
     "8595": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kourend"
     },
@@ -23418,7 +23415,7 @@
       "gender": "Male"
     },
     "8848": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -28746,101 +28743,101 @@
       "gender": "Male"
     },
     "10452": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "10453": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "10454": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "10455": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "10456": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "10457": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "10458": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kharidian"
     },
     "10459": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "10461": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "10462": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "10463": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "10464": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "10465": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "10466": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
     "10467": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "10468": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "10469": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "10470": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "10471": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "10472": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "10473": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male"
     },
     "10474": {
@@ -28869,37 +28866,37 @@
       "region": "misthalin"
     },
     "10479": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
     "10480": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
     "10481": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
     "10482": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
     "10483": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
     "10484": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
     "10485": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "karamja"
     },
@@ -30997,12 +30994,12 @@
       "region": "kharidian"
     },
     "11430": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "11431": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -33458,32 +33455,32 @@
       "gender": "Male"
     },
     "12466": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "12470": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "12471": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "12472": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "12474": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
     "12475": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kourend"
     },
@@ -36738,7 +36735,7 @@
       "region": "asgarnia"
     },
     "13614": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "asgarnia"
     },
@@ -42255,7 +42252,7 @@
       "gender": "Male"
     },
     "15601": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },
@@ -42270,7 +42267,7 @@
       "region": "kandarin"
     },
     "15604": {
-      "race": "Goblin",
+      "race": "Gnome",
       "gender": "Male",
       "region": "kandarin"
     },

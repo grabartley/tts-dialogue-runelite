@@ -1,5 +1,5 @@
 {
-  "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise, and nothing sounds American. Resolution combines every matching layer: default -> byRace[race] -> byRegion[region] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
+  "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise. Resolution combines every matching layer: default -> byRace[race] -> byRegion[region] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
   "default": {
     "name": "Gielinor Commoner",
     "accent": "Common British English, the plain, earthy speech of an ordinary medieval peasant or townsperson, not posh or refined.",
@@ -36,6 +36,12 @@
       "accent": "Scrappy British English with an East London edge.",
       "style": "A small, crude, mischievous goblin. High-pitched, reedy, and nasal, sniggering and excitable, never quite trustworthy.",
       "pace": "Quick and jittery, words tumbling out in bursts."
+    },
+    "Gnome": {
+      "name": "Gnome",
+      "accent": "A country Irish accent, the warm rural lilt of the Irish countryside.",
+      "style": "A small, brisk, brainy gnome. Chatty, clever, and self-important, brimming with opinions and schemes.",
+      "pace": "Fast and animated, tripping along eagerly."
     },
     "Troll": {
       "name": "Troll",
@@ -118,14 +124,6 @@
       "accent": "Light, airy British English, bright and delicate.",
       "style": "A small, sparkling fairy. Sweet, breezy, and quick, flitting from thought to thought with childlike delight.",
       "pace": "Quick and light, with a fluttering, buoyant lilt."
-    },
-    {
-      "id": "gnome",
-      "keywords": ["gnome"],
-      "name": "Gnome",
-      "accent": "Quick, clever British English with a West Country lilt.",
-      "style": "A small, brainy, faintly comical gnome. Brisk, chatty, and self-important, brimming with opinions and schemes.",
-      "pace": "Fast and animated, tripping along eagerly."
     },
     {
       "id": "ogre",

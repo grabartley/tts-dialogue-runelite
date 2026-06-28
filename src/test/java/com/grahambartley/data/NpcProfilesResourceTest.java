@@ -62,6 +62,9 @@ public class NpcProfilesResourceTest {
             .accent()
             .contains("Scottish"));
     assertTrue(
+        "gnomes sound country Irish",
+        table.resolveNpc(null, "Gnome Child", "Gnome", null).profile().accent().contains("Irish"));
+    assertTrue(
         "leprechauns sound Irish",
         table
             .resolveNpc(null, "Tool Leprechaun", "Human", null)

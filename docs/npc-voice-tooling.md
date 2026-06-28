@@ -104,7 +104,7 @@ Kokoro backend ignores profiles (it takes no prompt).
 The source of truth is `tools/profiles.json`; the generator embeds it under the
 output's `profiles` key. This is a **British** medieval fantasy world: commoners
 speak plain, common British, only royalty, knights, nobles and other high society
-use posh Received Pronunciation, and nothing sounds American.
+use posh Received Pronunciation.
 
 ### Layers (all matches combine)
 
