@@ -6,7 +6,7 @@
     "npc_pages": 5899,
     "count": 13663,
     "name_matched_ids": 713,
-    "overrides_applied": 510,
+    "overrides_applied": 570,
     "race_counts": {
       "Demon": 757,
       "Dwarf": 517,
@@ -24,21 +24,21 @@
       "Male": 11823
     },
     "ethnicity_counts": {
-      "asgarnia": 566,
+      "asgarnia": 568,
       "easternlands": 2,
       "fremennik": 626,
-      "kandarin": 1060,
+      "kandarin": 1064,
       "karamja": 182,
-      "kharidian": 557,
+      "kharidian": 522,
       "kourend": 820,
-      "menaphite": 117,
-      "misthalin": 786,
+      "menaphite": 127,
+      "misthalin": 793,
       "morytania": 991,
       "tirannwn": 343,
       "varlamore": 1000,
       "wilderness": 124
     },
-    "profiles_bespoke": 2885
+    "profiles_bespoke": 3322
   },
   "profiles": {
     "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise. Resolution combines every matching layer: default -> byRace[race] -> byEthnicity[ethnicity] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
@@ -12053,6 +12053,1832 @@
       "3706": {
         "name": "Former Vampyre",
         "style": "Dazed, hollow survivor; halting, weary speech still shaking off a long darkness."
+      },
+      "17": {
+        "name": "Rug Merchant",
+        "style": "Smooth and persuasive; a silver-tongued carpet salesman cheerfully hawking flying-carpet rides to every traveller."
+      },
+      "18": {
+        "name": "Rug Merchant",
+        "style": "Smooth and persuasive; a silver-tongued carpet salesman cheerfully hawking flying-carpet rides to every traveller."
+      },
+      "19": {
+        "name": "Rug Merchant",
+        "style": "Smooth and persuasive; a silver-tongued carpet salesman cheerfully hawking flying-carpet rides to every traveller."
+      },
+      "20": {
+        "name": "Rug Merchant",
+        "style": "Smooth and persuasive; a silver-tongued carpet salesman cheerfully hawking flying-carpet rides to every traveller."
+      },
+      "22": {
+        "name": "Rug Merchant",
+        "style": "Smooth and persuasive; a silver-tongued carpet salesman cheerfully hawking flying-carpet rides to every traveller."
+      },
+      "23": {
+        "name": "Monkey (magic carpet)",
+        "style": "Rude, insolent and cheeky, snide and demanding, hurls insults and barks for bananas."
+      },
+      "310": {
+        "name": "Ayesha",
+        "style": "Easygoing, earthy gardener, friendly and practical, talks plainly about tending her cactus patch."
+      },
+      "385": {
+        "name": "Avan",
+        "style": "Refined, well-mannered nobleman, polished and slightly aloof, speaks in a posh, genteel register."
+      },
+      "386": {
+        "name": "Avan",
+        "style": "Refined, well-mannered nobleman, polished and slightly aloof, speaks in a posh, genteel register."
+      },
+      "387": {
+        "name": "Avan",
+        "style": "Refined, well-mannered nobleman, polished and slightly aloof, speaks in a posh, genteel register."
+      },
+      "687": {
+        "name": "Bartender (The Big Heist Lodge)",
+        "style": "Rough-and-ready tavern keeper, hearty and gruff, slides drinks with blunt friendliness."
+      },
+      "688": {
+        "name": "Eblis",
+        "style": "Distinguished and erudite; scholarly, measured, mystically composed delivery with refined diction."
+      },
+      "689": {
+        "name": "Eblis",
+        "style": "Distinguished and erudite; scholarly, measured, mystically composed delivery with refined diction."
+      },
+      "692": {
+        "name": "Bandit (The Big Heist Lodge)",
+        "style": "Tough lowlife criminal, gruff and swaggering, talks in short blunt mutters between drinks."
+      },
+      "693": {
+        "name": "Bandit (The Big Heist Lodge)",
+        "style": "Tough lowlife criminal, gruff and swaggering, talks in short blunt mutters between drinks."
+      },
+      "694": {
+        "name": "Bandit (The Big Heist Lodge)",
+        "style": "Tough lowlife criminal, gruff and swaggering, talks in short blunt mutters between drinks."
+      },
+      "730": {
+        "name": "Azzanadra",
+        "style": "Ancient high priest: grave, measured and commanding, every word weighted with archaic authority and zealous conviction."
+      },
+      "733": {
+        "name": "Bandit Leader",
+        "style": "Hard-nosed gang chief, menacing and clipped, gives orders expecting obedience."
+      },
+      "739": {
+        "name": "Cowardly Bandit",
+        "style": "Blustering then cowering; starts with puffed-up bravado that collapses into a quavering whimper."
+      },
+      "893": {
+        "name": "Father Reen",
+        "style": "Earnest, beseeching priest; sincere and slightly anxious, pleading tone of a man seeking help."
+      },
+      "894": {
+        "name": "Father Reen",
+        "style": "Earnest, beseeching priest; sincere and slightly anxious, pleading tone of a man seeking help."
+      },
+      "895": {
+        "name": "Father Badden",
+        "style": "Fervent, sanctimonious zealot; declamatory and righteous, voice rising into pious indignation."
+      },
+      "896": {
+        "name": "Father Badden",
+        "style": "Fervent, sanctimonious zealot; declamatory and righteous, voice rising into pious indignation."
+      },
+      "899": {
+        "name": "Eric",
+        "style": "Nervous, jittery cultist; voice quavers and rushes, desperate for attention and approval, easily rattled."
+      },
+      "900": {
+        "name": "Eric",
+        "style": "Nervous, jittery cultist; voice quavers and rushes, desperate for attention and approval, easily rattled."
+      },
+      "903": {
+        "name": "Matthew",
+        "style": "Nervous and uncertain, hesitant and second-guessing, voice tight with unease."
+      },
+      "904": {
+        "name": "Matthew",
+        "style": "Nervous and uncertain, hesitant and second-guessing, voice tight with unease."
+      },
+      "905": {
+        "name": "Jennifer",
+        "style": "Cryptic, hushed, sinister murmur of a cultist; low, guarded, enigmatic tones.",
+        "pace": "slow"
+      },
+      "906": {
+        "name": "Jennifer",
+        "style": "Cryptic, hushed, sinister murmur of a cultist; low, guarded, enigmatic tones.",
+        "pace": "slow"
+      },
+      "907": {
+        "name": "Tanya",
+        "style": "Theatrical villain; sneering, grandiose and self-important, draws words out with relish and breaks into a triumphant cackle."
+      },
+      "908": {
+        "name": "Tanya",
+        "style": "Theatrical villain; sneering, grandiose and self-important, draws words out with relish and breaks into a triumphant cackle."
+      },
+      "909": {
+        "name": "Patrick",
+        "style": "Breathless and over-eager; a fervent cultist gushing with manic zeal, words tumbling out in fanatical excitement."
+      },
+      "910": {
+        "name": "Patrick",
+        "style": "Breathless and over-eager; a fervent cultist gushing with manic zeal, words tumbling out in fanatical excitement."
+      },
+      "917": {
+        "name": "Clay golem",
+        "style": "Ponderous earthen construct; slow grinding stone voice, simple and earnest, deliberate.",
+        "pace": "slow"
+      },
+      "918": {
+        "name": "Clay golem",
+        "style": "Ponderous earthen construct; slow grinding stone voice, simple and earnest, deliberate.",
+        "pace": "slow"
+      },
+      "948": {
+        "name": "Klenter",
+        "style": "Bitter, vindictive ex-priest, imperious and sneering, speaks down to everyone with cold spite."
+      },
+      "954": {
+        "name": "Weird Old Man",
+        "style": "Crazed mumbler; disjointed rambling and incoherent muttering, trails off and lurches between half-finished thoughts.",
+        "accent": "mumbling, slurred"
+      },
+      "1350": {
+        "name": "Artimeus",
+        "style": "Confident, knowledgeable tradesman, plain and assured, talks shop about hunting gear like an old hand."
+      },
+      "1615": {
+        "name": "Banknote Exchange Merchant",
+        "style": "Transactional and matter-of-fact, recites his small-fee exchange terms like a routine pitch."
+      },
+      "1779": {
+        "name": "Guardian mummy",
+        "style": "Dry, raspy, bandaged drawl; a gruff taskmaster barking terse instructions, equal parts ancient and irritable."
+      },
+      "1780": {
+        "name": "Guardian mummy",
+        "style": "Dry, raspy, bandaged drawl; a gruff taskmaster barking terse instructions, equal parts ancient and irritable."
+      },
+      "1781": {
+        "name": "Tarik",
+        "style": "Eager, talkative scholar; animated and knowledgeable, tumbles into rapid-fire explanations and conspiratorial rumour-sharing."
+      },
+      "1807": {
+        "name": "Sorceress",
+        "style": "Aloof, antisocial sorceress, coldly imperious and dismissive, curt with unwelcome intruders."
+      },
+      "1808": {
+        "name": "Apprentice",
+        "style": "Eager, slightly scatterbrained young trainee, chatty and a touch flustered, keen to show off half-learned spells."
+      },
+      "1809": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "1810": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "1811": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "1813": {
+        "name": "Del-Monty",
+        "style": "Laid-back contented cat; lazy unhurried drawl, smug and self-satisfied about his orchard life."
+      },
+      "1833": {
+        "name": "Bandit shopkeeper",
+        "style": "Shifty fence with a sly merchant patter, half-helpful, half-dodgy as he hawks stolen survival gear."
+      },
+      "2133": {
+        "name": "Tiles",
+        "style": "Brisk transactional merchant; clipped no-nonsense trader's patter, all business and quick figures."
+      },
+      "2552": {
+        "name": "Wingstone",
+        "style": "Restless wandering chatterbox; animated and rambling, talks fast and digresses, the perpetual traveller."
+      },
+      "2570": {
+        "name": "Captain Daerkin",
+        "style": "Off-duty pilot, tipsy and boisterous, words slurring and running together as he rambles about fights.",
+        "pace": "slow"
+      },
+      "2637": {
+        "name": "Sphinx",
+        "style": "Ancient, aloof feline guardian, detached and riddling, speaks with weary disinterest in mortal affairs."
+      },
+      "2817": {
+        "name": "Shop keeper (Al Kharid)",
+        "style": "Practiced general-store proprietor, smooth well-worn merchant patter, ever ready to trade."
+      },
+      "2818": {
+        "name": "Shop assistant (Al Kharid)",
+        "style": "Helpful retail assistant, friendly accommodating patter, warms up the more you spend."
+      },
+      "2873": {
+        "name": "Silk trader",
+        "style": "Persistent haggler, drawn-out wheedling sales pitch, dragging out negotiations over the price of silk."
+      },
+      "2874": {
+        "name": "Gem trader",
+        "style": "Shrewd haggling merchant; smooth, persuasive sales patter quick to talk up the worth of his stones."
+      },
+      "2875": {
+        "name": "Zeke",
+        "style": "Laid-back, affable salesman; relaxed easygoing drawl peppered with 'man', genial and unbothered."
+      },
+      "2876": {
+        "name": "Louie Legs",
+        "style": "Brash bazaar trader, loud and pushy, hawks his armoured legwear with cocksure flair."
+      },
+      "2877": {
+        "name": "Karim",
+        "style": "Cheery street-food hawker, warm and chatty, forever pushing his kebabs with friendly patter."
+      },
+      "2878": {
+        "name": "Ranael",
+        "style": "Brisk and proud; a confident saleswoman talking up her armoured skirts with chipper sales patter."
+      },
+      "2879": {
+        "name": "Dommik",
+        "style": "Helpful shopkeeper; brisk salesman patter, eager to push needles, thread and his crafting wares."
+      },
+      "3090": {
+        "name": "Banker (Al Kharid)",
+        "style": "Crisp, polite and businesslike, efficient with money and unhurried with customers."
+      },
+      "3091": {
+        "name": "Banker (Al Kharid)",
+        "style": "Crisp, polite and businesslike, efficient with money and unhurried with customers."
+      },
+      "3231": {
+        "name": "Ellis",
+        "style": "Workmanlike tradesman; brisk, no-nonsense patter quoting fees, the practiced spiel of a busy tanner."
+      },
+      "3331": {
+        "name": "Mubariz",
+        "style": "Gruff, hard-edged fight handler, brusque and tough-talking, no patience for time-wasters."
+      },
+      "3340": {
+        "name": "Fadli",
+        "style": "Bored, deadpan banker who perks into boastful swagger when bragging he's Al Kharid's best warrior."
+      },
+      "3341": {
+        "name": "A'abla",
+        "style": "Calm, reassuring nurse with a gentle bedside manner; soft, steady and caring delivery."
+      },
+      "3342": {
+        "name": "Sabreen",
+        "style": "Brisk yet caring; an attentive arena nurse with a reassuring, no-nonsense bedside manner."
+      },
+      "3343": {
+        "name": "Surgeon General Tafani",
+        "style": "Brisk, competent surgeon, reassuring clinical bedside manner, efficient and authoritative."
+      },
+      "3344": {
+        "name": "Jaraah",
+        "style": "Blunt, matter-of-fact bluster of a butcher-surgeon; gruff and unfazed, with grim gallows humour about gore."
+      },
+      "3345": {
+        "name": "Zahwa",
+        "style": "Battered weary brawler; gruff pained mutters, low and worn, grumbling like a man who's taken too many hits."
+      },
+      "3346": {
+        "name": "Ima",
+        "style": "Idle, casual chatter of a fight spectator; loose, offhand small talk."
+      },
+      "3347": {
+        "name": "Sabeil",
+        "style": "Eager and animated; an excitable arena spectator chattering with casual onlooker energy."
+      },
+      "3348": {
+        "name": "Jadid",
+        "style": "Relaxed, offhand chatter of a casual spectator; idle small talk."
+      },
+      "3349": {
+        "name": "Dalal",
+        "style": "Idle spectator; casual chatty onlooker, relaxed gossipy commentary on the fights."
+      },
+      "3350": {
+        "name": "Afrah",
+        "style": "Idle, chatty bystander watching the fights; casual, offhand small-talk delivery."
+      },
+      "3351": {
+        "name": "Jeed",
+        "style": "Idle, chatty small talk of a spectator; loose and gossipy."
+      },
+      "3352": {
+        "name": "Hamid",
+        "style": "Gentle, pious cadence of a monk, soft-spoken and devout, with a sheepish, slightly roguish undertone."
+      },
+      "3388": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "3442": {
+        "name": "Ali the dyer",
+        "style": "Weary, matter-of-fact craftswoman, dye-stained hands and few wasted words, talks shop about ingredients."
+      },
+      "3450": {
+        "name": "Rennard",
+        "style": "Slurred, rambling and guilt-ridden; a spectral thief muttering through a drunken haze, regret bleeding into every word.",
+        "accent": "drunken slur"
+      },
+      "3514": {
+        "name": "Scout (Shantay Pass)",
+        "style": "Hushed, breathy spectral murmur of an unseen scout, furtive and on edge, reporting in low whispers."
+      },
+      "3533": {
+        "name": "Ali Morrisane",
+        "style": "Silver-tongued, greedy fast-talker; oily charm overselling junk with relentless salesman patter."
+      },
+      "3534": {
+        "name": "Drunken Ali",
+        "style": "Soused and rambling; slurred, meandering speech that loses the thread, loud then trailing off.",
+        "accent": "slurred drunken",
+        "pace": "slow"
+      },
+      "3535": {
+        "name": "Ali the Barman",
+        "style": "Hassled, weary barman; gruff and put-upon but still obliging to thirsty customers."
+      },
+      "3536": {
+        "name": "Ali the Kebab seller",
+        "style": "Cheery street-food vendor; lively, hearty hawking of kebabs with welcoming gusto."
+      },
+      "3537": {
+        "name": "Market seller",
+        "style": "Brisk stall keeper, calls out his goods with practised market patter."
+      },
+      "3538": {
+        "name": "Ali the Camel Man",
+        "style": "Pushy discount animal hawker; eager, salesy patter trying to offload camels on anyone."
+      },
+      "3539": {
+        "name": "Street urchin",
+        "style": "Cheeky street kid, quick mischievous chatter, wheedling and angling for a handful of coins.",
+        "pace": "fast"
+      },
+      "3540": {
+        "name": "Ali the Mayor",
+        "style": "Pompous but ineffectual official; blustery and self-important yet timid and powerless underneath."
+      },
+      "3541": {
+        "name": "Ali the Hag",
+        "style": "Croaky, cackling old crone; raspy, muttering and conspiratorial as she brews her potions.",
+        "pace": "slow"
+      },
+      "3542": {
+        "name": "Ali the Snake Charmer",
+        "style": "Hypnotic, mellow charmer; soothing, sing-song lull as if coaxing a serpent from its basket."
+      },
+      "3546": {
+        "name": "Blackjack seller",
+        "style": "Loud market hawker, chatty and persuasive, talks fast to push his wares before the urchins nick them."
+      },
+      "3547": {
+        "name": "Menaphite Leader",
+        "style": "Fanatical, grandiose zealot, self-important ranting priest, menacing and theatrical about his grand plans."
+      },
+      "3548": {
+        "name": "Ali the Operator",
+        "style": "Smooth, sly gangster; cool, calculating and quietly menacing, every word deliberate."
+      },
+      "3552": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3553": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3554": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3555": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3556": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3557": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3558": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3559": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3560": {
+        "name": "Villager",
+        "style": "Wary desert villagers; guarded, terse mutters to strangers, suspicious and tight-lipped."
+      },
+      "3568": {
+        "name": "Pentyn",
+        "style": "Frail, trembling and weary; an ancient tormented knight speaking in slow, broken, suffering rasps.",
+        "pace": "slow"
+      },
+      "3569": {
+        "name": "Aristarchus",
+        "style": "Erudite, measured elderly scholar, lectures patiently with academic precision and a fondness for detail."
+      },
+      "3570": {
+        "name": "Boneguard",
+        "style": "Bound spirit in bones, hollow rasping voice, slow and tormented as it speaks against its will.",
+        "pace": "slow"
+      },
+      "3572": {
+        "name": "Desert Spirit",
+        "style": "Ethereal trapped spectre; faint, whispery and mournful, drifting and disembodied."
+      },
+      "3577": {
+        "name": "Boneguard",
+        "style": "Bound spirit in bones, hollow rasping voice, slow and tormented as it speaks against its will.",
+        "pace": "slow"
+      },
+      "3578": {
+        "name": "Akthanakos",
+        "style": "Ancient, cold and vengeful warrior; measured, imperious menace that carries the weight of millennia."
+      },
+      "3580": {
+        "name": "Lazim",
+        "style": "Impatient and sarcastic, sneers and makes snide remarks, condescending toward anyone slower than him."
+      },
+      "3582": {
+        "name": "Akthanakos",
+        "style": "Ancient, cold and vengeful warrior; measured, imperious menace that carries the weight of millennia."
+      },
+      "3875": {
+        "name": "Jex",
+        "style": "Fervent, sermonizing preacher's cadence; rolling, impassioned evangelical delivery, eager to expound on the gods."
+      },
+      "3876": {
+        "name": "Maisa",
+        "style": "Sharp and guarded, clipped no-nonsense delivery, wary and quick-thinking like the spy she is."
+      },
+      "3877": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "3878": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "3879": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "3880": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "3881": {
+        "name": "Sophanem Guard",
+        "style": "Vigilant city guard, clipped martial challenges, watchful and authoritative on patrol."
+      },
+      "3882": {
+        "name": "Sophanem Guard",
+        "style": "Vigilant city guard, clipped martial challenges, watchful and authoritative on patrol."
+      },
+      "3883": {
+        "name": "Sophanem Guard",
+        "style": "Vigilant city guard, clipped martial challenges, watchful and authoritative on patrol."
+      },
+      "3884": {
+        "name": "Sophanem Guard",
+        "style": "Vigilant city guard, clipped martial challenges, watchful and authoritative on patrol."
+      },
+      "3887": {
+        "name": "Banker (Sophanem)",
+        "style": "Formal, attentive and orderly, handles deposits with quiet professional courtesy."
+      },
+      "3888": {
+        "name": "Banker (Sophanem)",
+        "style": "Formal, attentive and orderly, handles deposits with quiet professional courtesy."
+      },
+      "3889": {
+        "name": "Stonemason (Sophanem)",
+        "style": "Gruff craftsman, matter-of-fact, talks plainly about stone, granite and the desert heat."
+      },
+      "3890": {
+        "name": "Nathifa",
+        "style": "Warm, friendly and chatty; a homely baker happily talking up her fresh goods to anyone passing the stall."
+      },
+      "3891": {
+        "name": "Urbi",
+        "style": "Confident weapons seller; sharp persuasive sales patter, proud and self-assured, leans in with hints of work to come."
+      },
+      "3892": {
+        "name": "Jamila",
+        "style": "Brisk, sing-song market patter; hawks her wares with practiced vendor charm."
+      },
+      "4193": {
+        "name": "Wanderer",
+        "style": "Enigmatic, hypnotic woman; silken, slow and alluring, low commanding cadence with a predatory undertone.",
+        "pace": "slow"
+      },
+      "4194": {
+        "name": "Wanderer",
+        "style": "Enigmatic, hypnotic woman; silken, slow and alluring, low commanding cadence with a predatory undertone.",
+        "pace": "slow"
+      },
+      "4202": {
+        "name": "Embalmer",
+        "style": "Morbid, soft-spoken mortician; calm and matter-of-fact about death, faintly unsettling salesman of spices."
+      },
+      "4203": {
+        "name": "Carpenter",
+        "style": "Blunt, no-nonsense tradesman; terse gruff grumbles, easily riled and quick to bark you off."
+      },
+      "4205": {
+        "name": "Siamun",
+        "style": "Gruff, prickly tradesman dyer, curt and easily irritated, softening only to terse civility."
+      },
+      "4206": {
+        "name": "High Priest (Sophanem)",
+        "style": "Solemn, devout, careful delivery of a temple leader; measured and dignified, a touch weary beneath heavy duty."
+      },
+      "4209": {
+        "name": "Sphinx",
+        "style": "Ancient, aloof feline guardian, detached and riddling, speaks with weary disinterest in mortal affairs."
+      },
+      "4285": {
+        "name": "Chancellor Hassan",
+        "style": "Dignified statesman; measured, formal, authoritative register of a man used to ruling and being obeyed."
+      },
+      "4286": {
+        "name": "Osman",
+        "style": "Shrewd, sly and guarded; the spymaster speaks low and conspiratorial, every sentence weighed and politically calculated."
+      },
+      "4287": {
+        "name": "Border Guard",
+        "style": "Officious, bored toll-collector, demands the entry fee in flat bureaucratic monotone."
+      },
+      "4288": {
+        "name": "Border Guard",
+        "style": "Officious, bored toll-collector, demands the entry fee in flat bureaucratic monotone."
+      },
+      "4585": {
+        "name": "Ali Morrisane",
+        "style": "Silver-tongued, greedy fast-talker; oily charm overselling junk with relentless salesman patter."
+      },
+      "4629": {
+        "name": "Ana",
+        "style": "Curious, eager young woman with an adventurer's restlessness, talks quickly and impulsively about exploring."
+      },
+      "4631": {
+        "name": "Female slave",
+        "style": "Weary and irritable; curt, overworked snaps from someone too tired and busy to talk."
+      },
+      "4632": {
+        "name": "Male slave",
+        "style": "Downtrodden, exhausted labourer, grumbling and put-upon, low and resentful."
+      },
+      "4633": {
+        "name": "Escaping slave",
+        "style": "Furtive and breathless; hushed, hurried whispers of someone trying not to be caught, glancing over the shoulder."
+      },
+      "4637": {
+        "name": "Al Shabim",
+        "style": "Enigmatic, shrewd nomad chieftain; calm, deliberate authority with a measured bargaining cadence."
+      },
+      "4638": {
+        "name": "Bedabin Nomad",
+        "style": "Weathered desert trader, hardy and plain-spoken, unhurried as the sands he lives in."
+      },
+      "4639": {
+        "name": "Bedabin Nomad Guard",
+        "style": "Terse and watchful sentry, clipped warnings, guards his post with stoic suspicion."
+      },
+      "4640": {
+        "name": "Irena",
+        "style": "Wavering, fretful delivery of a pleading mother; voice catches and trembles, words tumbling out in anxious bursts."
+      },
+      "4641": {
+        "name": "Irena",
+        "style": "Wavering, fretful delivery of a pleading mother; voice catches and trembles, words tumbling out in anxious bursts."
+      },
+      "4642": {
+        "name": "Shantay",
+        "style": "Officious gatekeeper, no-nonsense businesslike delivery, issues brisk warnings about the deadly desert."
+      },
+      "4653": {
+        "name": "Mine cart driver",
+        "style": "Busy, preoccupied workman, gruff and clipped, attention half on his cart."
+      },
+      "4670": {
+        "name": "Male slave",
+        "style": "Downtrodden, exhausted labourer, grumbling and put-upon, low and resentful."
+      },
+      "4671": {
+        "name": "Male slave",
+        "style": "Downtrodden, exhausted labourer, grumbling and put-upon, low and resentful."
+      },
+      "4672": {
+        "name": "Female slave",
+        "style": "Weary and irritable; curt, overworked snaps from someone too tired and busy to talk."
+      },
+      "4673": {
+        "name": "Female slave",
+        "style": "Weary and irritable; curt, overworked snaps from someone too tired and busy to talk."
+      },
+      "4674": {
+        "name": "Cart Camel",
+        "style": "Indignant beast of burden; haughty snorting retorts, dry put-upon sarcasm at being insulted."
+      },
+      "4738": {
+        "name": "Genie (Spirits of the Elid)",
+        "style": "Grandiose, booming and self-important, yet dim-witted; muddles words and grasps the wrong meaning with confident pomp."
+      },
+      "4739": {
+        "name": "Nirrie",
+        "style": "Serene, flowing and ethereal; a gentle water spirit speaking in soft lilting ripples."
+      },
+      "4740": {
+        "name": "Tirrie",
+        "style": "Ethereal water spirit; lilting, flowing and otherworldly, words drift and ripple in a soft murmur.",
+        "accent": "soft, watery, flowing"
+      },
+      "4741": {
+        "name": "Hallak",
+        "style": "Soft, flowing, watery murmur; words ripple and drift as if carried on a current, airy and otherworldly."
+      },
+      "4745": {
+        "name": "Ghaslor the Elder",
+        "style": "Slow, gravelly speech of a venerable village elder; weighs every word with the patience of great age, trailing into reflective pauses.",
+        "pace": "slow"
+      },
+      "4746": {
+        "name": "Ali the Carter",
+        "style": "Oily profiteering scammer; smug, smooth pitch pricing water at outrageous rates without a flicker of shame."
+      },
+      "4747": {
+        "name": "Usi",
+        "style": "Laid-back townsman; casual, unhurried small talk, easygoing and idle."
+      },
+      "4748": {
+        "name": "Nkuku",
+        "style": "Casual and idle; an easygoing wanderer making relaxed small talk as he ambles around town."
+      },
+      "4749": {
+        "name": "Garai",
+        "style": "Absent-minded and vague; rambling, oblivious delivery of a man who pays no attention to anything around him."
+      },
+      "4750": {
+        "name": "Habibah",
+        "style": "Easygoing, conversational tone of an ordinary townswoman going about her day."
+      },
+      "4751": {
+        "name": "Meskhenet",
+        "style": "Ordinary townswoman, calm and unremarkable, easy everyday conversational tone."
+      },
+      "4752": {
+        "name": "Zahra",
+        "style": "Ordinary townswoman; relaxed, friendly chatter, casual and warm."
+      },
+      "4753": {
+        "name": "Zahur",
+        "style": "Brisk, knowledgeable herbalist; professional and efficient, helpful clipped instructions and steady competence."
+      },
+      "4754": {
+        "name": "Seddu",
+        "style": "Shrewd, pragmatic armour merchant, steady salesmanship pitching his wares with confident ease."
+      },
+      "4755": {
+        "name": "Kazemde",
+        "style": "Easygoing shopkeeper, affable and unhurried, rattles off his wares with a salesman's ease."
+      },
+      "4756": {
+        "name": "Awusah the Mayor",
+        "style": "Affable, slightly bumbling civic leader, warm and well-meaning but a touch out of his depth; talks in an officious, mayoral register."
+      },
+      "4760": {
+        "name": "Shiratti the Custodian",
+        "style": "Devout, weary temple custodian, dutiful and put-upon, grumbles wearily about bureaucratic neglect."
+      },
+      "4761": {
+        "name": "Rokuh",
+        "style": "Cheerful and affable; a chatty stall-keeper proud of his cooling treats, warm and welcoming to customers."
+      },
+      "4762": {
+        "name": "Nardah Banker",
+        "style": "Brisk, courteous and efficient; the measured professional tone of a small-town bank clerk handling your coin."
+      },
+      "5134": {
+        "name": "Clay golem",
+        "style": "Ponderous earthen construct; slow grinding stone voice, simple and earnest, deliberate.",
+        "pace": "slow"
+      },
+      "5135": {
+        "name": "Clay golem",
+        "style": "Ponderous earthen construct; slow grinding stone voice, simple and earnest, deliberate.",
+        "pace": "slow"
+      },
+      "5136": {
+        "name": "Clay golem",
+        "style": "Ponderous earthen construct; slow grinding stone voice, simple and earnest, deliberate.",
+        "pace": "slow"
+      },
+      "5289": {
+        "name": "Carpenter",
+        "style": "Blunt, no-nonsense tradesman; terse gruff grumbles, easily riled and quick to bark you off."
+      },
+      "5520": {
+        "name": "Jarr",
+        "style": "Keen, upbeat delivery of an ambitious young citizen, brimming with eager enthusiasm."
+      },
+      "5786": {
+        "name": "Simon Templeton",
+        "style": "Greedy, slick treasure-hunter, smooth wheedling deal-maker forever eyeing the next valuable artefact."
+      },
+      "5949": {
+        "name": "Al the Camel",
+        "style": "Lovelorn romantic poet; wistful, dreamy and theatrical, savouring each verse he recites."
+      },
+      "5950": {
+        "name": "Elly the Camel",
+        "style": "Forlorn, sighing musings of a lovelorn camel; wistful and self-pitying, slow plodding delivery.",
+        "pace": "slow"
+      },
+      "5951": {
+        "name": "Ollie the Camel",
+        "style": "Dreamy and wistful, turning sulky and indignant when insulted; a camel who fancies himself a future flier."
+      },
+      "5952": {
+        "name": "Cam the Camel",
+        "style": "Lazy, languid camel, drawling and droll, can barely be bothered to finish a sentence."
+      },
+      "5954": {
+        "name": "Alice the Camel",
+        "style": "Haughty, droll, world-weary camel; sardonic and easily offended, delivers slow disdainful retorts to insults.",
+        "pace": "slow"
+      },
+      "5955": {
+        "name": "Neferti the Camel",
+        "style": "Wistful and dreamy; a wry, world-weary camel longing to travel, droll and a touch self-pitying."
+      },
+      "5956": {
+        "name": "Ali the Leaflet Dropper",
+        "style": "Shrill, energetic young boy shouting shop adverts at passersby; eager, breathless hawking."
+      },
+      "5957": {
+        "name": "Ali the Smith",
+        "style": "Gruff blacksmith; hearty, blunt bluster delivered between imagined hammer blows."
+      },
+      "5958": {
+        "name": "Ali the Farmer",
+        "style": "Laid-back agricultural chatterer; plodding, easygoing rural musing about crops and cacti."
+      },
+      "5959": {
+        "name": "Ali the Tailor",
+        "style": "Brisk shopkeeper patter, eager to make a sale, talks up his cloth and scissors with a tradesman's practised pitch."
+      },
+      "5960": {
+        "name": "Ali the Guard",
+        "style": "Gruff, tight-lipped hired muscle; terse, guarded replies that hint at a rough past he won't share."
+      },
+      "5978": {
+        "name": "Entrance Guardian",
+        "style": "Booming, ceremonious golem; didactic and welcoming, recites history and purpose in slow stony cadence.",
+        "pace": "slow"
+      },
+      "5979": {
+        "name": "Telekinetic Guardian",
+        "style": "Hollow automaton; flat monotone recitation of arena rules, ponderous and impersonal with no inflection.",
+        "accent": "deep, hollow, resonant",
+        "pace": "slow, measured"
+      },
+      "5980": {
+        "name": "Alchemy Guardian",
+        "style": "Deep, flat, monotone stone construct; ponderous mechanical announcements with no inflection.",
+        "pace": "slow"
+      },
+      "5981": {
+        "name": "Enchantment Guardian",
+        "style": "Deep, resonant, mechanical instruction; flat ceremonial monotone announcing rules and bonuses without emotion.",
+        "pace": "slow"
+      },
+      "5982": {
+        "name": "Graveyard Guardian",
+        "style": "Deep, grinding monotone of animated stone; slow, heavy, deliberate pronouncements with no inflection.",
+        "pace": "slow"
+      },
+      "5984": {
+        "name": "Rewards Guardian (Mage Training Arena)",
+        "style": "Deep, ponderous and booming; a stony arena guardian speaking in slow, heavy, resonant tones.",
+        "pace": "slow"
+      },
+      "5985": {
+        "name": "Charmed Warrior",
+        "style": "Hollow animated armour; clanking echoing voice with no body behind it, empty and metallic."
+      },
+      "5986": {
+        "name": "Charmed Warrior",
+        "style": "Hollow animated armour; clanking echoing voice with no body behind it, empty and metallic."
+      },
+      "5987": {
+        "name": "Charmed Warrior",
+        "style": "Hollow animated armour; clanking echoing voice with no body behind it, empty and metallic."
+      },
+      "5988": {
+        "name": "Charmed Warrior",
+        "style": "Hollow animated armour; clanking echoing voice with no body behind it, empty and metallic."
+      },
+      "6589": {
+        "name": "Dr Ford",
+        "style": "Unhinged and manic; rambling distracted mutterings, fixated and paranoid about the hole that speaks to him."
+      },
+      "6771": {
+        "name": "Drew",
+        "style": "Easygoing chatterbox; jokey banter, friendly and talkative, slips in jests as he works the grinder."
+      },
+      "7369": {
+        "name": "Wesley",
+        "style": "Chipper, simple enthusiast; eager and friendly, bubbles over about crushing things with childlike excitement, a touch dim."
+      },
+      "7654": {
+        "name": "Breive",
+        "style": "Dry, deadpan gatekeeper, wry gallows humour delivered flat as he turns away unqualified slayers."
+      },
+      "10250": {
+        "name": "Eric",
+        "style": "Nervous, jittery cultist; voice quavers and rushes, desperate for attention and approval, easily rattled."
+      },
+      "10452": {
+        "name": "Captain Dalbur",
+        "style": "Chipper aviator, brisk and plummy, all 'tally ho' enthusiasm as he hawks his glider rides."
+      },
+      "10453": {
+        "name": "Captain Dalbur",
+        "style": "Chipper aviator, brisk and plummy, all 'tally ho' enthusiasm as he hawks his glider rides."
+      },
+      "10454": {
+        "name": "Captain Dalbur",
+        "style": "Chipper aviator, brisk and plummy, all 'tally ho' enthusiasm as he hawks his glider rides."
+      },
+      "10455": {
+        "name": "Captain Dalbur",
+        "style": "Chipper aviator, brisk and plummy, all 'tally ho' enthusiasm as he hawks his glider rides."
+      },
+      "10456": {
+        "name": "Captain Dalbur",
+        "style": "Chipper aviator, brisk and plummy, all 'tally ho' enthusiasm as he hawks his glider rides."
+      },
+      "10457": {
+        "name": "Captain Dalbur",
+        "style": "Chipper aviator, brisk and plummy, all 'tally ho' enthusiasm as he hawks his glider rides."
+      },
+      "10458": {
+        "name": "Captain Dalbur",
+        "style": "Chipper aviator, brisk and plummy, all 'tally ho' enthusiasm as he hawks his glider rides."
+      },
+      "10583": {
+        "name": "Captain Pudi",
+        "style": "Seasoned captain and leader, authoritative and instructive, explains the Tempoross fight with crisp confidence."
+      },
+      "10584": {
+        "name": "Captain Dudi",
+        "style": "Brisk sea-captain, commanding bark, rattles off countdowns and orders with deckside urgency."
+      },
+      "10585": {
+        "name": "Captain Pudi",
+        "style": "Seasoned captain and leader, authoritative and instructive, explains the Tempoross fight with crisp confidence."
+      },
+      "10586": {
+        "name": "Captain Pudi",
+        "style": "Seasoned captain and leader, authoritative and instructive, explains the Tempoross fight with crisp confidence."
+      },
+      "10587": {
+        "name": "Captain Dudi",
+        "style": "Brisk sea-captain, commanding bark, rattles off countdowns and orders with deckside urgency."
+      },
+      "10588": {
+        "name": "Captain Dudi",
+        "style": "Brisk sea-captain, commanding bark, rattles off countdowns and orders with deckside urgency."
+      },
+      "10593": {
+        "name": "First Mate Deri",
+        "style": "Booming, hollering deckhand; barks brisk tips and instructions over the wind and waves with seafaring gusto.",
+        "pace": "fast"
+      },
+      "10595": {
+        "name": "First Mate Deri",
+        "style": "Booming, hollering deckhand; barks brisk tips and instructions over the wind and waves with seafaring gusto.",
+        "pace": "fast"
+      },
+      "10596": {
+        "name": "First Mate Peri",
+        "style": "Brisk, carrying voice; loud encouraging caller shouting quick instructions across the deck during the fight.",
+        "pace": "fast"
+      },
+      "10597": {
+        "name": "First Mate Peri",
+        "style": "Brisk, carrying voice; loud encouraging caller shouting quick instructions across the deck during the fight.",
+        "pace": "fast"
+      },
+      "10604": {
+        "name": "Sailor (Ruins of Unkah)",
+        "style": "Salt-of-the-earth deckhand, brisk and practical seafaring chatter, keeps things shipshape."
+      },
+      "10605": {
+        "name": "Spirit Angler (Reward pool)",
+        "style": "Laid-back fisherman, easygoing explanatory patter, slightly spaced-out as he gazes out to sea."
+      },
+      "10606": {
+        "name": "Spirit Angler",
+        "style": "Hardy fisherfolk, brisk weathered camaraderie, easy sea-banter between casts."
+      },
+      "10607": {
+        "name": "Spirit Angler",
+        "style": "Hardy fisherfolk, brisk weathered camaraderie, easy sea-banter between casts."
+      },
+      "10608": {
+        "name": "Spirit Angler",
+        "style": "Hardy fisherfolk, brisk weathered camaraderie, easy sea-banter between casts."
+      },
+      "10609": {
+        "name": "Spirit Angler",
+        "style": "Hardy fisherfolk, brisk weathered camaraderie, easy sea-banter between casts."
+      },
+      "10610": {
+        "name": "Ferryman Sathwood",
+        "style": "Weathered, matter-of-fact boatman; plain practical patter of a working ferryman naming his routes."
+      },
+      "10611": {
+        "name": "Ferryman Nathwood",
+        "style": "Salt-of-the-earth boatman; casual, friendly and unhurried, the easy chatter of a man who ferries folk all day."
+      },
+      "10612": {
+        "name": "Retired sailor",
+        "style": "Gruff and weathered; a salty old sea-dog with a slow, hearty seafaring drawl and a fondness for tall tales."
+      },
+      "10613": {
+        "name": "Gita Prymes",
+        "style": "Brash, self-promoting patter; talks herself up as a master angler with breezy overconfidence, quick to boast and short on substance."
+      },
+      "10614": {
+        "name": "Taiman",
+        "style": "Gruff, weathered seafarer; speaks low and curt, reluctant to talk, clipped brooding lines from a mariner who keeps to himself."
+      },
+      "10615": {
+        "name": "Koanee",
+        "style": "Glum, weary navigator, terse and downcast, mutters more than she talks."
+      },
+      "10616": {
+        "name": "Timallus",
+        "style": "Harried, brusque cook; dismissive and rushed, mutters about being too busy, snappy short replies."
+      },
+      "10617": {
+        "name": "Lauretta",
+        "style": "Bookish and studious, absorbed in her writing, measured and slightly distracted when spoken to."
+      },
+      "10618": {
+        "name": "Ishmael",
+        "style": "Weathered, salty patter of an old fisherman-turned-monger; gruff, hearty sales talk."
+      },
+      "10634": {
+        "name": "Shantay Guard (Ruins of Unkah)",
+        "style": "Dutiful checkpoint guard, terse and functional, waves travellers through with clipped efficiency."
+      },
+      "11161": {
+        "name": "Dusty Aliv",
+        "style": "Dry rattling skull; sardonic, gravelly warning tone, bone-dry wit toward foolhardy adventurers."
+      },
+      "11467": {
+        "name": "Kovac",
+        "style": "Slow, rumbling giant smith, deliberate and heavy-spoken, calm but immensely strong-willed.",
+        "pace": "slow"
+      },
+      "11468": {
+        "name": "Kovac",
+        "style": "Slow, rumbling giant smith, deliberate and heavy-spoken, calm but immensely strong-willed.",
+        "pace": "slow"
+      },
+      "11469": {
+        "name": "Kovac",
+        "style": "Slow, rumbling giant smith, deliberate and heavy-spoken, calm but immensely strong-willed.",
+        "pace": "slow"
+      },
+      "11470": {
+        "name": "Kovac",
+        "style": "Slow, rumbling giant smith, deliberate and heavy-spoken, calm but immensely strong-willed.",
+        "pace": "slow"
+      },
+      "11472": {
+        "name": "Kovac",
+        "style": "Slow, rumbling giant smith, deliberate and heavy-spoken, calm but immensely strong-willed.",
+        "pace": "slow"
+      },
+      "11473": {
+        "name": "Tarik",
+        "style": "Eager, talkative scholar; animated and knowledgeable, tumbles into rapid-fire explanations and conspiratorial rumour-sharing."
+      },
+      "11474": {
+        "name": "Maisa",
+        "style": "Sharp and guarded, clipped no-nonsense delivery, wary and quick-thinking like the spy she is."
+      },
+      "11475": {
+        "name": "Maisa",
+        "style": "Sharp and guarded, clipped no-nonsense delivery, wary and quick-thinking like the spy she is."
+      },
+      "11476": {
+        "name": "Maisa",
+        "style": "Sharp and guarded, clipped no-nonsense delivery, wary and quick-thinking like the spy she is."
+      },
+      "11477": {
+        "name": "Maisa",
+        "style": "Sharp and guarded, clipped no-nonsense delivery, wary and quick-thinking like the spy she is."
+      },
+      "11479": {
+        "name": "Mehhar",
+        "style": "Ancient, solemn spirit, dignified and weary, speaks slowly with sorrowful gravity."
+      },
+      "11480": {
+        "name": "High Priest of Scabaras",
+        "style": "Reverent, hushed devotional cadence with a skittering, insectile rasp and an otherworldly edge."
+      },
+      "11502": {
+        "name": "High Priest (Sophanem)",
+        "style": "Solemn, devout, careful delivery of a temple leader; measured and dignified, a touch weary beneath heavy duty."
+      },
+      "11533": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11534": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11535": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11536": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11537": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11538": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11539": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11540": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11541": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11542": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11543": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11544": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11545": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11546": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11547": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11548": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11549": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11550": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11551": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11552": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11553": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11554": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11555": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11556": {
+        "name": "Citizen (Menaphos)",
+        "style": "Dazed and entranced; vacant, dreamlike monotone repeating the same phrase, drained of will.",
+        "pace": "slow"
+      },
+      "11562": {
+        "name": "Jex",
+        "style": "Fervent, sermonizing preacher's cadence; rolling, impassioned evangelical delivery, eager to expound on the gods."
+      },
+      "11563": {
+        "name": "Jex",
+        "style": "Fervent, sermonizing preacher's cadence; rolling, impassioned evangelical delivery, eager to expound on the gods."
+      },
+      "11564": {
+        "name": "Maisa",
+        "style": "Sharp and guarded, clipped no-nonsense delivery, wary and quick-thinking like the spy she is."
+      },
+      "11590": {
+        "name": "Wanderer",
+        "style": "Enigmatic, hypnotic woman; silken, slow and alluring, low commanding cadence with a predatory undertone.",
+        "pace": "slow"
+      },
+      "11592": {
+        "name": "Worker (Sophanem)",
+        "style": "Surly resentful labourer; gruff grumbling, bitter hostile mutters, scornful and short with outsiders."
+      },
+      "11593": {
+        "name": "Worker (Sophanem)",
+        "style": "Surly resentful labourer; gruff grumbling, bitter hostile mutters, scornful and short with outsiders."
+      },
+      "11594": {
+        "name": "Worker (Sophanem)",
+        "style": "Surly resentful labourer; gruff grumbling, bitter hostile mutters, scornful and short with outsiders."
+      },
+      "11595": {
+        "name": "Worker (Sophanem)",
+        "style": "Surly resentful labourer; gruff grumbling, bitter hostile mutters, scornful and short with outsiders."
+      },
+      "11596": {
+        "name": "Embalmer",
+        "style": "Morbid, soft-spoken mortician; calm and matter-of-fact about death, faintly unsettling salesman of spices."
+      },
+      "11598": {
+        "name": "Raetul",
+        "style": "Long-winded and fussy; a fashion-obsessed cloth merchant who natters at length before he'll get down to business."
+      },
+      "11599": {
+        "name": "Raetul",
+        "style": "Long-winded and fussy; a fashion-obsessed cloth merchant who natters at length before he'll get down to business."
+      },
+      "11600": {
+        "name": "Raetul",
+        "style": "Long-winded and fussy; a fashion-obsessed cloth merchant who natters at length before he'll get down to business."
+      },
+      "11601": {
+        "name": "Siamun",
+        "style": "Gruff, prickly tradesman dyer, curt and easily irritated, softening only to terse civility."
+      },
+      "11602": {
+        "name": "High Priest (Sophanem)",
+        "style": "Solemn, devout, careful delivery of a temple leader; measured and dignified, a touch weary beneath heavy duty."
+      },
+      "11603": {
+        "name": "High Priest (Sophanem)",
+        "style": "Solemn, devout, careful delivery of a temple leader; measured and dignified, a touch weary beneath heavy duty."
+      },
+      "11604": {
+        "name": "High Priest (Sophanem)",
+        "style": "Solemn, devout, careful delivery of a temple leader; measured and dignified, a touch weary beneath heavy duty."
+      },
+      "11605": {
+        "name": "High Priest (Sophanem)",
+        "style": "Solemn, devout, careful delivery of a temple leader; measured and dignified, a touch weary beneath heavy duty."
+      },
+      "11654": {
+        "name": "Apmeken",
+        "style": "Playful, mischievous, unpredictable divine voice; teasing and prone to exaggeration, flits between mockery and wisdom."
+      },
+      "11655": {
+        "name": "Apmeken",
+        "style": "Playful, mischievous, unpredictable divine voice; teasing and prone to exaggeration, flits between mockery and wisdom."
+      },
+      "11656": {
+        "name": "Apmeken",
+        "style": "Playful, mischievous, unpredictable divine voice; teasing and prone to exaggeration, flits between mockery and wisdom."
+      },
+      "11657": {
+        "name": "Crondis",
+        "style": "Ancient serene goddess; regal, measured and graceful, weary and faded from long imprisonment.",
+        "pace": "slow"
+      },
+      "11659": {
+        "name": "Crondis",
+        "style": "Ancient serene goddess; regal, measured and graceful, weary and faded from long imprisonment.",
+        "pace": "slow"
+      },
+      "11660": {
+        "name": "Crondis",
+        "style": "Ancient serene goddess; regal, measured and graceful, weary and faded from long imprisonment.",
+        "pace": "slow"
+      },
+      "11661": {
+        "name": "Scabaras",
+        "style": "Withdrawn, distant god of isolation; speaks sparingly in a hollow, reluctant murmur as if loath to be addressed.",
+        "pace": "slow"
+      },
+      "11662": {
+        "name": "Scabaras",
+        "style": "Withdrawn, distant god of isolation; speaks sparingly in a hollow, reluctant murmur as if loath to be addressed.",
+        "pace": "slow"
+      },
+      "11663": {
+        "name": "Scabaras",
+        "style": "Withdrawn, distant god of isolation; speaks sparingly in a hollow, reluctant murmur as if loath to be addressed.",
+        "pace": "slow"
+      },
+      "11664": {
+        "name": "Arena Guard Fronk",
+        "style": "Wiry, scrappy guard with a brusque, ready-for-trouble edge; talks tough and quick."
+      },
+      "11665": {
+        "name": "Arena Guard Nikkolas",
+        "style": "Steady, by-the-book guard, authoritative and measured, delivers rules without fuss."
+      },
+      "11666": {
+        "name": "Arena Guard Fawry",
+        "style": "Gruff, plain-spoken guard, blunt and unbothered, gives short flat answers."
+      },
+      "11667": {
+        "name": "Arena Guard Yon",
+        "style": "Aloof and half-distracted, clipped and absent-minded, answers as if barely paying attention."
+      },
+      "11668": {
+        "name": "Arena Guard Drakno",
+        "style": "Stern, intimidating enforcer, low and curt, speaks like someone you would not want to cross."
+      },
+      "11669": {
+        "name": "Arena Guard Rachi",
+        "style": "Dry, deadpan guard with a faintly disillusioned air, wry asides about how she ended up here."
+      },
+      "11670": {
+        "name": "Arena Guard Joby",
+        "style": "Laid-back, easygoing guard, casual and conversational, drifts into talk of the mountains he misses."
+      },
+      "11671": {
+        "name": "Arena Guard Beni",
+        "style": "Watchful, no-nonsense guard; terse and businesslike, keeps order with clipped instructions."
+      },
+      "11672": {
+        "name": "1v1 Tournament Guide",
+        "style": "Brisk, helpful arena attendant who walks you through tournament rules in a clear, businesslike, slightly upbeat register."
+      },
+      "11673": {
+        "name": "Duel Guide",
+        "style": "Clear instructive guide; explanatory and patient, walks you through dueling rules step by step."
+      },
+      "11674": {
+        "name": "Chris",
+        "style": "Brisk practical repairman; matter-of-fact tradesman patter, mildly territorial about his anvil."
+      },
+      "11686": {
+        "name": "Het",
+        "style": "Resonant, commanding divine register; measured, authoritative pronouncements befitting a lesser god of health and vigour.",
+        "pace": "slow"
+      },
+      "11687": {
+        "name": "Het",
+        "style": "Resonant, commanding divine register; measured, authoritative pronouncements befitting a lesser god of health and vigour.",
+        "pace": "slow"
+      },
+      "11688": {
+        "name": "Het",
+        "style": "Resonant, commanding divine register; measured, authoritative pronouncements befitting a lesser god of health and vigour.",
+        "pace": "slow"
+      },
+      "11689": {
+        "name": "Osmumten",
+        "style": "Regal, grave and commanding; an ancient pharaoh speaking in slow dignified pronouncements, weary yet authoritative."
+      },
+      "11690": {
+        "name": "Osmumten",
+        "style": "Regal, grave and commanding; an ancient pharaoh speaking in slow dignified pronouncements, weary yet authoritative."
+      },
+      "11691": {
+        "name": "Osmumten",
+        "style": "Regal, grave and commanding; an ancient pharaoh speaking in slow dignified pronouncements, weary yet authoritative."
+      },
+      "11692": {
+        "name": "Osmumten",
+        "style": "Regal, grave and commanding; an ancient pharaoh speaking in slow dignified pronouncements, weary yet authoritative."
+      },
+      "11693": {
+        "name": "Osmumten",
+        "style": "Regal, grave and commanding; an ancient pharaoh speaking in slow dignified pronouncements, weary yet authoritative."
+      },
+      "11807": {
+        "name": "Maisa",
+        "style": "Sharp and guarded, clipped no-nonsense delivery, wary and quick-thinking like the spy she is."
+      },
+      "11808": {
+        "name": "Maisa",
+        "style": "Sharp and guarded, clipped no-nonsense delivery, wary and quick-thinking like the spy she is."
+      },
+      "11870": {
+        "name": "Ali the dyer",
+        "style": "Weary, matter-of-fact craftswoman, dye-stained hands and few wasted words, talks shop about ingredients."
+      },
+      "11872": {
+        "name": "Drunken Ali",
+        "style": "Soused and rambling; slurred, meandering speech that loses the thread, loud then trailing off.",
+        "accent": "slurred drunken",
+        "pace": "slow"
+      },
+      "11874": {
+        "name": "Ali the Barman",
+        "style": "Hassled, weary barman; gruff and put-upon but still obliging to thirsty customers."
+      },
+      "11876": {
+        "name": "Ali the Kebab seller",
+        "style": "Cheery street-food vendor; lively, hearty hawking of kebabs with welcoming gusto."
+      },
+      "11878": {
+        "name": "Ali the Camel Man",
+        "style": "Pushy discount animal hawker; eager, salesy patter trying to offload camels on anyone."
+      },
+      "11879": {
+        "name": "Ali the Mayor",
+        "style": "Pompous but ineffectual official; blustery and self-important yet timid and powerless underneath."
+      },
+      "11881": {
+        "name": "Ali the Hag",
+        "style": "Croaky, cackling old crone; raspy, muttering and conspiratorial as she brews her potions.",
+        "pace": "slow"
+      },
+      "11883": {
+        "name": "Ali the Snake Charmer",
+        "style": "Hypnotic, mellow charmer; soothing, sing-song lull as if coaxing a serpent from its basket."
+      },
+      "11889": {
+        "name": "Ali the Operator",
+        "style": "Smooth, sly gangster; cool, calculating and quietly menacing, every word deliberate."
+      },
+      "12102": {
+        "name": "Ali the Tea Seller",
+        "style": "Rambling, over-promising stall vendor who keeps dangling tea and hints of work he never actually delivers; chatty and meandering."
+      },
+      "12103": {
+        "name": "Morgiana",
+        "style": "Dignified battle-worn veteran, steely and measured, carries herself with formal knightly composure."
+      },
+      "12104": {
+        "name": "Cassim",
+        "style": "Refined, indulgent connoisseur; smooth unhurried delivery savouring his words like a fine wine."
+      },
+      "12105": {
+        "name": "Elias White",
+        "style": "Worldly, measured explorer; speaks with scholarly curiosity and seasoned calm, weighing each word like a seasoned investigator."
+      },
+      "12156": {
+        "name": "Lil'viathan",
+        "style": "Small abyss-deformed creature, distorted burbling and gurgling, otherworldly and barely articulate."
+      },
+      "12160": {
+        "name": "Lil'viathan",
+        "style": "Small abyss-deformed creature, distorted burbling and gurgling, otherworldly and barely articulate."
+      },
+      "12162": {
+        "name": "Asgarnia Smith",
+        "style": "Boastful, vain showman, smooth and self-aggrandizing, name-drops his own legend and inflates every tale."
+      },
+      "12291": {
+        "name": "Asgarnia Smith",
+        "style": "Boastful, vain showman, smooth and self-aggrandizing, name-drops his own legend and inflates every tale."
+      },
+      "12292": {
+        "name": "Asgarnia Smith",
+        "style": "Boastful, vain showman, smooth and self-aggrandizing, name-drops his own legend and inflates every tale."
+      },
+      "12297": {
+        "name": "Mysterious Figure",
+        "style": "Cold, clipped and menacing; speaks in low controlled murmurs, every word a veiled threat from a hired killer."
+      },
+      "12298": {
+        "name": "Mysterious Figure",
+        "style": "Cold, clipped and menacing; speaks in low controlled murmurs, every word a veiled threat from a hired killer."
+      },
+      "12300": {
+        "name": "Mysterious Figure",
+        "style": "Cold, clipped and menacing; speaks in low controlled murmurs, every word a veiled threat from a hired killer."
+      },
+      "12301": {
+        "name": "Mysterious Figure",
+        "style": "Cold, clipped and menacing; speaks in low controlled murmurs, every word a veiled threat from a hired killer."
+      },
+      "12305": {
+        "name": "Azzanadra",
+        "style": "Ancient high priest: grave, measured and commanding, every word weighted with archaic authority and zealous conviction."
+      },
+      "12306": {
+        "name": "Azzanadra",
+        "style": "Ancient high priest: grave, measured and commanding, every word weighted with archaic authority and zealous conviction."
+      },
+      "12307": {
+        "name": "Azzanadra",
+        "style": "Ancient high priest: grave, measured and commanding, every word weighted with archaic authority and zealous conviction."
+      },
+      "12308": {
+        "name": "Azzanadra",
+        "style": "Ancient high priest: grave, measured and commanding, every word weighted with archaic authority and zealous conviction."
+      },
+      "12311": {
+        "name": "Akthanakos",
+        "style": "Ancient, cold and vengeful warrior; measured, imperious menace that carries the weight of millennia."
+      },
+      "12312": {
+        "name": "Akthanakos",
+        "style": "Ancient, cold and vengeful warrior; measured, imperious menace that carries the weight of millennia."
+      },
+      "12313": {
+        "name": "Akthanakos",
+        "style": "Ancient, cold and vengeful warrior; measured, imperious menace that carries the weight of millennia."
+      },
+      "12347": {
+        "name": "Mysterious Bandit",
+        "style": "Shifty and secretive, hushed sly delivery, talks low like a black-market dealer with something to hide."
+      },
+      "12383": {
+        "name": "Catalytic Guardian",
+        "style": "Otherworldly construct; flat resonant monotone, detached and impersonal, speaks in even cadence."
+      },
+      "12384": {
+        "name": "Catalytic Guardian",
+        "style": "Otherworldly construct; flat resonant monotone, detached and impersonal, speaks in even cadence."
+      },
+      "12397": {
+        "name": "Akthanakos",
+        "style": "Ancient, cold and vengeful warrior; measured, imperious menace that carries the weight of millennia."
+      },
+      "12398": {
+        "name": "Akthanakos",
+        "style": "Ancient, cold and vengeful warrior; measured, imperious menace that carries the weight of millennia."
+      },
+      "12610": {
+        "name": "Elias White",
+        "style": "Worldly, measured explorer; speaks with scholarly curiosity and seasoned calm, weighing each word like a seasoned investigator."
+      },
+      "14230": {
+        "name": "Faaid",
+        "style": "Wistful and soft-spoken; lonely, gentle delivery as if glad for any company, trailing off quietly."
+      },
+      "15049": {
+        "name": "Captain Siad",
+        "style": "Hard-edged slave-camp overseer, stern and suspicious, voice softening only when he reminisces about the sea."
+      },
+      "15322": {
+        "name": "Spotter Virginia",
+        "style": "Sharp-eyed lookout, confident boastful crow's-nest banter, keen and quick to call out what she spots."
+      },
+      "15323": {
+        "name": "Spotter Virginia",
+        "style": "Sharp-eyed lookout, confident boastful crow's-nest banter, keen and quick to call out what she spots."
+      },
+      "15325": {
+        "name": "Spotter Virginia",
+        "style": "Sharp-eyed lookout, confident boastful crow's-nest banter, keen and quick to call out what she spots."
+      },
+      "15326": {
+        "name": "Spotter Virginia",
+        "style": "Sharp-eyed lookout, confident boastful crow's-nest banter, keen and quick to call out what she spots."
+      },
+      "15327": {
+        "name": "Spotter Virginia",
+        "style": "Sharp-eyed lookout, confident boastful crow's-nest banter, keen and quick to call out what she spots."
+      },
+      "15328": {
+        "name": "Spotter Virginia",
+        "style": "Sharp-eyed lookout, confident boastful crow's-nest banter, keen and quick to call out what she spots."
+      },
+      "15329": {
+        "name": "Spotter Virginia",
+        "style": "Sharp-eyed lookout, confident boastful crow's-nest banter, keen and quick to call out what she spots."
+      },
+      "15331": {
+        "name": "Ex-Captain Siad",
+        "style": "Easygoing, cheerful crewmate; relaxed and eager-to-please, content chatter of a deckhand glad to be aboard."
+      },
+      "15332": {
+        "name": "Ex-Captain Siad",
+        "style": "Easygoing, cheerful crewmate; relaxed and eager-to-please, content chatter of a deckhand glad to be aboard."
+      },
+      "15334": {
+        "name": "Ex-Captain Siad",
+        "style": "Easygoing, cheerful crewmate; relaxed and eager-to-please, content chatter of a deckhand glad to be aboard."
+      },
+      "15335": {
+        "name": "Ex-Captain Siad",
+        "style": "Easygoing, cheerful crewmate; relaxed and eager-to-please, content chatter of a deckhand glad to be aboard."
+      },
+      "15336": {
+        "name": "Ex-Captain Siad",
+        "style": "Easygoing, cheerful crewmate; relaxed and eager-to-please, content chatter of a deckhand glad to be aboard."
+      },
+      "15337": {
+        "name": "Ex-Captain Siad",
+        "style": "Easygoing, cheerful crewmate; relaxed and eager-to-please, content chatter of a deckhand glad to be aboard."
+      },
+      "15338": {
+        "name": "Ex-Captain Siad",
+        "style": "Easygoing, cheerful crewmate; relaxed and eager-to-please, content chatter of a deckhand glad to be aboard."
+      },
+      "28252": {
+        "name": "Lil'viathan",
+        "style": "Small abyss-deformed creature, distorted burbling and gurgling, otherworldly and barely articulate."
+      },
+      "3456": {
+        "name": "Fareed",
+        "style": "Arrogant fire warrior; booming, scornful taunts, fierce and domineering, relishes intimidating challengers."
+      },
+      "3549": {
+        "name": "Menaphite Thug",
+        "style": "Street-gang muscle; gruff, swaggering menace, drawls threats lazily, all intimidation and little patience."
+      },
+      "3550": {
+        "name": "Menaphite Thug",
+        "style": "Street-gang muscle; gruff, swaggering menace, drawls threats lazily, all intimidation and little patience."
+      },
+      "3551": {
+        "name": "Tough Guy",
+        "style": "Cocky gang enforcer; boastful, sneering taunts, throws his weight around with loud bravado."
+      },
+      "3575": {
+        "name": "Enakhra",
+        "style": "Imperious sorceress; cold, haughty, deliberate delivery dripping with disdain, silken and menacing, savours every threat."
+      },
+      "3576": {
+        "name": "Enakhra",
+        "style": "Imperious sorceress; cold, haughty, deliberate delivery dripping with disdain, silken and menacing, savours every threat."
+      },
+      "3581": {
+        "name": "Enakhra",
+        "style": "Imperious sorceress; cold, haughty, deliberate delivery dripping with disdain, silken and menacing, savours every threat."
+      },
+      "4199": {
+        "name": "Icthlarin",
+        "style": "Ancient guardian of the dead; grave, sonorous divine register, unhurried and sorrowful, speaks with calm otherworldly authority.",
+        "pace": "slow"
+      },
+      "4207": {
+        "name": "Priest (Sophanem)",
+        "style": "Devout temple priest; solemn, reverent chant-like cadence, hushed and pious, occasionally distracted by the itch of his affliction."
+      },
+      "4208": {
+        "name": "Priest (Sophanem)",
+        "style": "Devout temple priest; solemn, reverent chant-like cadence, hushed and pious, occasionally distracted by the itch of his affliction."
+      },
+      "4210": {
+        "name": "Possessed Priest",
+        "style": "Once-pious priest warped by possession; cadence cracks between holy murmur and snarling, raving malice."
+      },
+      "4643": {
+        "name": "Shantay Guard",
+        "style": "Officious pass guard; brisk, by-the-book warnings about desert dangers, clipped and authoritative."
+      },
+      "4648": {
+        "name": "Shantay Guard",
+        "style": "Officious pass guard; brisk, by-the-book warnings about desert dangers, clipped and authoritative."
+      },
+      "4655": {
+        "name": "Bedabin Nomad Fighter",
+        "style": "Hardy desert nomad; weathered, plainspoken and easygoing, gives directions in a steady, unhurried manner."
+      },
+      "4757": {
+        "name": "Tarik (Nardah)",
+        "style": "Gruff town guard; plain, watchful, no-frills replies, dutiful and a touch bored at his post."
+      },
+      "4758": {
+        "name": "Poltenip",
+        "style": "Weathered town sentry; brusque, economical speech, sizes up everyone before bothering to reply."
+      },
+      "4759": {
+        "name": "Radat",
+        "style": "Stolid mayor's guard; terse, gravelly answers, stands stiff and businesslike on watch."
+      },
+      "10599": {
+        "name": "Cannoneer",
+        "style": "Brisk deckhand; shouts quick, energetic calls over the roar of cannon fire, busy and focused on the next shot."
+      },
+      "10600": {
+        "name": "Cannoneer",
+        "style": "Brisk deckhand; shouts quick, energetic calls over the roar of cannon fire, busy and focused on the next shot."
+      },
+      "10601": {
+        "name": "Cannoneer",
+        "style": "Brisk deckhand; shouts quick, energetic calls over the roar of cannon fire, busy and focused on the next shot."
+      },
+      "10602": {
+        "name": "Cannoneer",
+        "style": "Brisk deckhand; shouts quick, energetic calls over the roar of cannon fire, busy and focused on the next shot."
+      },
+      "11489": {
+        "name": "Selim",
+        "style": "Furtive backstreet agent; talks low and quick out the side of his mouth, conspiratorial and evasive, always glancing over his shoulder."
+      },
+      "11499": {
+        "name": "Coenus",
+        "style": "Hard-edged garrison commander; barks clipped orders and curt dismissals, brooks no argument, delivers every line like a checkpoint refusal."
+      },
+      "11500": {
+        "name": "Jabari",
+        "style": "Smooth palace adviser; speaks in measured, deferential murmurs at the ruler's side, polished and careful with every word."
+      },
+      "11501": {
+        "name": "Pharaoh Kemesis",
+        "style": "Aloof sovereign; pronounces in slow, lofty ceremonial cadence from on high, distant and guarded, expecting unquestioned obedience.",
+        "pace": "slow"
+      },
+      "11503": {
+        "name": "Priest (Sophanem)",
+        "style": "Devout temple priest; solemn, reverent chant-like cadence, hushed and pious, occasionally distracted by the itch of his affliction."
+      },
+      "11504": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11505": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11506": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11507": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11515": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11516": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11517": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11519": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11520": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11521": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11522": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11523": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11524": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11525": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11526": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11527": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11561": {
+        "name": "Selim",
+        "style": "Furtive backstreet agent; talks low and quick out the side of his mouth, conspiratorial and evasive, always glancing over his shoulder."
+      },
+      "11570": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11571": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11572": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11573": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11574": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11575": {
+        "name": "Menaphite Guard",
+        "style": "Terse gate sentry; flat, dismissive warnings ordering trespassers to move along, no patience for idle chatter."
+      },
+      "11576": {
+        "name": "Coenus",
+        "style": "Hard-edged garrison commander; barks clipped orders and curt dismissals, brooks no argument, delivers every line like a checkpoint refusal."
+      },
+      "11591": {
+        "name": "Amascut",
+        "style": "Malevolent devourer; grandiose divine register sliding from honeyed whisper to predatory snarl, gloating and merciless."
+      },
+      "11606": {
+        "name": "Priest (Sophanem)",
+        "style": "Devout temple priest; solemn, reverent chant-like cadence, hushed and pious, occasionally distracted by the itch of his affliction."
+      },
+      "11607": {
+        "name": "Priest (Sophanem)",
+        "style": "Devout temple priest; solemn, reverent chant-like cadence, hushed and pious, occasionally distracted by the itch of his affliction."
+      },
+      "11609": {
+        "name": "Priest (Sophanem)",
+        "style": "Devout temple priest; solemn, reverent chant-like cadence, hushed and pious, occasionally distracted by the itch of his affliction."
+      },
+      "11610": {
+        "name": "Priest (Sophanem)",
+        "style": "Devout temple priest; solemn, reverent chant-like cadence, hushed and pious, occasionally distracted by the itch of his affliction."
+      },
+      "11696": {
+        "name": "Amascut",
+        "style": "Malevolent devourer; grandiose divine register sliding from honeyed whisper to predatory snarl, gloating and merciless."
+      },
+      "12309": {
+        "name": "Enakhra",
+        "style": "Imperious sorceress; cold, haughty, deliberate delivery dripping with disdain, silken and menacing, savours every threat."
+      },
+      "12310": {
+        "name": "Enakhra",
+        "style": "Imperious sorceress; cold, haughty, deliberate delivery dripping with disdain, silken and menacing, savours every threat."
+      },
+      "12395": {
+        "name": "Enakhra",
+        "style": "Imperious sorceress; cold, haughty, deliberate delivery dripping with disdain, silken and menacing, savours every threat."
       }
     }
   },
@@ -13547,17 +15373,17 @@
     "385": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "misthalin"
     },
     "386": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "misthalin"
     },
     "387": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "misthalin"
     },
     "388": {
       "race": "Human",
@@ -15636,13 +17462,11 @@
     },
     "895": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "896": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "897": {
       "race": "Demon",
@@ -15654,13 +17478,11 @@
     },
     "899": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "900": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "901": {
       "race": "Human",
@@ -15672,43 +17494,35 @@
     },
     "903": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "904": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "905": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "906": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "907": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "908": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "909": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "910": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "911": {
       "race": "Demon",
@@ -25680,7 +27494,7 @@
     "3352": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "asgarnia"
     },
     "3353": {
       "race": "Goblin",
@@ -25961,7 +27775,8 @@
     },
     "3456": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "3458": {
       "race": "Human",
@@ -26361,25 +28176,27 @@
     "3547": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "3548": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "3549": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "menaphite"
     },
     "3550": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "menaphite"
     },
     "3551": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "3552": {
       "race": "Human",
@@ -26461,12 +28278,12 @@
     "3568": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "misthalin"
     },
     "3569": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "3570": {
       "race": "Undead",
@@ -29537,11 +31354,13 @@
     },
     "4287": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "4288": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "4289": {
       "race": "Human",
@@ -30921,7 +32740,8 @@
     },
     "4629": {
       "race": "Human",
-      "gender": "Female"
+      "gender": "Female",
+      "ethnicity": "misthalin"
     },
     "4630": {
       "race": "Human",
@@ -30987,7 +32807,8 @@
     },
     "4643": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "4644": {
       "race": "Gnome",
@@ -31011,7 +32832,8 @@
     },
     "4648": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "4649": {
       "race": "Human",
@@ -31040,7 +32862,8 @@
     },
     "4655": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "4656": {
       "race": "Human",
@@ -31482,15 +33305,18 @@
     },
     "4757": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "4758": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "4759": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "4760": {
       "race": "Human",
@@ -35580,8 +37406,7 @@
     },
     "5786": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "5787": {
       "race": "Human",
@@ -38101,8 +39926,7 @@
     },
     "6589": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "6590": {
       "race": "Human",
@@ -41245,8 +43069,7 @@
     },
     "7369": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "7370": {
       "race": "Human",
@@ -42342,7 +44165,7 @@
     "7654": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "kandarin"
     },
     "7656": {
       "race": "Demon",
@@ -52366,8 +54189,7 @@
     },
     "10250": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "10251": {
       "race": "Human",
@@ -53816,23 +55638,19 @@
     },
     "10599": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "10600": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "10601": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "10602": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "10603": {
       "race": "Monkey",
@@ -53880,8 +55698,7 @@
     },
     "10612": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "10613": {
       "race": "Human",
@@ -57943,11 +59760,13 @@
     },
     "11670": {
       "race": "Human",
-      "gender": "Male"
+      "gender": "Male",
+      "ethnicity": "kharidian"
     },
     "11671": {
       "race": "Human",
-      "gender": "Female"
+      "gender": "Female",
+      "ethnicity": "kharidian"
     },
     "11672": {
       "race": "Human",
@@ -57961,8 +59780,7 @@
     },
     "11674": {
       "race": "Human",
-      "gender": "Male",
-      "ethnicity": "kharidian"
+      "gender": "Male"
     },
     "11675": {
       "race": "Human",
@@ -58012,17 +59830,17 @@
     "11686": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11687": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11688": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11689": {
       "race": "Undead",
@@ -58718,7 +60536,7 @@
     "11889": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "menaphite"
     },
     "11890": {
       "race": "Human",
@@ -59559,7 +61377,7 @@
     "12103": {
       "race": "Human",
       "gender": "Female",
-      "ethnicity": "kharidian"
+      "ethnicity": "asgarnia"
     },
     "12104": {
       "race": "Human",
@@ -59569,7 +61387,7 @@
     "12105": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "misthalin"
     },
     "12107": {
       "race": "Human",
@@ -59790,7 +61608,7 @@
     "12162": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "kandarin"
     },
     "12163": {
       "race": "Human",
@@ -60286,12 +62104,12 @@
     "12291": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "kandarin"
     },
     "12292": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "kandarin"
     },
     "12293": {
       "race": "Human",
@@ -60308,13 +62126,11 @@
     },
     "12297": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "12298": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "12299": {
       "race": "Human",
@@ -60322,13 +62138,11 @@
     },
     "12300": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "12301": {
       "race": "Human",
-      "gender": "Female",
-      "ethnicity": "kharidian"
+      "gender": "Female"
     },
     "12302": {
       "race": "Human",
@@ -61486,7 +63300,7 @@
     "12610": {
       "race": "Human",
       "gender": "Male",
-      "ethnicity": "kharidian"
+      "ethnicity": "misthalin"
     },
     "12611": {
       "race": "Human",
