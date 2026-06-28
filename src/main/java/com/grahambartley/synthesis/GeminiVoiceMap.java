@@ -36,21 +36,27 @@ final class GeminiVoiceMap {
     playerVoices.put(NPCGender.FEMALE, new String[] {"Aoede", "Autonoe"});
 
     npcVoices = new EnumMap<>(NPCRace.class);
-    // Human (most common): clear, neutral voices.
-    put(NPCRace.HUMAN, male("Charon", "Achird"), female("Autonoe", "Despina"));
-    // Elf (refined, elegant): clear/gentle voices.
+    // Voice depth is inferred from the catalog's character adjectives: gravelly (Algenib), firm
+    // (Alnilam, Orus), even (Schedar), breathy (Enceladus) and informative (Charon, Rasalgethi,
+    // Sadaltager) are the deep, mature end; upbeat (Puck) and casual (Zubenelgenubi) are bright.
+    // Big,
+    // imposing races (troll/ogre, demon, undead, dwarf) anchor to the deep end so they sound large
+    // rather than high-pitched; goblins stay deliberately bright and small.
+    // Human (most common): clear, neutral, mid-depth voices.
+    put(NPCRace.HUMAN, male("Charon", "Iapetus"), female("Despina", "Erinome"));
+    // Elf (refined, elegant): clear/refined voices.
     put(NPCRace.ELF, male("Iapetus", "Rasalgethi"), female("Vindemiatrix", "Erinome"));
-    // Dwarf (gruff, sturdy): gravelly/firm voices.
+    // Dwarf (gruff, sturdy): gravelly/firm, deep.
     put(NPCRace.DWARF, male("Algenib", "Alnilam"), female("Gacrux", "Kore"));
-    // Goblin (small, crude): upbeat/light voices.
+    // Goblin (small, crude): bright/light voices, deliberately high.
     put(NPCRace.GOBLIN, male("Puck", "Zubenelgenubi"), female("Leda", "Laomedeia"));
-    // Troll (big, deep, primitive): firm/even voices.
-    put(NPCRace.TROLL, male("Orus", "Schedar"), female("Kore", "Gacrux"));
-    // Undead (hollow, eerie): breathy/soft voices.
-    put(NPCRace.UNDEAD, male("Enceladus", "Umbriel"), female("Achernar", "Sulafat"));
-    // Demon (sinister, otherworldly): smooth/deep voices.
-    put(NPCRace.DEMON, male("Algieba", "Sadaltager"), female("Despina", "Callirrhoe"));
-    // Wizard (wise, mystical): knowledgeable/warm voices.
+    // Troll/ogre (big, lumbering): gravelly/firm, the deepest male timbres.
+    put(NPCRace.TROLL, male("Algenib", "Orus"), female("Gacrux", "Kore"));
+    // Undead (hollow, eerie): breathy/even, deep and cold.
+    put(NPCRace.UNDEAD, male("Enceladus", "Schedar"), female("Achernar", "Sulafat"));
+    // Demon (booming, sinister): gravelly/informative, the deepest.
+    put(NPCRace.DEMON, male("Algenib", "Rasalgethi"), female("Gacrux", "Despina"));
+    // Wizard (wise, mystical): knowledgeable/informative, weighty.
     put(NPCRace.WIZARD, male("Sadaltager", "Charon"), female("Sulafat", "Vindemiatrix"));
   }
 

@@ -141,6 +141,14 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     if (cap > 0 && text != null && text.length() > cap) {
       variant.append("|c").append(cap);
     }
+    // A character profile is prepended to the input as an AUDIO PROFILE block, so it changes the
+    // rendered audio. Fold its content digest in (only when present) so two profiles never collide
+    // and a re-tuned profile re-keys; a line with no profile keeps the pre-profile variant, so
+    // existing cache entries stay valid.
+    CharacterProfile profile = request.profile();
+    if (profile != null) {
+      variant.append("|p").append(profile.cacheKey());
+    }
     return variant.toString();
   }
 
@@ -155,6 +163,12 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     String voice = voiceMap.voiceFor(request.voice());
     String cappedText = capLength(request.text(), config.maxCloudCharsPerLine());
     String styledInput = GeminiEmotionStyle.apply(cappedText, request.emotion());
+    // The profile block sets the tone (accent/style/pace) and the emotion tag colours the moment;
+    // they compose, so the block leads and the emotion-tagged transcript follows the divider. A
+    // null
+    // profile leaves the input exactly as the pre-profile backend produced it.
+    CharacterProfile profile = request.profile();
+    String input = profile == null ? styledInput : profile.renderPromptBlock() + styledInput;
 
     if (config.debugMode()) {
       String tag = GeminiEmotionStyle.tagFor(request.emotion());
@@ -162,6 +176,15 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
           "[TTS voice] cloud emotion {} -> {}",
           request.emotion(),
           tag == null ? "no tag (neutral input)" : "inline tag [" + tag + "]");
+      if (profile == null) {
+        log.info("[TTS cloud] no character profile (plain input)");
+      } else {
+        log.info(
+            "[TTS cloud] character profile '{}' accent='{}' (cacheKey={})",
+            profile.name(),
+            profile.accent(),
+            profile.cacheKey());
+      }
       if (cappedText.length() != request.text().length()) {
         log.info(
             "[TTS cloud] line capped {} -> {} chars (maxCloudCharsPerLine={})",
@@ -173,7 +196,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
     JsonObject payload = new JsonObject();
     payload.addProperty("model", MODEL);
-    payload.addProperty("input", styledInput);
+    payload.addProperty("input", input);
     payload.addProperty("voice", voice);
     payload.addProperty("response_format", RESPONSE_FORMAT);
     int speed = speedPercent();
@@ -197,25 +220,36 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
             .build();
 
     try (Response response = httpClient.newCall(httpRequest).execute()) {
+      ResponseBody body = response.body();
+      // Read the bytes once; on any failure they are the diagnostic payload (an OpenRouter/Gemini
+      // error is usually returned as a JSON/text body, sometimes even with HTTP 200), so capturing
+      // them is the only way to see why a line was rejected rather than guessing.
+      byte[] bytes = body == null ? new byte[0] : body.bytes();
+      String contentType = headerOrEmpty(response, "Content-Type");
+      String generationId = headerOrEmpty(response, "X-Generation-Id");
+
       if (!response.isSuccessful()) {
         warnOnce(
             "OpenRouter TTS request failed (HTTP "
                 + response.code()
                 + "); check your API key. Falling back to the local voice.");
-        log.debug("OpenRouter TTS non-2xx response: {} {}", response.code(), response.message());
+        logFailure(
+            "non-2xx", response.code(), response.message(), contentType, generationId, bytes);
         return null;
       }
-      ResponseBody body = response.body();
-      if (body == null) {
+      if (bytes.length == 0) {
         warnOnce("OpenRouter TTS returned an empty response; falling back to the local voice.");
+        logFailure(
+            "empty-body", response.code(), response.message(), contentType, generationId, bytes);
         return null;
       }
-      Pcm pcm = RawPcmDecoder.decode(body.bytes(), SAMPLE_RATE);
+      Pcm pcm = RawPcmDecoder.decode(bytes, SAMPLE_RATE);
       if (pcm == null) {
         warnOnce(
             "OpenRouter TTS returned audio that could not be decoded; falling back to the local"
                 + " voice.");
-        log.debug("OpenRouter TTS response body was not decodable 16-bit PCM");
+        logFailure(
+            "undecodable", response.code(), response.message(), contentType, generationId, bytes);
         return null;
       }
       return pcm;
@@ -266,6 +300,46 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
       return window.substring(0, lastSpace).trim();
     }
     return window.trim();
+  }
+
+  /**
+   * Logs why a cloud line was rejected: HTTP status, content type, generation id, and byte count
+   * (at warn so it surfaces without debug), plus a short UTF-8 snippet of the body (at info, only
+   * in debug mode) since a Gemini/OpenRouter error is typically a JSON/text body, sometimes
+   * returned even with HTTP 200. This is what tells rate-limiting/quota/content errors apart from
+   * genuinely bad audio.
+   */
+  private void logFailure(
+      String kind,
+      int code,
+      String message,
+      String contentType,
+      String generationId,
+      byte[] bytes) {
+    log.warn(
+        "[TTS cloud] {} response: HTTP {} {} contentType={} genId={} bytes={}",
+        kind,
+        code,
+        message,
+        contentType.isEmpty() ? "-" : contentType,
+        generationId.isEmpty() ? "-" : generationId,
+        bytes.length);
+    if (config.debugMode() && bytes.length > 0) {
+      log.info("[TTS cloud] {} body snippet: {}", kind, bodySnippet(bytes));
+    }
+  }
+
+  private static String headerOrEmpty(Response response, String name) {
+    String value = response.header(name);
+    return value == null ? "" : value;
+  }
+
+  /** First chunk of a response body as printable UTF-8, for diagnosing a non-audio response. */
+  private static String bodySnippet(byte[] bytes) {
+    int n = Math.min(bytes.length, 300);
+    String text =
+        new String(bytes, 0, n, StandardCharsets.UTF_8).replaceAll("\\p{Cntrl}+", " ").trim();
+    return bytes.length > n ? text + "..." : text;
   }
 
   private void warnOnce(String message) {

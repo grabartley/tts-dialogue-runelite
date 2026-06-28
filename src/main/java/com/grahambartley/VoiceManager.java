@@ -1,7 +1,11 @@
 package com.grahambartley;
 
+import com.grahambartley.data.LearnedNpcStore;
 import com.grahambartley.data.NPCAttributes;
 import com.grahambartley.data.NPCDemographicAnalyzer;
+import com.grahambartley.data.NpcLearningService;
+import com.grahambartley.data.NpcProfileTable;
+import com.grahambartley.synthesis.CharacterProfile;
 import com.grahambartley.synthesis.VoiceSpec;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -157,12 +161,80 @@ public class VoiceManager {
   private final TTSDialogueConfig config;
   private final Client client;
   private final NPCDemographicAnalyzer demographicAnalyzer;
+  private final NpcProfileTable profileTable;
+
+  /** Optional runtime wiki fallback for NPCs missing from the bundled table; null when off. */
+  private NpcLearningService learningService;
 
   public VoiceManager(TTSDialogueConfig config, Client client) {
     this.config = config;
     this.client = client;
     this.demographicAnalyzer = new NPCDemographicAnalyzer();
     this.demographicAnalyzer.initialize();
+    this.profileTable = new NpcProfileTable();
+    this.profileTable.initialize();
+  }
+
+  /**
+   * Wires in the runtime "learn a new NPC" fallback: the analyzer consults {@code store} for NPCs
+   * missing from the bundled table, and an unknown NPC triggers a one-off background wiki lookup
+   * via {@code service} that populates {@code store} for subsequent lines.
+   */
+  public void enableLearning(LearnedNpcStore store, NpcLearningService service) {
+    this.demographicAnalyzer.setLearnedStore(store);
+    this.learningService = service;
+  }
+
+  /**
+   * Resolves the {@link CharacterProfile} steering a line's delivery: the player's configured
+   * profile for player lines, or the NPC profile built by combining every matching layer (default,
+   * race, every keyword category that matches, and any per-NPC override) keyed on the NPC's
+   * composition id and display name. Never returns {@code null}. Only the cloud backend renders the
+   * profile; the local backend ignores it.
+   */
+  public CharacterProfile resolveProfile(String speaker, String npcName) {
+    if ("player".equalsIgnoreCase(speaker)) {
+      CharacterProfile profile =
+          profileTable.resolvePlayer(
+              config.playerProfileAccent(),
+              config.playerProfileStyle(),
+              config.playerProfilePace());
+      if (config.debugMode()) {
+        log.info("[TTS profile] player -> '{}' accent='{}'", profile.name(), profile.accent());
+      }
+      return profile;
+    }
+
+    Integer npcId = null;
+    String race = null;
+    String ethnicity = null;
+    NPC npc = findNPCByName(npcName);
+    if (npc != null) {
+      npcId = npc.getId();
+      NPCAttributes attributes = demographicAnalyzer.analyzeNPC(npc);
+      if (attributes != null) {
+        race = attributes.getRace();
+        ethnicity = attributes.getEthnicity();
+        // The id the analyzer actually matched (active or base), so a bespoke byId profile keyed by
+        // the wiki id resolves even for transformed multiloc NPCs.
+        npcId = attributes.getNpcId();
+      }
+    }
+
+    NpcProfileTable.Resolution resolution =
+        profileTable.resolveNpc(npcId, npcName, race, ethnicity);
+    if (config.debugMode()) {
+      log.info(
+          "[TTS profile] npc='{}' id={} race={} ethnicity={} -> '{}' (source={}, accent='{}')",
+          npcName,
+          npcId == null ? "MISS" : npcId,
+          race == null ? "UNKNOWN" : race,
+          ethnicity == null ? "-" : ethnicity,
+          resolution.profile().name(),
+          resolution.source(),
+          resolution.profile().accent());
+    }
+    return resolution.profile();
   }
 
   /**
@@ -309,6 +381,13 @@ public class VoiceManager {
     NPCRace race = convertToNPCRace(attributes.getRace());
     NPCGender gender = convertToNPCGender(attributes.getGender());
     String source = "StaticTable".equals(attributes.getSource()) ? "table-hit" : "table-miss";
+
+    // An NPC unknown to the bundled table (and the learned cache) triggers a one-off background
+    // wiki
+    // lookup when the fallback is enabled, so the next line voices it correctly. No-op otherwise.
+    if (race == NPCRace.UNKNOWN && learningService != null) {
+      learningService.considerLearning(npc.getId(), npcName);
+    }
 
     // An unrecognised race falls back rather than silently borrowing the human voice, so the
     // fallback toggle stays meaningful.

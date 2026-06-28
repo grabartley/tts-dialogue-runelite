@@ -2,7 +2,11 @@ package com.grahambartley;
 
 import com.google.gson.Gson;
 import com.google.inject.Provides;
+import com.grahambartley.data.LearnedNpcStore;
+import com.grahambartley.data.NpcLearningService;
+import com.grahambartley.data.WikiNpcClient;
 import com.grahambartley.synthesis.BackendProvider;
+import com.grahambartley.synthesis.CharacterProfile;
 import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.ExpressionEmotionTable;
 import com.grahambartley.synthesis.LocalKokoroBackend;
@@ -15,6 +19,8 @@ import com.grahambartley.tts.AudioPlayer;
 import com.grahambartley.tts.DialogueAudioService;
 import com.grahambartley.tts.DiskAudioCache;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -88,11 +94,32 @@ public class TTSDialoguePlugin extends Plugin {
 
   private DialogueAudioService audioService;
 
+  /** Dedicated daemon thread for off-game-thread wiki NPC lookups (the auto-learn fallback). */
+  private ExecutorService wikiExecutor;
+
   @Override
   protected void startUp() {
     voiceManager = new VoiceManager(config, client);
 
     Path ttsDir = RuneLite.RUNELITE_DIR.toPath().resolve("tts-dialogue");
+    // Runtime "learn a new NPC" fallback: the learned cache is always consulted (so previously
+    // learned NPCs voice correctly even with the toggle off), while new wiki lookups are gated by
+    // the config toggle. Lookups run on a dedicated daemon thread, never the game thread.
+    LearnedNpcStore learnedStore = new LearnedNpcStore(ttsDir.resolve("learned-npcs.json"), gson);
+    wikiExecutor =
+        Executors.newSingleThreadExecutor(
+            r -> {
+              Thread t = new Thread(r, "tts-wiki-learn");
+              t.setDaemon(true);
+              return t;
+            });
+    NpcLearningService learningService =
+        new NpcLearningService(
+            new WikiNpcClient(okHttpClient, gson),
+            learnedStore,
+            wikiExecutor,
+            config::wikiLookupFallback);
+    voiceManager.enableLearning(learnedStore, learningService);
     // The local Kokoro backend now runs the engine as an external --stdio process. The installer
     // resolves the per-OS bundle from the bundled manifest and downloads it (off the game thread,
     // lazily on warm-up); the client spawns and drives that process. No model or native libs ship
@@ -146,6 +173,10 @@ public class TTSDialoguePlugin extends Plugin {
       backendProvider.close();
       backendProvider = null;
     }
+    if (wikiExecutor != null) {
+      wikiExecutor.shutdownNow();
+      wikiExecutor = null;
+    }
     log.info("TTS Plugin stopped");
   }
 
@@ -172,7 +203,12 @@ public class TTSDialoguePlugin extends Plugin {
     if (config.debugMode()) {
       log.info("[TTS voice] resolved emotion {} for head animation {}", emotion, headAnimationId);
     }
-    audioService.speak(new SynthesisRequest(text, voice, emotion));
+    // Character profile steers accent/style/pace and is rendered only by the cloud backend; emotion
+    // still layers on top. Resolved only when enabled, so a null profile keeps the request (and its
+    // cache key) byte-for-byte identical to the pre-profile behaviour.
+    CharacterProfile profile =
+        config.enableCharacterProfiles() ? voiceManager.resolveProfile(speaker, npcName) : null;
+    audioService.speak(new SynthesisRequest(text, voice, emotion, profile));
   }
 
   /**

@@ -24,7 +24,10 @@ model is fixed to Google's **Gemini 3.1 Flash TTS**, the one OpenRouter speech m
 catalog rich enough to map every race and gender and full emotion support. Each NPC gets a
 gender-correct Gemini voice by race, and two NPCs of the same race and gender are spread across a
 sub-pool so they sound distinct but stable. The detected emotion is prepended to `input` as an inline
-style tag (`GeminiEmotionStyle`); Neutral adds none. The body requests `response_format: "pcm"`, a
+style tag (`GeminiEmotionStyle`); Neutral adds none. A per-speaker **character profile**
+(`CharacterProfile`, resolved by `NpcProfileTable`) is also rendered as a leading `AUDIO PROFILE`
+direction block setting accent/style/pace, so the profile sets the character and the emotion tag
+colours the moment; the local backend ignores it. The body requests `response_format: "pcm"`, a
 headerless 16-bit LE mono stream at 24 kHz decoded to the pipeline's native rate.
 
 With this backend active, dialogue text leaves your machine and is sent to OpenRouter. A missing key,

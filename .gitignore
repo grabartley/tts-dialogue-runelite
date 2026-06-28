@@ -16,3 +16,7 @@ nbproject/
 # Local secrets (never commit)
 *.key
 .openrouter-key
+
+# Python bytecode
+__pycache__/
+*.pyc

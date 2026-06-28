@@ -1,0 +1,272 @@
+{
+  "_comment": "Authoritative, hand-curated character voice profiles for the cloud (Gemini) TTS backend. A profile is a delivery template (name, accent, style, pace) the backend renders into a Gemini AUDIO PROFILE / DIRECTOR'S NOTES block prepended to the spoken line; chat-head emotion is layered on top as a separate inline tag. This file is the SOURCE: tools/generate_npc_voices.py embeds it verbatim into src/main/resources/npc-voices.json under the top-level 'profiles' key. Edit here, then regenerate. This is a BRITISH medieval fantasy world: every character defaults to a British accent unless lore or trope says otherwise. Resolution combines every matching layer: default -> byRace[race] -> byEthnicity[ethnicity] -> every byCategory whose keyword matches the display name -> byId[npcId]. 'style' accumulates across the matching layers; 'name', 'accent', and 'pace' take the most specific layer that sets them. 'default' must be complete (all four fields); every other layer is sparse, contributing only the fields it sets. byId entries are per-NPC bespoke overrides keyed by the live NPC id (NPCComposition#getId), carrying only what is unique about that character.",
+  "default": {
+    "name": "Gielinor Commoner",
+    "accent": "Common British English, the plain, earthy speech of an ordinary medieval peasant or townsperson, not posh or refined.",
+    "style": "A grounded medieval fantasy townsperson. Plain, sincere, and natural, with the easy warmth of someone going about their day.",
+    "pace": "Steady and conversational, with natural pauses at the punctuation."
+  },
+  "player": {
+    "name": "Adventurer",
+    "accent": "Common British English, the plain, down-to-earth speech of an ordinary adventurer, not posh or refined.",
+    "style": "A seasoned medieval fantasy adventurer: brave and resolute, carrying the quiet confidence of someone who has seen the whole of Gielinor.",
+    "pace": "Even and assured, unhurried but purposeful."
+  },
+  "byRace": {
+    "Human": {
+      "name": "Gielinor Townsfolk",
+      "accent": "Common British English, the plain, earthy speech of an ordinary medieval commoner, not posh or refined.",
+      "style": "An ordinary citizen of Gielinor. Down-to-earth, sincere, and approachable.",
+      "pace": "Steady and conversational."
+    },
+    "Elf": {
+      "name": "Elf of Tirannwn",
+      "accent": "Posh, refined British English, an elegant Received Pronunciation with a faint melodic lilt.",
+      "style": "An ancient, otherworldly elf. Graceful and soft-spoken, serene and knowing, speaking with quiet wisdom as if from beyond the mortal world.",
+      "pace": "Slow and flowing, with a graceful, deliberate cadence."
+    },
+    "Dwarf": {
+      "name": "Keldagrim Dwarf",
+      "accent": "Gruff Scottish English, as heard in Glasgow.",
+      "style": "A stout, hard-bitten mountain dwarf. Rough, gravelly, and blunt, with the no-nonsense grit of a lifetime at the forge.",
+      "pace": "Firm and forthright, clipped and a little impatient."
+    },
+    "Goblin": {
+      "name": "Goblin",
+      "accent": "Scrappy British English with an East London edge.",
+      "style": "A small, crude, mischievous goblin. High-pitched, reedy, and nasal, sniggering and excitable, never quite trustworthy.",
+      "pace": "Quick and jittery, words tumbling out in bursts."
+    },
+    "Gnome": {
+      "name": "Gnome",
+      "accent": "A country Irish accent, the warm rural lilt of the Irish countryside.",
+      "style": "A small, brisk, brainy gnome. Chatty, clever, and self-important, brimming with opinions and schemes.",
+      "pace": "Fast and animated, tripping along eagerly."
+    },
+    "Troll": {
+      "name": "Troll",
+      "accent": "British English, South London Brixton accent.",
+      "style": "A huge, slow, simple-minded troll, good-natured but dim. A very deep, low, booming, rumbling voice, lumbering and pleased with itself, easily confused.",
+      "pace": "Slow and heavy, with long thinking pauses."
+    },
+    "Undead": {
+      "name": "The Undead",
+      "accent": "British English, Received Pronunciation, cold and hollow.",
+      "style": "A restless undead thing dragged back from the grave. Hollow, breathy, and sepulchral, the voice echoing as if from a long way off.",
+      "pace": "Slow and dragging, with an eerie, drawn-out delivery."
+    },
+    "Demon": {
+      "name": "Demon",
+      "accent": "Deep, resonant British English with a menacing edge.",
+      "style": "A vast, malevolent demon from the abyss. Booming, guttural, and contemptuous, radiating ancient threat.",
+      "pace": "Slow and deliberate, each word landing like a hammer."
+    },
+    "Wizard": {
+      "name": "Wizard",
+      "accent": "Distinguished elderly British English, Received Pronunciation.",
+      "style": "A wise and learned old wizard, a sage and storyteller. Warm, knowing, and unhurried, weighty with deep arcane knowledge.",
+      "pace": "Measured and thoughtful, with deliberate, knowing pauses."
+    }
+  },
+  "byCategory": [
+    {
+      "id": "leprechaun",
+      "keywords": ["leprechaun"],
+      "name": "Leprechaun",
+      "accent": "Irish English, as heard in Dublin.",
+      "style": "A jaunty, twinkle-eyed leprechaun. Playful, lilting, and full of cheek, forever amused at its own jokes.",
+      "pace": "Quick and lively, with a bouncing, sing-song rhythm."
+    },
+    {
+      "id": "vampyre",
+      "keywords": ["vampyre", "vyre", "juvinate", "vanstrom", "drakan", "vanescula", "ranis", "damien", "count check"],
+      "name": "Vampyre",
+      "accent": "Aristocratic Eastern European, a Transylvanian accent in the manner of Dracula.",
+      "style": "An ancient, predatory vampyre noble. Silken, cold, and menacing, dripping with disdain for lesser mortals.",
+      "pace": "Slow and hypnotic, savouring every word with quiet menace."
+    },
+    {
+      "id": "fremennik",
+      "keywords": ["fremennik", "thorvald", "manni", "swensen", "sigli", "thora", "koschei", "askeladden", "brundt", "olaf", "lanzig", "freygerd", "skulgrimen", "peer the seer"],
+      "name": "Fremennik",
+      "accent": "A fantasy Norse accent, a Scandinavian-flavoured English in the manner of a Viking warrior from the old sagas.",
+      "style": "A hardy Fremennik Viking of the frozen north. Proud, hearty, and weathered, bred to longship, axe, and saga.",
+      "pace": "Strong and steady, robust and deliberate."
+    },
+    {
+      "id": "tzhaar",
+      "keywords": ["tzhaar", "tztok", "tzkal", "jad"],
+      "name": "TzHaar",
+      "accent": "Deep, rumbling British English, slow and elemental.",
+      "style": "A living creature of molten rock from the city of TzHaar. Vast, stony, and rumbling, calm but immense, speaking of honour and combat.",
+      "pace": "Very slow and ponderous, like grinding stone."
+    },
+    {
+      "id": "dragon",
+      "keywords": ["dragon", "wyvern", "wyrm", "drake"],
+      "name": "Dragon",
+      "accent": "Vast, resonant British English, ancient and imperious.",
+      "style": "An ancient, colossal dragon. Booming, regal, and contemptuous of mortals, every word freighted with age and power.",
+      "pace": "Slow and grand, rolling and unhurried."
+    },
+    {
+      "id": "imp",
+      "keywords": ["imp"],
+      "name": "Imp",
+      "accent": "Squeaky, high-pitched British English, fast and impish.",
+      "style": "A tiny, hyperactive imp. Shrill, gleeful, and mischievous, cackling and impossible to pin down.",
+      "pace": "Extremely fast and erratic, words spilling over each other."
+    },
+    {
+      "id": "fairy",
+      "keywords": ["fairy", "tooth fairy"],
+      "name": "Fairy",
+      "accent": "Light, airy British English, bright and delicate.",
+      "style": "A small, sparkling fairy. Sweet, breezy, and quick, flitting from thought to thought with childlike delight.",
+      "pace": "Quick and light, with a fluttering, buoyant lilt."
+    },
+    {
+      "id": "ogre",
+      "keywords": ["ogre"],
+      "name": "Ogre",
+      "accent": "Big, dim British English with a West Midlands burr.",
+      "style": "A huge, slow-witted ogre with a very deep, low, booming voice. Loud, blunt, and lumbering, friendly enough but not the sharpest.",
+      "pace": "Slow and heavy, with plodding, simple phrasing."
+    },
+    {
+      "id": "ghost",
+      "keywords": ["ghost", "spectre", "spirit", "wraith", "banshee", "shade"],
+      "name": "Ghost",
+      "accent": "Distant, breathy British English, Received Pronunciation, faint and mournful.",
+      "style": "A lingering, sorrowful spirit. Wispy, far-off, and forlorn, half-faded from the world of the living.",
+      "pace": "Slow and drifting, trailing off into silence."
+    },
+    {
+      "id": "pirate",
+      "keywords": ["pirate", "buccaneer", "corsair"],
+      "name": "Pirate",
+      "accent": "Rough West Country British English, a Cornish seafarer's drawl.",
+      "style": "A salty, swaggering pirate. Gravelly, hearty, and roguish, all bluster and grog and tall tales.",
+      "pace": "Loose and rollicking, with a swaggering swing."
+    },
+    {
+      "id": "barbarian",
+      "keywords": ["barbarian"],
+      "name": "Barbarian",
+      "accent": "Broad, hearty Northern English, as heard in Yorkshire.",
+      "style": "A boisterous barbarian of the wilds. Loud, blunt, and full-blooded, proud of strength and scornful of soft folk.",
+      "pace": "Forceful and robust, full of gusto."
+    },
+    {
+      "id": "wizard",
+      "keywords": ["wizard", "sorcerer", "sorceress", "mage", "magus", "necromancer", "enchanter", "warlock", "witch", "archmage"],
+      "name": "Wizard",
+      "style": "A wise and learned spellcaster, a sage and keeper of arcane lore; knowing and unhurried, speaking in a measured, scholarly register weighty with deep magical knowledge.",
+      "pace": "Measured and thoughtful, with deliberate, knowing pauses."
+    },
+    {
+      "id": "monk",
+      "keywords": ["monk", "friar", "abbot", "priest", "priestess", "nun", "cleric"],
+      "name": "Devotee",
+      "style": "A pious monastic of the faith; calm, kindly, and serene, speaking in a gentle, devout register with quiet, unshakeable conviction.",
+      "pace": "Slow and tranquil, softly measured."
+    },
+    {
+      "id": "royalty",
+      "keywords": ["king", "queen", "emperor", "empress", "prince", "princess", "duke", "duchess"],
+      "name": "Royalty",
+      "style": "A sovereign of the realm; regal, authoritative, and gracious, speaking in a refined, aristocratic, elevated register, every word carrying the weight of a crown.",
+      "pace": "Stately and deliberate, never rushed."
+    },
+    {
+      "id": "knight",
+      "keywords": ["knight", "paladin", "squire", "templar", "sir"],
+      "name": "Knight",
+      "style": "A noble knight of the realm; honourable, disciplined, and gallant, speaking in a crisp, formal, well-bred register weighted with chivalric duty.",
+      "pace": "Firm and measured, crisp and commanding."
+    },
+    {
+      "id": "noble",
+      "keywords": ["lord", "lady", "baron", "baroness", "advisor", "chancellor", "steward", "dame", "noble"],
+      "name": "Noble",
+      "style": "A highborn aristocrat of the realm; polished, urbane, and self-assured, speaking in a refined, well-bred register, accustomed to deference.",
+      "pace": "Measured and composed."
+    }
+  ],
+  "byEthnicity": {
+    "_comment": "Accent layer keyed by an NPC's ethnicity (where they are from, baked per-NPC into npcs[id].ethnicity; defaulted from the wiki leagueRegion and corrected in overrides.json for foreigners). Applied only to the plain folk (Human / unknown race) so it tints them with local colour, while distinctive races (dwarf, elf, troll, goblin, undead, demon, wizard) keep their racial accent wherever they are. A keyword category (vampyre, ghost) or a bespoke byId entry can still override. Sparse and accent-only, so it does not dilute the persona blend. The desert and far lands follow the real-world cultures they are based on; the central British kingdoms use distinct English regional accents for variety. NPCs with no single ethnicity keep the common British default.",
+    "misthalin": {
+      "accent": "Common British English, the plain, standard speech of Gielinor's central kingdom of Misthalin."
+    },
+    "asgarnia": {
+      "accent": "A West Country British English, the rural burr of the Asgarnian countryside."
+    },
+    "kandarin": {
+      "accent": "A Northern English accent, as heard in Yorkshire, for the folk of Kandarin."
+    },
+    "kourend": {
+      "accent": "A broad, rustic British English, the working speech of the Kingdom of Great Kourend."
+    },
+    "wilderness": {
+      "accent": "A rough, harsh British English, the hard edge of the outlaws of the Wilderness."
+    },
+    "tirannwn": {
+      "accent": "A Welsh accent, lilting and lyrical, of the western land of Tirannwn."
+    },
+    "varlamore": {
+      "accent": "An Italian accent, warm and expressive, as spoken by a native of Rome, Italy speaking English, with a melodic, rolling, up-and-down intonation."
+    },
+    "kharidian": {
+      "accent": "A Middle Eastern accent, Arabic-inflected English, as spoken in the desert cities of the Kharidian."
+    },
+    "menaphite": {
+      "accent": "An Egyptian accent, the cadence of ancient Menaphos and Sophanem."
+    },
+    "karamja": {
+      "accent": "A West African accent, Nigerian-inflected English, as spoken on the jungle isle of Karamja."
+    },
+    "morytania": {
+      "accent": "An Eastern European accent, the cold, gothic lilt of the cursed land of Morytania."
+    },
+    "fremennik": {
+      "accent": "A fantasy Norse accent, a Scandinavian-flavoured English in the manner of a Viking from the old sagas."
+    },
+    "easternlands": {
+      "accent": "A Japanese accent, refined and precise, of the distant Eastern Lands across the sea."
+    }
+  },
+  "byId": {
+    "_comment": "Per-NPC bespoke overrides keyed by live NPC id (NPCComposition#getId). Sparse: only fields unique to the character. Inherits accent/pace (and name, if omitted) from the matched category/ethnicity/race/default layers.",
+    "3105": { "name": "Hans", "style": "An eccentric, doddery old groundskeeper who has shuffled around Lumbridge Castle for decades; rambling, friendly, oddly proud of his longevity.", "pace": "Slow and shuffling, wandering between thoughts." },
+    "306": { "name": "Lumbridge Guide", "style": "A patient, welcoming older man who orients newcomers; calm, helpful, and mildly officious." },
+    "4626": { "name": "Cook", "style": "A flustered, fretful castle cook in a perpetual flap over his kitchen; scatterbrained and self-important.", "pace": "Quick and harried." },
+    "2812": { "name": "Father Aereck", "style": "A gentle, earnest, soft-spoken parish priest; mild-mannered and a touch timid." },
+    "10619": { "name": "Bob", "style": "A laid-back, chatty axe-shop owner; easygoing and casual, a bit of a rambler who loves to gab." },
+    "1305": { "name": "Hairdresser", "style": "A bubbly, talkative Falador stylist; upbeat, breezy, and a little vain about appearances." },
+    "732": { "name": "Fred the Farmer", "style": "A gruff, plain-spoken working farmer; blunt, no-nonsense, and rustic.", "accent": "Rural West Country English." },
+    "4628": { "name": "Gillie Groats", "style": "A cheery, down-to-earth milkmaid; simple, sweet, and chatty.", "accent": "Rural West Country English." },
+    "2147": { "name": "Veos", "style": "An earnest, purposeful seafarer with a calm, faintly devout streak; steady and measured." },
+    "3308": { "name": "Gielinor Guide", "style": "A warm, encouraging instructor for brand-new adventurers; clear, patient, and didactic." },
+    "4243": { "name": "Reldo", "style": "A bookish, mild-mannered royal librarian; precise and slightly pedantic, quietly enthusiastic about history and lore." },
+    "2886": { "name": "Aubury", "style": "An eccentric, slightly distracted rune-shop wizard; affable but absent-minded, with an offhand scholarly oddness." },
+    "5005": { "name": "Wizard Mizgog", "style": "A cranky, irritable old wizard; gruff, impatient, and blunt, forever grumbling about younger folk." },
+    "11868": { "name": "Gypsy Aris", "style": "A theatrical, knowing fortune-teller; mysterious and dramatic, speaking in cryptic, leading prophecy.", "accent": "Romani Eastern European fortune-teller's lilt." },
+    "5037": { "name": "Romeo", "style": "A naive, lovestruck young romantic; gushing, dim-witted, and overdramatic, with his head in the clouds." },
+    "5035": { "name": "Juliet", "style": "A gentle, earnest young noblewoman; soft-spoken, sincere, and romantic, a touch melodramatic." },
+    "3480": { "name": "Dr Harlow", "style": "A washed-up, perpetually sozzled vampire-hunter; gruff and rambling, far more interested in his next drink than the conversation.", "pace": "Slow, slurred, and meandering." },
+    "4771": { "name": "Sir Amik Varze", "style": "The stately commander of the White Knights; authoritative, formal, and dignified, measured and noble in tone." },
+    "4687": { "name": "Sir Tiffy Cashien", "style": "A genteel, chipper old Temple Knight recruiter; warmly polite and grandfatherly, all mild upper-class charm and good humour." },
+    "2108": { "name": "Wise Old Man", "style": "A venerable, world-weary retired adventurer; calm, sage, and dryly self-assured, speaking with patient gravitas." },
+    "815": { "name": "Duke Horacio", "style": "A portly, genial nobleman of middling competence; pompous but kindly, and fond of his own title." },
+    "5215": { "name": "King Roald", "style": "A formal, regal monarch; measured and slightly aloof, speaking with stately, bureaucratic authority." },
+    "923": { "name": "Father Urhney", "style": "A reclusive hermit priest; grumpy, irritable, and curt, resentful of being disturbed in his swamp." },
+    "3500": { "name": "Gertrude", "style": "A busy, fussy working mother; brisk and talkative, brusque but ultimately warm-hearted." },
+    "4619": { "name": "Hetty", "style": "A sly old village witch; sing-song, mysterious, and faintly mocking, relishing the dark and arcane." },
+    "5081": { "name": "Wizard Traiborn", "style": "A doddering, absent-minded old wizard; eccentric, rambling, and forgetful, forever wandering off-topic." },
+    "3893": { "name": "Doric", "style": "A hardy, plain-spoken dwarf smith; gruff but good-natured and welcoming to those who lend a hand.", "accent": "Gruff Scottish English, as heard in Glasgow." },
+    "822": { "name": "Oziach", "style": "A blunt, no-nonsense armour seller; gruff and dismissive, unimpressed and curt with strangers." },
+    "9636": { "name": "Drezel", "style": "A meek, devout monk; gentle, humble, and earnest, soft-spoken and grateful for any aid." },
+    "4280": { "name": "Ned", "style": "An old salt-of-the-earth Draynor villager and rope-maker; folksy, rough-edged, and chatty.", "accent": "Irish English." },
+    "2989": { "name": "Ak-Haranu", "style": "A worldly, shrewd traveller from the distant Eastern Lands; courteous and composed, with a gambler's quiet, cunning confidence." }
+  }
+}

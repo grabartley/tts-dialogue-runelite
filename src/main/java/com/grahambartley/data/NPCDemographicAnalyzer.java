@@ -49,10 +49,21 @@ public class NPCDemographicAnalyzer {
   /** Immutable npcId -> {race, gender} table loaded once from the bundled resource. */
   private Map<Integer, NPCAttributes> voiceTable = Collections.emptyMap();
 
+  /**
+   * Optional writable cache of NPCs learned at runtime via the wiki fallback, consulted after the
+   * bundled table and before the default so a once-learned NPC voices correctly thereafter.
+   */
+  private LearnedNpcStore learnedStore;
+
   /** Loads the static lookup table from the bundled resource. */
   public void initialize() {
     voiceTable = loadVoiceTable();
     log.info("NPC voice table loaded with {} entries from {}", voiceTable.size(), TABLE_RESOURCE);
+  }
+
+  /** Wires in the runtime learned-NPC cache (the wiki fallback). */
+  public void setLearnedStore(LearnedNpcStore learnedStore) {
+    this.learnedStore = learnedStore;
   }
 
   /**
@@ -68,8 +79,18 @@ public class NPCDemographicAnalyzer {
     if (composition == null) {
       return null;
     }
-
-    return lookup(composition.getId(), composition.getName());
+    // Prefer the NPC's active id, which matches the wiki/cache ids the table is keyed by. A
+    // transformed multiloc NPC (many Karamja, quest and morphing NPCs) reports a different
+    // composition (base) id than its active id, and only the active id is in the table; falling
+    // back
+    // to the base id keeps the simple, non-transformed NPCs working unchanged.
+    int activeId = npc.getId();
+    int baseId = composition.getId();
+    NPCAttributes known = lookupKnown(activeId);
+    if (known == null && baseId != activeId) {
+      known = lookupKnown(baseId);
+    }
+    return known != null ? known : defaultAttributes(activeId, composition.getName());
   }
 
   /**
@@ -78,11 +99,17 @@ public class NPCDemographicAnalyzer {
    * configured fallback voice always applies.
    */
   public NPCAttributes lookup(int npcId, String npcName) {
+    NPCAttributes known = lookupKnown(npcId);
+    return known != null ? known : defaultAttributes(npcId, npcName);
+  }
+
+  /** A bundled-table or learned hit for an id, or {@code null} when neither knows it. */
+  private NPCAttributes lookupKnown(int npcId) {
     NPCAttributes attributes = voiceTable.get(npcId);
     if (attributes != null) {
       return attributes;
     }
-    return defaultAttributes(npcId, npcName);
+    return learnedStore != null ? learnedStore.get(npcId) : null;
   }
 
   /** Number of entries in the loaded table (for logging and tests). */
@@ -133,6 +160,9 @@ public class NPCDemographicAnalyzer {
                   "StaticTable",
                   1.0);
           attributes.setNpcId(npcId);
+          if (entry.has("ethnicity") && !entry.get("ethnicity").isJsonNull()) {
+            attributes.setEthnicity(entry.get("ethnicity").getAsString());
+          }
           table.put(npcId, attributes);
         } catch (RuntimeException e) {
           log.warn("Skipping malformed NPC voice entry {}: {}", npcIdStr, e.getMessage());

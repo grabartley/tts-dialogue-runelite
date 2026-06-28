@@ -220,6 +220,77 @@ public class OpenRouterTtsBackendTest {
         backend.cacheVariant(elfFemale));
   }
 
+  private static final CharacterProfile PROFILE =
+      new CharacterProfile(
+          "Troll",
+          "British English, South London Brixton accent.",
+          "A huge, slow, simple-minded troll.",
+          "Slow and heavy.");
+
+  @Test
+  public void profilePrependsTheAudioProfileBlockBeforeTheEmotionTaggedTranscript()
+      throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
+
+    backend(config)
+        .synthesize(
+            new SynthesisRequest(
+                "You no take candle!",
+                VoiceSpec.npc(NPCRace.TROLL, NPCGender.MALE),
+                Emotion.ANGRY,
+                PROFILE));
+
+    JsonObject body =
+        new JsonParser().parse(server.takeRequest().getBody().readUtf8()).getAsJsonObject();
+    String input = body.get("input").getAsString();
+    assertTrue("the AUDIO PROFILE block leads", input.startsWith("AUDIO PROFILE: Troll"));
+    assertTrue("the director's notes carry the accent", input.contains("Brixton"));
+    assertTrue(
+        "the emotion-tagged transcript follows the divider, so the two layers compose",
+        input.contains("#### TRANSCRIPT\n[angry] You no take candle!"));
+  }
+
+  @Test
+  public void noProfileLeavesTheInputByteForByteUnchanged() throws Exception {
+    // Same request as inputForEmotion: a null profile must produce exactly the pre-profile input.
+    assertEquals("Hello & welcome", inputForEmotion(Emotion.NEUTRAL));
+  }
+
+  @Test
+  public void cacheVariantFoldsInProfileSoDifferentProfilesNeverCollide() {
+    OpenRouterTtsBackend backend = backend(new TestConfig());
+    VoiceSpec voice = VoiceSpec.npc(NPCRace.TROLL, NPCGender.MALE);
+    SynthesisRequest noProfile = new SynthesisRequest("a", voice, Emotion.NEUTRAL);
+    SynthesisRequest withProfile = new SynthesisRequest("a", voice, Emotion.NEUTRAL, PROFILE);
+    SynthesisRequest otherProfile =
+        new SynthesisRequest(
+            "a",
+            voice,
+            Emotion.NEUTRAL,
+            new CharacterProfile("Goblin", "East London.", "Mischievous.", "Quick."));
+
+    assertFalse(
+        "a line with no profile carries no profile fragment, so existing cache stays valid",
+        backend.cacheVariant(noProfile).contains("|p"));
+    assertEquals(
+        "the profiled variant is exactly the unprofiled one plus the profile content key",
+        backend.cacheVariant(noProfile) + "|p" + PROFILE.cacheKey(),
+        backend.cacheVariant(withProfile));
+    assertNotEquals(
+        "a profiled line never shares a variant with the same unprofiled line",
+        backend.cacheVariant(noProfile),
+        backend.cacheVariant(withProfile));
+    assertNotEquals(
+        "two different profiles never share a variant",
+        backend.cacheVariant(withProfile),
+        backend.cacheVariant(otherProfile));
+  }
+
   @Test
   public void cacheVariantChangesWithSpeedSoStaleAudioIsNeverServed() {
     TestConfig config = new TestConfig();

@@ -5,6 +5,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.google.gson.Gson;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,15 +35,16 @@ public class NPCDemographicAnalyzerTest {
 
   @Test
   public void knownNpcsResolveToCorrectRaceAndGender() {
-    // Real RuneLite/OSRS cache ids (the same ids the live client reports and the
-    // generator sources from), spanning each distinctive race bucket.
+    // Real OSRS cache ids (the same ids the live client reports), spanning each
+    // distinctive race bucket, with race/gender taken straight from the wiki.
     assertAttributes(385, "Human", "Male"); // Man
-    assertAttributes(1119, "Human", "Female"); // Woman
-    assertAttributes(655, "Goblin", "Male"); // Goblin
-    assertAttributes(70, "Undead", "Male"); // Skeleton
-    assertAttributes(85, "Undead", "Male"); // Ghost
+    assertAttributes(12, "Goblin", "Male"); // Goblin
+    assertAttributes(14, "Gnome", "Male"); // Gnome
+    assertAttributes(640, "Troll", "Male"); // Troll
+    assertAttributes(1477, "Elf", "Male"); // Elf
+    assertAttributes(229, "Demon", "Male"); // Demon
+    assertAttributes(491, "Undead", "Male"); // Undead
     assertAttributes(4733, "Dwarf", "Male"); // Thurgo
-    assertAttributes(142, "Demon", "Male"); // Demon
     assertAttributes(7746, "Wizard", "Male"); // Wizard Mizgog
   }
 
@@ -66,18 +70,18 @@ public class NPCDemographicAnalyzerTest {
   }
 
   @Test
-  public void femaleNamedTownsfolkResolveFemaleWithoutAnOverride() {
-    // Names with no female title still resolve Female via the curated first-name
-    // lexicon in the generator, so townsfolk like these don't default to male.
+  public void femaleNamedTownsfolkResolveFemale() {
+    // Gender comes straight from the wiki, so townsfolk with no gendered title
+    // (Gertrude, Cassie) still resolve Female instead of defaulting to male.
     assertAttributes(7284, "Human", "Female"); // Gertrude
     assertAttributes(3214, "Human", "Female"); // Cassie
   }
 
   @Test
   public void knownEntriesAreMarkedAsTableSourced() {
-    NPCAttributes goblin = analyzer.lookup(655, "Goblin");
-    assertEquals("StaticTable", goblin.getSource());
-    assertEquals(655, goblin.getNpcId());
+    NPCAttributes hans = analyzer.lookup(3105, "Hans");
+    assertEquals("StaticTable", hans.getSource());
+    assertEquals(3105, hans.getNpcId());
   }
 
   @Test
@@ -114,6 +118,20 @@ public class NPCDemographicAnalyzerTest {
   @Test
   public void nullNpcReturnsNull() {
     assertNull(analyzer.analyzeNPC(null));
+  }
+
+  @Test
+  public void learnedStoreIsConsultedForIdsMissingFromTheBundledTable() throws Exception {
+    Path file = Files.createTempDirectory("learned").resolve("l.json");
+    LearnedNpcStore store = new LearnedNpcStore(file, new Gson());
+    store.learn(987001, "Elf", "Female", "tirannwn");
+    analyzer.setLearnedStore(store);
+
+    NPCAttributes a = analyzer.lookup(987001, "A New Elf");
+    assertEquals("Elf", a.getRace());
+    assertEquals("Female", a.getGender());
+    assertEquals("tirannwn", a.getEthnicity());
+    assertEquals("Learned", a.getSource());
   }
 
   @Test
