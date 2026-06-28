@@ -51,7 +51,7 @@ final class GeminiVoiceMap {
     // Goblin (small, crude): bright/light voices, deliberately high.
     put(NPCRace.GOBLIN, male("Puck", "Zubenelgenubi"), female("Leda", "Laomedeia"));
     // Monkey (small, quick, chattery): bright, energetic, playful.
-    put(NPCRace.MONKEY, male("Lysithea", "Cyllene"), female("Pasithee", "Helene"));
+    put(NPCRace.MONKEY, male("Fenrir", "Sadachbia"), female("Zephyr", "Pulcherrima"));
     // Troll/ogre (big, lumbering): gravelly/firm, the deepest male timbres.
     put(NPCRace.TROLL, male("Algenib", "Orus"), female("Gacrux", "Kore"));
     // Undead (hollow, eerie): breathy/even, deep and cold.

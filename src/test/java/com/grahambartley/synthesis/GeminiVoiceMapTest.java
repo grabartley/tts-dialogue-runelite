@@ -22,11 +22,51 @@ public class GeminiVoiceMapTest {
     NPCRace.ELF,
     NPCRace.DWARF,
     NPCRace.GOBLIN,
+    NPCRace.MONKEY,
     NPCRace.TROLL,
     NPCRace.UNDEAD,
     NPCRace.DEMON,
     NPCRace.WIZARD
   };
+
+  /**
+   * The 30 prebuilt Gemini TTS voices. Every voice the map can emit must be one of these names; a
+   * name that is not a real voice fails synthesis at runtime, so the map is checked against the
+   * catalog here rather than only by ear.
+   */
+  private static final Set<String> GEMINI_VOICE_CATALOG =
+      new HashSet<>(
+          java.util.Arrays.asList(
+              "Zephyr",
+              "Puck",
+              "Charon",
+              "Kore",
+              "Fenrir",
+              "Leda",
+              "Orus",
+              "Aoede",
+              "Callirrhoe",
+              "Autonoe",
+              "Enceladus",
+              "Iapetus",
+              "Umbriel",
+              "Algieba",
+              "Despina",
+              "Erinome",
+              "Algenib",
+              "Rasalgethi",
+              "Laomedeia",
+              "Achernar",
+              "Alnilam",
+              "Schedar",
+              "Gacrux",
+              "Pulcherrima",
+              "Achird",
+              "Zubenelgenubi",
+              "Vindemiatrix",
+              "Sadachbia",
+              "Sadaltager",
+              "Sulafat"));
 
   @Test
   public void everyRaceGenderPairResolvesToANonBlankVoice() {
@@ -97,6 +137,18 @@ public class GeminiVoiceMapTest {
     assertTrue("player male is in the male pool", voicesFor(NPCGender.MALE).contains(playerMale));
     assertTrue(
         "player female is in the female pool", voicesFor(NPCGender.FEMALE).contains(playerFemale));
+  }
+
+  @Test
+  public void everyEmittableVoiceIsARealGeminiVoice() {
+    Set<String> emitted = new HashSet<>();
+    emitted.addAll(voicesFor(NPCGender.MALE));
+    emitted.addAll(voicesFor(NPCGender.FEMALE));
+    emitted.add(GeminiVoiceMap.DEFAULT_VOICE);
+    Set<String> bogus = new HashSet<>(emitted);
+    bogus.removeAll(GEMINI_VOICE_CATALOG);
+    assertTrue(
+        "every mapped voice must be a real Gemini voice, not these: " + bogus, bogus.isEmpty());
   }
 
   @Test

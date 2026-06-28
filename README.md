@@ -76,7 +76,7 @@ Per-NPC expression heads (e.g. `lore_lizard_chat_happy` 4843, `peng_chat_sad` 56
 
 ## Voices
 
-Each NPC's voice is chosen by race and gender, and the player has a dedicated voice. Race and gender come from a static, precomputed `npcId -> {race, gender}` lookup table bundled with the plugin, so choosing a voice at runtime is a single in-memory lookup with no network calls. The matrix spans eight races across two genders plus player voices, and each category maps to a distinct speaker so they sound genuinely different.
+Each NPC's voice is chosen by race and gender, and the player has a dedicated voice. Race and gender come from a static, precomputed `npcId -> {race, gender}` lookup table bundled with the plugin, so choosing a voice at runtime is a single in-memory lookup with no network calls. The matrix spans nine races across two genders plus player voices, and each category maps to a distinct speaker so they sound genuinely different.
 
 | Category | Male | Female |
 |----------|------|--------|
@@ -85,6 +85,7 @@ Each NPC's voice is chosen by race and gender, and the player has a dedicated vo
 | **Elf** | `bm_george` | `bf_emma` |
 | **Dwarf** | `bm_lewis` | `bf_isabella` |
 | **Goblin** | `am_puck` | `af_sky` |
+| **Monkey** | `am_liam` | `af_jessica` |
 | **Troll** | `am_onyx` | `af_sarah` |
 | **Undead** | `am_echo` | `af_nicole` |
 | **Demon** | `bm_daniel` | `af_river` |
