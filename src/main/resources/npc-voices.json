@@ -4,23 +4,23 @@
     "schema": "npcs[id] = { race, gender, ethnicity? }",
     "source": "oldschool.runescape.wiki Infobox NPC (race/gender/leagueRegion/location), cross-referenced by name against a full id dump for variant ids, + curated tools/overrides.json; profiles from tools/profiles.json.",
     "npc_pages": 5899,
-    "count": 13661,
+    "count": 13663,
     "name_matched_ids": 713,
-    "overrides_applied": 257,
+    "overrides_applied": 281,
     "race_counts": {
       "Demon": 751,
       "Dwarf": 517,
       "Elf": 323,
       "Gnome": 263,
-      "Goblin": 309,
-      "Human": 10241,
+      "Goblin": 333,
+      "Human": 10219,
       "Troll": 438,
       "Undead": 813,
       "Wizard": 6
     },
     "gender_counts": {
       "Female": 1821,
-      "Male": 11840
+      "Male": 11842
     },
     "ethnicity_counts": {
       "asgarnia": 567,
@@ -31,7 +31,7 @@
       "kharidian": 557,
       "kourend": 820,
       "menaphite": 117,
-      "misthalin": 783,
+      "misthalin": 781,
       "morytania": 1057,
       "tirannwn": 343,
       "varlamore": 1000,
@@ -25073,27 +25073,27 @@
       "ethnicity": "misthalin"
     },
     "5163": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5164": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5165": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5166": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5167": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5168": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5169": {
@@ -25738,43 +25738,43 @@
       "ethnicity": "misthalin"
     },
     "5330": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5331": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5332": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5333": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5334": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5335": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5336": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5337": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5338": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5339": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "5340": {
@@ -29676,19 +29676,19 @@
       "ethnicity": "karamja"
     },
     "6434": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "6435": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "6436": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "6437": {
-      "race": "Human",
+      "race": "Goblin",
       "gender": "Male"
     },
     "6438": {
@@ -57683,14 +57683,16 @@
       "gender": "Male"
     },
     "13572": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
+    },
+    "13573": {
+      "race": "Goblin",
+      "gender": "Male"
     },
     "13574": {
-      "race": "Human",
-      "gender": "Female",
-      "ethnicity": "misthalin"
+      "race": "Goblin",
+      "gender": "Female"
     },
     "13575": {
       "race": "Human",
@@ -57904,6 +57906,10 @@
     },
     "13624": {
       "race": "Human",
+      "gender": "Male"
+    },
+    "13643": {
+      "race": "Goblin",
       "gender": "Male"
     },
     "13655": {
