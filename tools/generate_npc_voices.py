@@ -7,26 +7,28 @@ keyed by NPC id. Regenerate whenever you want to refresh coverage, then commit
 the updated resource.
 
 Data source: the Old School RuneScape Wiki (https://oldschool.runescape.wiki),
-which is authoritative and current. Every NPC page transcludes
-``Template:Infobox NPC`` and exposes ``race``, ``gender``, ``leagueRegion``,
-``location`` and one or more cache ``id``s. We enumerate those pages, parse the
-infoboxes, and map each id -> {race, gender, ethnicity}. This replaces the older
-heuristic name classifier: race and gender now come straight from the wiki, so
-townsfolk get the correct gender (e.g. Cecilia is Female) and newer NPCs
-(Varlamore, etc.) are covered as soon as the wiki documents them.
+which is authoritative and current. Talkable NPCs transclude ``Template:Infobox
+NPC`` (carrying ``race``, ``gender``, ``leagueRegion``, ``location`` and cache
+``id``s); talkable creatures transclude ``Template:Infobox Monster`` (which
+carries none of those, so their race comes from the page's categories). We map
+each id -> {race, gender, ethnicity}. This replaces the older heuristic name
+classifier: race and gender now come straight from the wiki, so townsfolk get the
+correct gender (e.g. Cecilia is Female) and newer NPCs (Varlamore, etc.) are
+covered as soon as the wiki documents them.
 
 Pipeline
 --------
-  1. Enumerate every page in the main namespace that transcludes
-     ``Template:Infobox NPC``.
-  2. Fetch each page's lead wikitext (where the infobox lives) in batches.
-  3. Parse every infobox: collect all cache ids and the page's race, gender,
-     leagueRegion and location.
-  4. Map the wiki race onto one of the eight voice buckets, normalise gender,
-     and map leagueRegion (+ location for the Menaphite cities) onto a region
-     accent key.
-  5. Merge the hand-curated overrides on top (authoritative, always win).
-  6. Embed tools/profiles.json under the ``profiles`` key and emit
+  1. Enumerate every main-namespace page transcluding an NPC or Monster infobox.
+  2. Fetch each page's lead wikitext and categories in batches.
+  3. Parse every infobox: cache ids (grouped per version), gender (per version),
+     race, leagueRegion and location.
+  4. Map race onto a voice bucket (from the infobox race, else the page's
+     categories), normalise gender (paired per version), and map leagueRegion
+     (+ location/categories for the Menaphite cities) onto an ethnicity key.
+  5. Cross-reference a full id -> name dump by name to cover variant ids the wiki
+     pages do not list.
+  6. Merge the hand-curated overrides on top (authoritative, always win).
+  7. Embed tools/profiles.json under the ``profiles`` key and emit
      src/main/resources/npc-voices.json.
 
 Usage
@@ -99,7 +101,7 @@ RACE_BUCKET_RULES = [
 RACE_BUCKET_RULES = [(re.compile(p, re.IGNORECASE), b) for p, b in RACE_BUCKET_RULES]
 
 # Sophanem/Menaphos are split out of the Desert league region into the Menaphite
-# (Egyptian) ethnicity by matching the NPC's location text.
+# (Egyptian) ethnicity by matching the NPC's location text or wiki categories.
 MENAPHITE_HINT = re.compile(r"sophanem|menaphos|menaphite|necropolis", re.IGNORECASE)
 
 # Single wiki leagueRegion -> ethnicity accent key in tools/profiles.json byEthnicity.
@@ -310,7 +312,7 @@ def fetch_json_url(url):
 
 
 def build_table_from_wiki(limit=None):
-    """Build the id -> {race, gender, region} table and a name -> entry map from the wiki."""
+    """Build the id -> {race, gender, ethnicity} table and a name -> entry map from the wiki."""
     titles = enumerate_npc_pages(limit=limit)
     print(f"Enumerated {len(titles)} NPC pages from the wiki", file=sys.stderr)
     table = {}
@@ -445,7 +447,7 @@ def main():
 
     out = {
         "_meta": {
-            "description": "Static precomputed npcId -> {race, gender, region?} lookup plus "
+            "description": "Static precomputed npcId -> {race, gender, ethnicity?} lookup plus "
                            "cloud voice profiles, baked into the plugin. Generated offline by "
                            "tools/generate_npc_voices.py from the Old School RuneScape Wiki "
                            "(Infobox NPC). Do not hand-edit; edit tools/overrides.json or "

@@ -236,7 +236,7 @@
     }
   },
   "byId": {
-    "_comment": "Per-NPC bespoke overrides keyed by live NPC id (NPCComposition#getId). Sparse: only fields unique to the character. Inherits accent/pace (and name, if omitted) from the matched category/region/race/default layers.",
+    "_comment": "Per-NPC bespoke overrides keyed by live NPC id (NPCComposition#getId). Sparse: only fields unique to the character. Inherits accent/pace (and name, if omitted) from the matched category/ethnicity/race/default layers.",
     "3105": { "name": "Hans", "style": "An eccentric, doddery old groundskeeper who has shuffled around Lumbridge Castle for decades; rambling, friendly, oddly proud of his longevity.", "pace": "Slow and shuffling, wandering between thoughts." },
     "306": { "name": "Lumbridge Guide", "style": "A patient, welcoming older man who orients newcomers; calm, helpful, and mildly officious." },
     "4626": { "name": "Cook", "style": "A flustered, fretful castle cook in a perpetual flap over his kitchen; scatterbrained and self-important.", "pace": "Quick and harried." },

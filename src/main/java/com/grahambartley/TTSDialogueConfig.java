@@ -242,7 +242,7 @@ public interface TTSDialogueConfig extends Config {
       name = "Auto-learn New NPCs",
       description =
           "When an NPC isn't in the bundled voice table (e.g. one added to the game since the last"
-              + " plugin update), look its race, gender and region up on the Old School RuneScape"
+              + " plugin update), look its race, gender and ethnicity up on the Old School RuneScape"
               + " Wiki once, then cache the result locally so it voices correctly from then on. The"
               + " first line for such an NPC still uses the default voice while the lookup runs. Off"
               + " by default; when on it makes a network request (the NPC's name) to the wiki.",

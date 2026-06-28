@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Static precomputed npcId -> {race, gender, region?} lookup plus cloud voice profiles, baked into the plugin. Generated offline by tools/generate_npc_voices.py from the Old School RuneScape Wiki (Infobox NPC). Do not hand-edit; edit tools/overrides.json or tools/profiles.json and regenerate.",
+    "description": "Static precomputed npcId -> {race, gender, ethnicity?} lookup plus cloud voice profiles, baked into the plugin. Generated offline by tools/generate_npc_voices.py from the Old School RuneScape Wiki (Infobox NPC). Do not hand-edit; edit tools/overrides.json or tools/profiles.json and regenerate.",
     "schema": "npcs[id] = { race, gender, ethnicity? }",
     "source": "oldschool.runescape.wiki Infobox NPC (race/gender/leagueRegion/location), cross-referenced by name against a full id dump for variant ids, + curated tools/overrides.json; profiles from tools/profiles.json.",
     "npc_pages": 5899,
@@ -378,7 +378,7 @@
       }
     },
     "byId": {
-      "_comment": "Per-NPC bespoke overrides keyed by live NPC id (NPCComposition#getId). Sparse: only fields unique to the character. Inherits accent/pace (and name, if omitted) from the matched category/region/race/default layers.",
+      "_comment": "Per-NPC bespoke overrides keyed by live NPC id (NPCComposition#getId). Sparse: only fields unique to the character. Inherits accent/pace (and name, if omitted) from the matched category/ethnicity/race/default layers.",
       "3105": {
         "name": "Hans",
         "style": "An eccentric, doddery old groundskeeper who has shuffled around Lumbridge Castle for decades; rambling, friendly, oddly proud of his longevity.",
