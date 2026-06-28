@@ -16,9 +16,9 @@ in the primary checkout on `main`).
 There is **no fixed NPC cap**. Cover the whole region. Splitting a region only
 makes sense if a reviewer asks for it.
 
-## 1. Build the candidate list: league region UNION location, deduped
+## 1. Build the candidate list: league region UNION location UNION category, deduped
 
-Select on **two** signals and take the **union, deduped by id**, so nothing
+Select on **three** signals and take the **union, deduped by id**, so nothing
 between or under the towns is missed:
 
 1. **By `leagueRegion`** equal to the region (single-region only).
@@ -28,10 +28,19 @@ between or under the towns is missed:
    place-names (its towns plus its named sub-areas) and substring-match the wiki
    `location` field against them; include any hit even if its `leagueRegion`
    did not qualify.
+3. **By wiki category.** A real cluster of talkable NPCs carries a **place
+   category** (`Category:Canifis`, `Category:Rellekka`, `Category:Keldagrim`, ...)
+   while their infobox has **no `leagueRegion`, no `location`, and no `options`
+   line at all** (sparse 2007-era pages). Those slip through both fields *and* the
+   Talk-to filter, so they vanish silently. Substring-match the region's
+   place-names against each page's **category titles** and include any hit. This
+   is what catches the Canifis citizens (ids 2613-2632: Boris, Galina, Svetlana,
+   ...), tagged only `Category:Canifis` + `Category:Monsters`, with an otherwise
+   empty infobox.
 
 Do **not** rely on `leagueRegion` alone, and do **not** filter by town as the
-*only* axis either. Union both. The generator already enumerates and parses every
-NPC page; reuse its functions:
+*only* axis either. Union all three. The generator already enumerates and parses
+every NPC page; reuse its functions:
 
 ```python
 import sys; sys.path.insert(0, "tools"); import generate_npc_voices as g
@@ -43,22 +52,36 @@ titles = g.enumerate_npc_pages()                   # ~5-6k pages, slow; cache it
 for title, wikitext, cats in g.fetch_infoboxes(titles):
     lr = (g.first_field(wikitext, "leagueRegion") or "").lower()
     loc = (g.first_field(wikitext, "location") or "").lower()
+    cat = " | ".join(cats).lower()                 # the page's category titles
     single = lr and "," not in lr and "&" not in lr   # multi-region -> British default
-    in_region = (single and lr in REGION) or any(p in loc for p in PLACES)
+    in_region = ((single and lr in REGION)
+                 or any(p in loc for p in PLACES)
+                 or any(("category:" + p) in cat for p in PLACES))
     if not in_region:
         continue
     ids = sorted({i for grp in g.parse_id_groups(wikitext) for i in grp})
 ```
 
+The category axis pulls in combat mobs and animals too (a place category sits on
+beasts as well as residents), so it **surfaces** candidates for triage rather than
+auto-including: drop the pure creatures by name/category in the talkable filter
+below, keep the named humanoid residents. Never trust a single axis to be
+complete; the union plus the sweeps in section 4 are the only safety net.
+
 Then:
 - **Talkable filter:** keep NPCs whose `|options...=` line contains `Talk-to`
-  (case-insensitive). This drops museum displays, livestock, pets, furniture, and
-  fake-player NPCs. **Caveat:** some NPCs that genuinely talk in-game have a blank
-  options line or only an `Infobox Monster` page (combat-flavoured NPCs with minor
-  dialogue, e.g. the Dorgesh-Kaan cave goblin miners/guards). The wiki
-  under-documents them, so the Talk-to filter and even the location union can miss
-  them. The **race-sanity sweep** and the **in-game QA pass** (sections 4 and 6)
-  are the safety nets for that class; do not assume the wiki is complete.
+  (case-insensitive), **plus** every category-axis hit whose page is a named
+  humanoid resident even though its options line is blank. This drops museum
+  displays, livestock, pets, furniture, and fake-player NPCs. **Caveat:** many
+  NPCs that genuinely talk in-game have a blank options line, only an
+  `Infobox Monster` page, or a near-empty infobox (the Dorgesh-Kaan cave goblin
+  miners/guards; the Canifis citizens). The Talk-to line, `leagueRegion`, and
+  `location` are **all** empty on those, so only the **category axis** above
+  surfaces them, and then only a human/agent eyeball separates the talkable
+  resident from the pure mob (the wiki tags an attackable townsperson
+  `Category:Monsters` exactly like a Basilisk). Treat the **category sweep**, the
+  **race-sanity sweep**, and the **in-game QA pass** (sections 1, 4, 6) as the
+  safety nets; do not assume the wiki is complete or the options line is present.
 - **Subtract the already-bespoke:** skip any NPC whose ids are already in
   `tools/profiles.json` `byId`.
 - **Cache** the enumeration/fetch to a temp file. The full wiki crawl takes
@@ -124,6 +147,19 @@ differs; most locals need none.
 - **Skip the non-voiced.** Cats (catspeak meows would get a silly human voice),
   boss pets, and overhead-only critters survive the Talk-to filter sometimes;
   drop them.
+- **Category sweep (catches sparse-infobox residents).** Run this BEFORE shipping
+  and treat it as mandatory, not optional. Re-walk the cache and collect every
+  page carrying a region **place category** (`Category:Canifis`,
+  `Category:Rellekka`, `Category:Keldagrim`, ...) whose ids are **not yet
+  bespoke**. This residue is a mix of talkable residents and pure mobs; eyeball it
+  and keep the named humanoid townsfolk. The Canifis citizens (ids 2613-2632:
+  Boris, Galina, Svetlana, Yuri, ...) were exactly this class: real Talk-to
+  townsfolk with an empty infobox (no `leagueRegion`/`location`/`options`), tagged
+  only `Category:Canifis` + `Category:Monsters`, so all three field-based filters
+  and the Talk-to filter missed them silently. They were also genuinely
+  mis-gendered (every one defaulted `Male`; half are women), so research and set
+  gender from the wiki, and give them the region ethnicity. Do not assume a region
+  is "done" until this sweep comes back clean.
 - **Race-sanity sweep (catches wiki-invisible NPCs).** Some talkable NPCs never
   appear on a usable wiki page at all (no `leagueRegion`, no `location`, no
   `Talk-to`); they reach the bundled table only via the id-dump name cross-ref,
@@ -134,7 +170,9 @@ differs; most locals need none.
   race keyword (`goblin`, `dwarf`, `gnome`, `troll`, `ghost`, `skeleton`, `imp`,
   `demon`, `dragon`, ...) whose table race is `Human` is almost always a miss. Add
   `overrides.json` race corrections for the hits. Run this sweep for the region's
-  signature races before shipping.
+  signature races before shipping. The Morytania/Fremennik run found the Fremennik
+  Isles bridge trolls (1891/1892) and the Hazeel/Khazard ice-troll disguises
+  (12053/12060) bundled under human pages.
 - **File formatting is hand-curated.** `profiles.json` `byId` and
   `overrides.json` `npcs` use **one-line entry objects**; other layers are
   multi-line. A blind `json.dump(indent=2)` reformats every existing entry and
