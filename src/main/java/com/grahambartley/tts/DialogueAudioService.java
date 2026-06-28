@@ -46,16 +46,34 @@ public final class DialogueAudioService {
    */
   record CacheKey(String backendId, String voiceKey, Emotion emotion, String text) {}
 
+  /**
+   * Hard ceiling on concurrent prefetch synths, so speculative warming never floods the backend.
+   */
+  private static final int PREFETCH_THREADS = 2;
+
+  /**
+   * Bounded prefetch backlog; excess speculative work is dropped rather than queued unboundedly.
+   */
+  private static final int PREFETCH_QUEUE_CAPACITY = 16;
+
   private final BackendProvider backends;
   private final AudioOutput output;
   private final Executor executor;
   // Engine install/model-load runs here, NOT on the single synthesis thread, so a long bundle
   // download cannot block dialogue playback through an already-warm backend.
   private final Executor warmExecutor;
+  // Speculative dialogue-tree prefetch runs here, off the single synthesis thread, so warming the
+  // next likely line never delays the line the player is actually hearing. Small fixed pool so no
+  // more than PREFETCH_THREADS prefetch calls are ever in flight at once.
+  private final Executor prefetchExecutor;
   private final LruCache<CacheKey, Pcm> cache;
   private final DiskAudioCache diskCache;
   private final IntSupplier volume;
   private final AtomicLong epoch = new AtomicLong();
+  // Bumped on dialogue close / NPC change so prefetch tasks queued for the old node drop instead of
+  // spending on branches the player has already left. Separate from the playback epoch: a new
+  // spoken line must never cancel prefetch, and a prefetch must never cancel playback.
+  private final AtomicLong prefetchEpoch = new AtomicLong();
   // Synths currently running, keyed by CacheKey, so a second task for the same line reuses the
   // pending result instead of issuing a duplicate (billable) backend call.
   private final ConcurrentHashMap<CacheKey, CompletableFuture<Pcm>> inFlight =
@@ -74,13 +92,14 @@ public final class DialogueAudioService {
         diskCache,
         buildExecutor(queueCapacity),
         buildWarmExecutor(),
+        buildPrefetchExecutor(),
         cacheSize,
         volume);
   }
 
   /**
    * Test seam: lets callers inject an inline executor and disk cache so behavior is deterministic.
-   * The same executor backs warm-up so tests stay single-threaded and deterministic.
+   * The same executor backs warm-up and prefetch so tests stay single-threaded and deterministic.
    */
   DialogueAudioService(
       BackendProvider backends,
@@ -89,7 +108,7 @@ public final class DialogueAudioService {
       Executor executor,
       int cacheSize,
       IntSupplier volume) {
-    this(backends, output, diskCache, executor, executor, cacheSize, volume);
+    this(backends, output, diskCache, executor, executor, executor, cacheSize, volume);
   }
 
   private DialogueAudioService(
@@ -98,6 +117,7 @@ public final class DialogueAudioService {
       DiskAudioCache diskCache,
       Executor executor,
       Executor warmExecutor,
+      Executor prefetchExecutor,
       int cacheSize,
       IntSupplier volume) {
     this.backends = backends;
@@ -105,6 +125,7 @@ public final class DialogueAudioService {
     this.diskCache = diskCache;
     this.executor = executor;
     this.warmExecutor = warmExecutor;
+    this.prefetchExecutor = prefetchExecutor;
     this.cache = new LruCache<>(cacheSize);
     this.volume = volume;
   }
@@ -132,13 +153,70 @@ public final class DialogueAudioService {
     // even if the user switches backend before this line reaches the pipeline thread.
     SynthesisBackend backend = backends.active();
     SynthesisRequest effective = BackendProvider.downgradeFor(backend, request);
-    // Fold any backend-specific render variant (e.g. a selectable cloud model/voice) into the voice
-    // key so two renderings of the same line never collide in the cache.
+    CacheKey key = keyFor(backend, effective);
+    submit(() -> run(mine, backend, effective, key));
+  }
+
+  /**
+   * Speculatively synthesizes a line the player is likely to hear next (a visible dialogue option),
+   * warming both cache tiers so the real line plays from cache when it arrives. Unlike {@link
+   * #speak}, it never plays audio and never touches the playback epoch, so it cannot interrupt or
+   * be interrupted by the line currently playing. It shares the same in-flight dedup and both cache
+   * tiers as {@link #speak}, so a prefetch and a real line for the same key never both bill the
+   * backend, and an already-cached line is a cheap no-op. Skipped when the active backend is
+   * unavailable or rate-limit backing off, so speculation never piles onto a 429.
+   */
+  public void prefetch(SynthesisRequest request) {
+    if (request == null || request.text() == null || request.text().isEmpty()) {
+      return;
+    }
+    SynthesisBackend backend = backends.active();
+    if (!backend.isAvailable() || backend.isThrottled()) {
+      return;
+    }
+    SynthesisRequest effective = BackendProvider.downgradeFor(backend, request);
+    CacheKey key = keyFor(backend, effective);
+    if (lookup(key) != null) {
+      return;
+    }
+    long node = prefetchEpoch.get();
+    submitPrefetch(
+        () -> {
+          // The player may have left this node, the backend may have hit a limit, or a real line
+          // may
+          // have warmed this key while we waited in the queue: re-check all three before spending.
+          if (prefetchEpoch.get() != node || backend.isThrottled() || lookup(key) != null) {
+            return;
+          }
+          log.debug(
+              "Prefetching \"{}\" ({}/{})",
+              abbreviate(key.text()),
+              key.backendId(),
+              key.voiceKey());
+          synthesizeDeduped(backend, effective, key);
+        });
+  }
+
+  /**
+   * Cancels prefetches queued for the current dialogue node (dialogue closed or NPC changed) by
+   * advancing the prefetch epoch, so queued tasks drop instead of spending on a branch the player
+   * has left. A prefetch already mid-flight finishes and its bytes stay cached.
+   */
+  public void cancelPrefetch() {
+    prefetchEpoch.incrementAndGet();
+  }
+
+  /**
+   * Builds the cache key for a resolved request: the active backend id, the voice key folded with
+   * any backend-specific render variant (selectable cloud model/voice, profile, language), the
+   * downgraded emotion, and the text. Shared by {@link #speak} and {@link #prefetch} so a
+   * prefetched line and the real line resolve to the exact same key.
+   */
+  private CacheKey keyFor(SynthesisBackend backend, SynthesisRequest effective) {
     String variant = backend.cacheVariant(effective);
     String voiceKey =
         variant.isEmpty() ? effective.voice().key() : effective.voice().key() + "|" + variant;
-    CacheKey key = new CacheKey(backend.id(), voiceKey, effective.emotion(), effective.text());
-    submit(() -> run(mine, backend, effective, key));
+    return new CacheKey(backend.id(), voiceKey, effective.emotion(), effective.text());
   }
 
   /** Stops current playback and drops any queued lines for the now-stale dialogue. */
@@ -149,12 +227,16 @@ public final class DialogueAudioService {
 
   public void close() {
     epoch.incrementAndGet();
+    prefetchEpoch.incrementAndGet();
     output.stop();
     shutdown(executor);
-    // In production the warm-up executor is a distinct instance; the test seam reuses the synthesis
-    // executor, so only shut it down once.
+    // In production the warm-up and prefetch executors are distinct instances; the test seam reuses
+    // the synthesis executor, so only shut a distinct one down once.
     if (warmExecutor != executor) {
       shutdown(warmExecutor);
+    }
+    if (prefetchExecutor != executor && prefetchExecutor != warmExecutor) {
+      shutdown(prefetchExecutor);
     }
     output.close();
   }
@@ -276,6 +358,14 @@ public final class DialogueAudioService {
     }
   }
 
+  private void submitPrefetch(Runnable task) {
+    try {
+      prefetchExecutor.execute(task);
+    } catch (RejectedExecutionException ignored) {
+      // Prefetch backlog full or shutting down; dropping speculative work is always safe.
+    }
+  }
+
   private static ExecutorService buildExecutor(int queueCapacity) {
     return new ThreadPoolExecutor(
         1,
@@ -314,6 +404,27 @@ public final class DialogueAudioService {
           t.setDaemon(true);
           return t;
         });
+  }
+
+  /**
+   * The fixed pool that runs speculative prefetch synths, capped at {@link #PREFETCH_THREADS} so no
+   * more than that many prefetch calls are ever in flight at once. Its queue is bounded and the
+   * oldest queued prefetch is discarded under backpressure, since speculative work for a node the
+   * player may already have left is the safest thing to drop.
+   */
+  private static ExecutorService buildPrefetchExecutor() {
+    return new ThreadPoolExecutor(
+        PREFETCH_THREADS,
+        PREFETCH_THREADS,
+        0L,
+        TimeUnit.MILLISECONDS,
+        new ArrayBlockingQueue<>(PREFETCH_QUEUE_CAPACITY),
+        r -> {
+          Thread t = new Thread(r, "dialogue-prefetch");
+          t.setDaemon(true);
+          return t;
+        },
+        new ThreadPoolExecutor.DiscardOldestPolicy());
   }
 
   private static String abbreviate(String text) {

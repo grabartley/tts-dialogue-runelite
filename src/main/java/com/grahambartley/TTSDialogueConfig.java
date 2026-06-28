@@ -127,6 +127,46 @@ public interface TTSDialogueConfig extends Config {
   }
 
   @ConfigItem(
+      keyName = "providerRegion",
+      name = "Provider Region",
+      description =
+          "Optional geographic bias for OpenRouter provider routing, injected into the request's"
+              + " provider preferences when set. Leave blank (default) to let OpenRouter pick the"
+              + " best provider automatically. Used only by the Cloud backend.",
+      position = 3,
+      section = cloudOpenRouterSection)
+  default String providerRegion() {
+    return "";
+  }
+
+  @ConfigItem(
+      keyName = "targetLanguage",
+      name = "Spoken Language",
+      description =
+          "Language dialogue is spoken in. English (default) speaks the original line directly. Any"
+              + " other language routes each line through a translation model first, preserving"
+              + " names, places, and item terms, then voices the translation. Adds a translation"
+              + " request per new line. Used only by the Cloud backend.",
+      position = 4,
+      section = cloudOpenRouterSection)
+  default String targetLanguage() {
+    return "English";
+  }
+
+  @ConfigItem(
+      keyName = "enablePrefetch",
+      name = "Prefetch Dialogue Audio",
+      description =
+          "Warm the audio cache for the dialogue options you can see, so the line you pick next plays"
+              + " instantly. Raises Cloud API spend on branches you never choose. Used only when the"
+              + " Cloud backend is active; the local voice is free, so this just speeds it up.",
+      position = 5,
+      section = cloudOpenRouterSection)
+  default boolean enablePrefetch() {
+    return true;
+  }
+
+  @ConfigItem(
       keyName = "volume",
       name = "Dialogue Volume",
       description = "Volume of the spoken dialogue (0–100)",

@@ -36,6 +36,7 @@ public class DialogueAudioServiceTest {
     final List<String> requests = new ArrayList<>();
     private final String id;
     private final EnumSet<Emotion> supported;
+    volatile boolean throttled;
 
     FakeBackend(EnumSet<Emotion> supported) {
       // Use the fallback id so a default-LOCAL config resolves straight to this backend.
@@ -55,6 +56,11 @@ public class DialogueAudioServiceTest {
     @Override
     public boolean isAvailable() {
       return true;
+    }
+
+    @Override
+    public boolean isThrottled() {
+      return throttled;
     }
 
     @Override
@@ -487,6 +493,95 @@ public class DialogueAudioServiceTest {
 
     assertEquals(
         "a response that lands after the epoch advanced must not play", 0, output.streamCalls);
+  }
+
+  @Test
+  public void prefetchWarmsCacheWithoutPlayingOrInterrupting() {
+    FakeBackend backend = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    FakeOutput output = new FakeOutput();
+    DeferredExecutor executor = new DeferredExecutor();
+    DialogueAudioService svc = service(provider(backend), output, executor, 8, 100);
+
+    svc.prefetch(req("Yes, I'll help.", NPCRace.HUMAN, NPCGender.MALE));
+    executor.runAll();
+
+    assertEquals("prefetch synthesizes the line", 1, backend.requests.size());
+    assertEquals("prefetch never plays audio", 0, output.streamCalls);
+    assertEquals("prefetch never interrupts playback", 0, output.stopCalls);
+
+    // The real line now arrives: it must come from the warmed cache, not a second synth.
+    svc.speak(req("Yes, I'll help.", NPCRace.HUMAN, NPCGender.MALE));
+    executor.runAll();
+
+    assertEquals("the spoken line is served from the prefetched cache", 1, backend.requests.size());
+    assertEquals("the spoken line plays once", 1, output.streamCalls);
+  }
+
+  @Test
+  public void prefetchOfAnAlreadyCachedLineIsANoOp() {
+    FakeBackend backend = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    DeferredExecutor executor = new DeferredExecutor();
+    DialogueAudioService svc = service(provider(backend), new FakeOutput(), executor, 8, 100);
+
+    svc.speak(req("Already heard", NPCRace.HUMAN, NPCGender.MALE));
+    executor.runAll();
+    svc.prefetch(req("Already heard", NPCRace.HUMAN, NPCGender.MALE));
+    executor.runAll();
+
+    assertEquals("prefetch never re-synthesizes a cached line", 1, backend.requests.size());
+  }
+
+  @Test
+  public void prefetchSkipsWhenTheBackendIsThrottled() {
+    FakeBackend backend = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    backend.throttled = true;
+    DeferredExecutor executor = new DeferredExecutor();
+    DialogueAudioService svc = service(provider(backend), new FakeOutput(), executor, 8, 100);
+
+    svc.prefetch(req("Don't pile on the 429", NPCRace.HUMAN, NPCGender.MALE));
+    executor.runAll();
+
+    assertEquals("a rate-limited backend is never prefetched", 0, backend.requests.size());
+  }
+
+  @Test
+  public void cancelPrefetchDropsStillQueuedPrefetches() {
+    FakeBackend backend = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    DeferredExecutor executor = new DeferredExecutor();
+    DialogueAudioService svc = service(provider(backend), new FakeOutput(), executor, 8, 100);
+
+    // Queued but not yet run: leaving the node cancels it before it can spend.
+    svc.prefetch(req("Branch the player left", NPCRace.HUMAN, NPCGender.MALE));
+    svc.cancelPrefetch();
+    executor.runAll();
+
+    assertEquals("a cancelled prefetch never reaches the backend", 0, backend.requests.size());
+  }
+
+  @Test
+  public void prefetchedLineIsNotRebilledWhenSpokenAcrossTiers() {
+    // Prefetch writes through to disk too, so even a fresh in-memory tier serves the spoken line.
+    Path cacheDir = tmp.getRoot().toPath().resolve("cache");
+    FakeBackend warm = new FakeBackend("cloud-openrouter", EnumSet.allOf(Emotion.class));
+    TestConfig config = new TestConfig();
+    config.backend = VoiceBackend.CLOUD;
+    DeferredExecutor executor = new DeferredExecutor();
+    DialogueAudioService svc =
+        new DialogueAudioService(
+            new BackendProvider(config, new FakeBackend(EnumSet.of(Emotion.NEUTRAL)), warm),
+            new FakeOutput(),
+            new DiskAudioCache(cacheDir),
+            executor,
+            8,
+            () -> 100);
+
+    svc.prefetch(req("Tell me about the quest.", NPCRace.HUMAN, NPCGender.MALE));
+    executor.runAll();
+    svc.speak(req("Tell me about the quest.", NPCRace.HUMAN, NPCGender.MALE));
+    executor.runAll();
+
+    assertEquals(
+        "prefetch then speak bills the cloud backend exactly once", 1, warm.requests.size());
   }
 
   @Test

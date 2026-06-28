@@ -19,6 +19,8 @@ import com.grahambartley.tts.AudioPlayer;
 import com.grahambartley.tts.DialogueAudioService;
 import com.grahambartley.tts.DiskAudioCache;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.inject.Inject;
@@ -94,6 +96,13 @@ public class TTSDialoguePlugin extends Plugin {
 
   private DialogueAudioService audioService;
 
+  /**
+   * Warms the audio cache for the dialogue options the player can currently see, so the line picked
+   * next plays from cache. Off-thread behind {@link DialogueAudioService#prefetch}; gated by {@code
+   * enablePrefetch}; reset on dialogue close. Null until {@link #startUp}.
+   */
+  private DialoguePrefetcher prefetcher;
+
   /** Dedicated daemon thread for off-game-thread wiki NPC lookups (the auto-learn fallback). */
   private ExecutorService wikiExecutor;
 
@@ -159,12 +168,19 @@ public class TTSDialoguePlugin extends Plugin {
     // first line and becomes available instead of pre-emptively falling back. A no-op when the
     // selection is already the local Kokoro fallback.
     audioService.prewarm(backendProvider::warmUpActive);
+    // Speculative prefetch warms the cache for the dialogue options the player can see; it shares
+    // the audio service's dedup and both cache tiers, runs off the game thread, and is gated by the
+    // enablePrefetch config (read live, so toggling it takes effect immediately).
+    prefetcher =
+        new DialoguePrefetcher(
+            audioService::prefetch, audioService::cancelPrefetch, config::enablePrefetch);
 
     log.info("TTSDialogue started");
   }
 
   @Override
   protected void shutDown() {
+    prefetcher = null;
     if (audioService != null) {
       audioService.close();
       audioService = null;
@@ -293,6 +309,12 @@ public class TTSDialoguePlugin extends Plugin {
       }
     }
 
+    Widget options = client.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS);
+    boolean optionsVisible = options != null && !options.isHidden();
+    if (optionsVisible) {
+      prefetchVisibleOptions(options);
+    }
+
     if ((npcDialogue == null || npcDialogue.isHidden())
         && (playerDialogue == null || playerDialogue.isHidden())) {
       if (audioService != null) {
@@ -300,6 +322,57 @@ public class TTSDialoguePlugin extends Plugin {
       }
       lastSpoken = "";
     }
+
+    // Reset prefetch only when the dialogue is fully gone (no text and no option list), so the
+    // session cap and queued warming survive the option-select screen instead of being cancelled
+    // and re-cancelled every tick while the player is choosing.
+    boolean fullyClosed =
+        (npcDialogue == null || npcDialogue.isHidden())
+            && (playerDialogue == null || playerDialogue.isHidden())
+            && !optionsVisible;
+    if (fullyClosed && prefetcher != null) {
+      prefetcher.reset();
+    }
+  }
+
+  /**
+   * Warms the cache for the dialogue options the player can currently see. Each option's text is
+   * the line the player will speak if it is picked, so it is built into the exact same {@link
+   * SynthesisRequest} (player voice, player profile, neutral) that {@link #speakWithTTS} would
+   * produce for that line, and handed to the off-thread prefetcher. The known "Select an Option"
+   * header and any blank rows are skipped. Only touches the client on the game thread; never
+   * throws.
+   */
+  private void prefetchVisibleOptions(Widget options) {
+    if (audioService == null || prefetcher == null || !config.enablePrefetch()) {
+      return;
+    }
+    if (!backendProvider.active().isAvailable()) {
+      return;
+    }
+    Widget[] children = options.getDynamicChildren();
+    if (children == null || children.length == 0) {
+      return;
+    }
+    VoiceSpec voice = voiceManager.resolveVoice("player", null);
+    CharacterProfile profile =
+        config.enableCharacterProfiles() ? voiceManager.resolveProfile("player", null) : null;
+    List<SynthesisRequest> candidates = new ArrayList<>(children.length);
+    for (Widget child : children) {
+      if (child == null) {
+        continue;
+      }
+      String raw = child.getText();
+      if (raw == null) {
+        continue;
+      }
+      String cleaned = cleanDialogueText(raw);
+      if (cleaned.isEmpty() || "Select an Option".equalsIgnoreCase(cleaned)) {
+        continue;
+      }
+      candidates.add(new SynthesisRequest(cleaned, voice, Emotion.NEUTRAL, profile));
+    }
+    prefetcher.offer(candidates);
   }
 
   /**

@@ -21,6 +21,24 @@ public record CharacterProfile(String name, String accent, String style, String 
   static final String TRANSCRIPT_DIVIDER = "#### TRANSCRIPT";
 
   /**
+   * Trailing whitespace is stripped from every field at construction so the rendered direction
+   * block is byte-identical across calls for the same profile. That stability is what lets Gemini's
+   * implicit prompt cache hit on the leading block (cheaper input, faster prefill) when the same
+   * speaker speaks repeatedly; a stray trailing space leaking in from the bundled table or a config
+   * field would otherwise re-key the prefix and miss the cache every line.
+   */
+  public CharacterProfile {
+    name = stripTrailingOrNull(name);
+    accent = stripTrailingOrNull(accent);
+    style = stripTrailingOrNull(style);
+    pace = stripTrailingOrNull(pace);
+  }
+
+  private static String stripTrailingOrNull(String field) {
+    return field == null ? null : field.stripTrailing();
+  }
+
+  /**
    * Renders the leading direction block, ending with the {@code #### TRANSCRIPT} divider and a
    * newline so the caller can append the styled transcript directly. Mirrors the structured prompt
    * format Gemini steers from: an {@code AUDIO PROFILE} header and a {@code DIRECTOR'S NOTES} list

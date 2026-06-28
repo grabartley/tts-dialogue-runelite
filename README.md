@@ -100,6 +100,8 @@ Synthesis and playback run off the game thread, so the client stays responsive e
 
 The cloud backend adds a few cost and latency guards on top of the cache. Each line is capped at **Max Cloud Characters** and truncated at a sentence or word boundary before sending, so a pathological long line can never run up the per-character bill; OSRS lines are short, so this only bites edge cases. Cloud calls carry a 10-second timeout so a hung request cannot pin the pipeline, and a response that lands after you have already skipped ahead is dropped rather than played late. If two identical lines hit the synth step at once, only one cloud call is made and the second reuses its result.
 
+Cloud requests are tuned for latency. They reuse one long-lived keepalive HTTP/2 connection so back-to-back lines skip the TCP/TLS handshake, and they ask OpenRouter to route to the fastest provider for the model. The per-speaker character-profile block leads each request and is byte-stable, so Gemini's implicit prompt cache hits on repeats for the same speaker (cheaper input, faster start). An optional **Provider Region** biases routing by geography. Speculative prefetch (**Prefetch Dialogue Audio**) warms the cache for the dialogue options you can see, so the line you pick next plays from cache; it runs off-thread behind the same dedup and cache tiers, no more than two requests in flight, capped per conversation, and holds off when the backend is rate-limited. With **Spoken Language** set to anything other than English, each line is translated by a lightweight model before it is voiced, with names and RuneScape terms preserved; translations are cached per language so the same line is never re-billed.
+
 ## Configuration
 
 | Setting | Default | What it does |
@@ -116,6 +118,9 @@ The cloud backend adds a few cost and latency guards on top of the cache. Each l
 | **OpenRouter API Key** | empty | Your OpenRouter API key. Required for the Cloud backend; stored locally and never bundled with the plugin. |
 | **Max Cloud Characters** | `600` | Caps how many characters of a line are sent to the cloud backend, truncating at a sentence or word boundary. Bounds worst-case per-line cost. `0` disables the cap. |
 | **Cloud Speaking Pace** | `100` | Speaking pace for the cloud backend as a percent of normal. Sent as the OpenRouter speed parameter only when not `100`; the active model may ignore it. No effect on the local backend. |
+| **Provider Region** | empty | Optional geographic bias for OpenRouter provider routing, injected into the request when set. Blank lets OpenRouter pick the best provider automatically. Cloud only. |
+| **Spoken Language** | `English` | Language dialogue is spoken in. `English` voices the original line directly; any other language translates each line first (preserving names, places, and item terms), then voices the translation. Adds a translation request per new line. Cloud only. |
+| **Prefetch Dialogue Audio** | `On` | Warms the audio cache for the dialogue options you can see, so the line you pick next plays instantly. Raises Cloud API spend on branches you never choose. Cloud only. |
 
 ## Dev Setup
 
