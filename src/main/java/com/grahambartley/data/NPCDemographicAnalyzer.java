@@ -79,8 +79,18 @@ public class NPCDemographicAnalyzer {
     if (composition == null) {
       return null;
     }
-
-    return lookup(composition.getId(), composition.getName());
+    // Prefer the NPC's active id, which matches the wiki/cache ids the table is keyed by. A
+    // transformed multiloc NPC (many Karamja, quest and morphing NPCs) reports a different
+    // composition (base) id than its active id, and only the active id is in the table; falling
+    // back
+    // to the base id keeps the simple, non-transformed NPCs working unchanged.
+    int activeId = npc.getId();
+    int baseId = composition.getId();
+    NPCAttributes known = lookupKnown(activeId);
+    if (known == null && baseId != activeId) {
+      known = lookupKnown(baseId);
+    }
+    return known != null ? known : defaultAttributes(activeId, composition.getName());
   }
 
   /**
@@ -89,18 +99,17 @@ public class NPCDemographicAnalyzer {
    * configured fallback voice always applies.
    */
   public NPCAttributes lookup(int npcId, String npcName) {
+    NPCAttributes known = lookupKnown(npcId);
+    return known != null ? known : defaultAttributes(npcId, npcName);
+  }
+
+  /** A bundled-table or learned hit for an id, or {@code null} when neither knows it. */
+  private NPCAttributes lookupKnown(int npcId) {
     NPCAttributes attributes = voiceTable.get(npcId);
     if (attributes != null) {
       return attributes;
     }
-    if (learnedStore != null) {
-      NPCAttributes learned = learnedStore.get(npcId);
-      if (learned != null) {
-        learned.setName(npcName);
-        return learned;
-      }
-    }
-    return defaultAttributes(npcId, npcName);
+    return learnedStore != null ? learnedStore.get(npcId) : null;
   }
 
   /** Number of entries in the loaded table (for logging and tests). */

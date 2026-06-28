@@ -31,20 +31,28 @@ which exposes `race`, `gender`, `leagueRegion`, `location` and one or more cache
 
 Because race and gender come straight from the wiki, townsfolk get the correct
 gender (e.g. Cecilia is Female) and newly released NPCs (Varlamore, etc.) are
-covered as soon as the wiki documents them. The ids are real cache ids, the same
-ones the live client reports via `NPCComposition#getId`.
+covered as soon as the wiki documents them. The ids are real cache ids the live
+client reports.
 
-> **Coverage note.** Combat NPCs use a separate `Infobox Monster` and are *not*
-> enumerated here. Pure monsters have no dialogue, so this is harmless for TTS;
-> the handful of *talkable* monsters (e.g. TzHaar-Mej) can be pinned in
-> `overrides.json` if desired.
+The wiki does not always list every cache id an NPC uses (variants, multiloc
+versions). To close that gap the generator also cross-references a full
+`id -> name` NPC dump against the wiki data **by name**, so a variant id whose
+name still resolves to a documented NPC is covered too.
+
+> **Coverage notes.** The live client reports a transformed/multiloc NPC's
+> *active* id, which can differ from its base composition id; the runtime resolves
+> by the active id first (then the base id) to match the wiki. Combat creatures use
+> a separate `Infobox Monster` that carries **no race/gender/region**, so they
+> cannot be auto-derived; the handful of *talkable* monsters (e.g. TzHaar-Mej) are
+> pinned in `overrides.json`. Anything still unknown (a brand-new NPC) is left to
+> the runtime auto-learn fallback.
 
 ## Mapping rules
 
-- **Race.** The wiki race text is mapped onto one of the eight voice buckets
-  (`Human, Elf, Dwarf, Goblin, Troll, Undead, Demon, Wizard`). Buckets are
-  voice-categorical, not lore-accurate: gnome -> Goblin, ogre/cyclops -> Troll,
-  vampyre -> Undead, dragon/TzHaar -> Demon.
+- **Race.** The wiki race text is mapped onto a voice bucket. Buckets are
+  voice-categorical, not lore-accurate: ogre/cyclops -> Troll, vampyre -> Undead,
+  dragon/TzHaar -> Demon. Gnomes are kept as their own `Gnome` race (so they can
+  sound country Irish) even though they share the small/high goblin voice timbre.
 - **Gender.** Taken verbatim (`Male`/`Female`); defaults to `Male` only when the
   wiki has none.
 - **Region.** The wiki `leagueRegion` (the NPC's home region) maps to a region

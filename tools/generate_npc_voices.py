@@ -51,6 +51,11 @@ INFOBOX_TEMPLATE = "Template:Infobox NPC"
 DEFAULT_OUT = os.path.join("src", "main", "resources", "npc-voices.json")
 DEFAULT_OVERRIDES = os.path.join("tools", "overrides.json")
 DEFAULT_PROFILES = os.path.join("tools", "profiles.json")
+# Full NPC id -> name dump, used only to cross-reference ids the wiki pages do not
+# list (variants) onto wiki data by name. The wiki remains the source of truth.
+DEFAULT_SUMMARY_URL = (
+    "https://raw.githubusercontent.com/0xNeffarion/osrsreboxed-db/master/docs/npcs-summary.json"
+)
 
 VALID_RACES = {"Human", "Elf", "Dwarf", "Goblin", "Gnome", "Troll", "Undead", "Demon", "Wizard"}
 VALID_GENDERS = {"Male", "Female"}
@@ -227,27 +232,74 @@ def fetch_infoboxes(titles, batch=50):
         time.sleep(0.2)
 
 
+def normalize_name(name):
+    """Lower-cased, disambiguation-stripped name for cross-referencing the id dump."""
+    if not name:
+        return ""
+    name = re.sub(r"\(.*?\)", "", name)
+    return re.sub(r"\s+", " ", name).strip().lower()
+
+
+def iter_summary(summary):
+    """Yield (npc_id:int, name:str) from a full id -> name NPC dump."""
+    records = summary.values() if isinstance(summary, dict) else summary
+    for entry in records:
+        if not isinstance(entry, dict):
+            continue
+        try:
+            npc_id = int(entry.get("id"))
+        except (TypeError, ValueError):
+            continue
+        name = entry.get("name") or ""
+        if name and name.lower() != "null":
+            yield npc_id, name
+
+
+def fetch_json_url(url):
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(req, timeout=120) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
 def build_table_from_wiki(limit=None):
+    """Build the id -> {race, gender, region} table and a name -> entry map from the wiki."""
     titles = enumerate_npc_pages(limit=limit)
     print(f"Enumerated {len(titles)} NPC pages from the wiki", file=sys.stderr)
     table = {}
+    name_map = {}
     pages_with_ids = 0
-    for _title, wikitext in fetch_infoboxes(titles):
+    for title, wikitext in fetch_infoboxes(titles):
         ids = parse_ids(wikitext)
-        if not ids:
-            continue
-        pages_with_ids += 1
-        race = bucket_for_race(first_field(wikitext, "race"))
+        race = bucket_for_race(first_field(wikitext, "race")) or "Human"
         gender = normalise_gender(first_field(wikitext, "gender"))
         region = region_key(
             first_field(wikitext, "leagueRegion"), first_field(wikitext, "location"))
-        for npc_id in ids:
-            entry = {"race": race, "gender": gender}
-            if region:
-                entry["region"] = region
-            # First page to claim an id wins; overrides fix any conflict later.
-            table.setdefault(npc_id, entry)
-    return table, len(titles), pages_with_ids
+        entry = {"race": race, "gender": gender}
+        if region:
+            entry["region"] = region
+        # First page to claim a name wins, so the canonical NPC page beats a stray transclusion.
+        key = normalize_name(title)
+        if key and key not in name_map:
+            name_map[key] = entry
+        if ids:
+            pages_with_ids += 1
+            for npc_id in ids:
+                table.setdefault(npc_id, entry)
+    return table, len(titles), pages_with_ids, name_map
+
+
+def fill_from_summary(table, name_map, summary):
+    """Cover ids the wiki pages don't list by matching a full id -> name dump to the wiki
+    data by name. Catches variant ids whose name still resolves to a documented NPC."""
+    filled = 0
+    for npc_id, name in iter_summary(summary):
+        if npc_id in table:
+            continue
+        entry = name_map.get(normalize_name(name))
+        if entry:
+            table[npc_id] = entry
+            filled += 1
+    return filled
 
 
 def apply_overrides(table, overrides):
@@ -296,6 +348,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--overrides", default=DEFAULT_OVERRIDES)
     parser.add_argument("--profiles", default=DEFAULT_PROFILES)
+    parser.add_argument("--summary", default=DEFAULT_SUMMARY_URL,
+                        help="Full id->name NPC dump (URL) for name cross-reference; '' to skip.")
     parser.add_argument("--out", default=DEFAULT_OUT)
     parser.add_argument("--limit", type=int, default=None,
                         help="Cap the number of NPC pages (for quick test runs).")
@@ -304,7 +358,16 @@ def main():
     profiles = validate_profiles(load_json(args.profiles))
     overrides = load_json(args.overrides)
 
-    table, page_count, pages_with_ids = build_table_from_wiki(limit=args.limit)
+    table, page_count, pages_with_ids, name_map = build_table_from_wiki(limit=args.limit)
+    name_matched = 0
+    if args.summary:
+        try:
+            summary = fetch_json_url(args.summary)
+            name_matched = fill_from_summary(table, name_map, summary)
+            print(f"  name cross-ref covered {name_matched} extra ids from the id dump",
+                  file=sys.stderr)
+        except Exception as exc:  # noqa: BLE001 - tooling, surface and continue
+            print(f"  (skipping name cross-ref: {exc})", file=sys.stderr)
     override_count = apply_overrides(table, overrides)
 
     npcs = {str(npc_id): table[npc_id] for npc_id in sorted(table)}
@@ -324,10 +387,12 @@ def main():
                            "(Infobox NPC). Do not hand-edit; edit tools/overrides.json or "
                            "tools/profiles.json and regenerate.",
             "schema": "npcs[id] = { race, gender, region? }",
-            "source": "oldschool.runescape.wiki Infobox NPC (race/gender/leagueRegion/location) "
+            "source": "oldschool.runescape.wiki Infobox NPC (race/gender/leagueRegion/location), "
+                      "cross-referenced by name against a full id dump for variant ids, "
                       "+ curated tools/overrides.json; profiles from tools/profiles.json.",
             "npc_pages": page_count,
             "count": len(npcs),
+            "name_matched_ids": name_matched,
             "overrides_applied": override_count,
             "race_counts": dict(sorted(race_counts.items())),
             "gender_counts": dict(sorted(gender_counts.items())),

@@ -10,7 +10,6 @@ import com.grahambartley.synthesis.VoiceSpec;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
-import net.runelite.api.NPCComposition;
 
 /**
  * Resolves an NPC (or the player) to a backend-neutral {@link VoiceSpec} and, for the local Kokoro
@@ -211,14 +210,14 @@ public class VoiceManager {
     String region = null;
     NPC npc = findNPCByName(npcName);
     if (npc != null) {
-      NPCComposition composition = npc.getComposition();
-      if (composition != null) {
-        npcId = composition.getId();
-      }
+      npcId = npc.getId();
       NPCAttributes attributes = demographicAnalyzer.analyzeNPC(npc);
       if (attributes != null) {
         race = attributes.getRace();
         region = attributes.getRegion();
+        // The id the analyzer actually matched (active or base), so a bespoke byId profile keyed by
+        // the wiki id resolves even for transformed multiloc NPCs.
+        npcId = attributes.getNpcId();
       }
     }
 
@@ -385,8 +384,8 @@ public class VoiceManager {
     // An NPC unknown to the bundled table (and the learned cache) triggers a one-off background
     // wiki
     // lookup when the fallback is enabled, so the next line voices it correctly. No-op otherwise.
-    if (race == NPCRace.UNKNOWN && learningService != null && npc.getComposition() != null) {
-      learningService.considerLearning(npc.getComposition().getId(), npcName);
+    if (race == NPCRace.UNKNOWN && learningService != null) {
+      learningService.considerLearning(npc.getId(), npcName);
     }
 
     // An unrecognised race falls back rather than silently borrowing the human voice, so the
