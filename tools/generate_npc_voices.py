@@ -79,11 +79,11 @@ DEFAULT_SUMMARY_URL = (
     "https://raw.githubusercontent.com/0xNeffarion/osrsreboxed-db/master/docs/npcs-summary.json"
 )
 
-VALID_RACES = {"Human", "Elf", "Dwarf", "Goblin", "Gnome", "Troll", "Undead", "Demon", "Wizard"}
+VALID_RACES = {"Human", "Elf", "Dwarf", "Goblin", "Gnome", "Monkey", "Troll", "Undead", "Demon", "Wizard"}
 VALID_GENDERS = {"Male", "Female"}
 PROFILE_FIELDS = {"name", "accent", "style", "pace"}
 
-# Wiki race text -> the eight voice buckets (VoiceProfile). Buckets are
+# Wiki race text -> the nine voice buckets (VoiceProfile). Buckets are
 # voice-categorical, not lore-accurate: lore-distinct creatures map to the
 # closest available voice (gnome -> Goblin, ogre/cyclops -> Troll, vampyre ->
 # Undead, dragon/TzHaar -> Demon). Checked in order, first hit wins.
@@ -96,6 +96,7 @@ RACE_BUCKET_RULES = [
     (r"dwarf|dwarven", "Dwarf"),
     (r"\belf\b|\belves\b|elven|gnome elf", "Elf"),
     (r"troll|\bgiant\b|cyclops|ogre|\bent\b|\bgolem\b|\bhuman.*giant", "Troll"),
+    (r"monkey|gorilla|primate|baboon|mandril", "Monkey"),
     (r"\bhuman\b|\bman\b|\bwoman\b|\bgnome child\b", "Human"),
 ]
 RACE_BUCKET_RULES = [(re.compile(p, re.IGNORECASE), b) for p, b in RACE_BUCKET_RULES]

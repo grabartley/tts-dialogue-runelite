@@ -58,7 +58,7 @@ public class VoiceManagerTest {
     for (VoiceProfile voice : VoiceProfile.values()) {
       ids.add(voice.getSpeakerId());
     }
-    assertEquals("each race/gender category must map to a unique Kokoro speaker", 18, ids.size());
+    assertEquals("each race/gender category must map to a unique Kokoro speaker", 20, ids.size());
     assertEquals(VoiceProfile.values().length, ids.size());
   }
 

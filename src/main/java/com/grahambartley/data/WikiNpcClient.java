@@ -169,6 +169,9 @@ public final class WikiNpcClient {
     if (t.matches(".*(goblin|hobgoblin).*")) {
       return "Goblin";
     }
+    if (t.matches(".*(monkey|gorilla|primate|baboon|mandril).*")) {
+      return "Monkey";
+    }
     if (t.matches(".*(dwarf|dwarven).*")) {
       return "Dwarf";
     }

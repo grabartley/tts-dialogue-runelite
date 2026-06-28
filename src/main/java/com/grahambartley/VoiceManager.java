@@ -29,6 +29,7 @@ public class VoiceManager {
     ELF,
     DWARF,
     GOBLIN,
+    MONKEY,
     TROLL,
     UNDEAD,
     DEMON,
@@ -70,6 +71,10 @@ public class VoiceManager {
     // Goblin voices (small, crude) - lighter, mischievous
     GOBLIN_MALE(18, "am_puck", "Goblin Male", NPCRace.GOBLIN, NPCGender.MALE),
     GOBLIN_FEMALE(10, "af_sky", "Goblin Female", NPCRace.GOBLIN, NPCGender.FEMALE),
+
+    // Monkey voices (small, quick, chattery) - bright, energetic
+    MONKEY_MALE(15, "am_liam", "Monkey Male", NPCRace.MONKEY, NPCGender.MALE),
+    MONKEY_FEMALE(4, "af_jessica", "Monkey Female", NPCRace.MONKEY, NPCGender.FEMALE),
 
     // Troll voices (big, deep, primitive)
     TROLL_MALE(17, "am_onyx", "Troll Male", NPCRace.TROLL, NPCGender.MALE),
@@ -515,6 +520,8 @@ public class VoiceManager {
         return female ? VoiceProfile.DWARF_FEMALE : VoiceProfile.DWARF_MALE;
       case GOBLIN:
         return female ? VoiceProfile.GOBLIN_FEMALE : VoiceProfile.GOBLIN_MALE;
+      case MONKEY:
+        return female ? VoiceProfile.MONKEY_FEMALE : VoiceProfile.MONKEY_MALE;
       case TROLL:
         return female ? VoiceProfile.TROLL_FEMALE : VoiceProfile.TROLL_MALE;
       case UNDEAD:
