@@ -43,6 +43,20 @@ public class TTSDialoguePluginConfigChangeTest {
   }
 
   /**
+   * First-run onboarding decision: show the guide on a fresh install (flag unset or false) and stay
+   * quiet once it has been seen.
+   */
+  @Test
+  public void shouldShowOnboardingOnlyUntilSeen() {
+    assertTrue(
+        "fresh install (flag never set) shows the guide",
+        TTSDialoguePlugin.shouldShowOnboarding(null));
+    assertTrue(
+        "flag explicitly false shows the guide", TTSDialoguePlugin.shouldShowOnboarding(false));
+    assertFalse("flag true suppresses the guide", TTSDialoguePlugin.shouldShowOnboarding(true));
+  }
+
+  /**
    * A backend-key change in the plugin group drives the real off-thread pipeline end to end: {@code
    * prewarm} -> executor -> {@code warmUpActive} -> the selected (non-Kokoro) backend's {@code
    * warmUp}, exactly once.

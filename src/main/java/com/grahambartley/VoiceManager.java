@@ -133,6 +133,35 @@ public class VoiceManager {
   }
 
   /**
+   * The two selectable player voices, kept deliberately opaque ("Type A" / "Type B") so the config
+   * exposes a simple either/or instead of the full {@link VoiceProfile} bank. Each maps to one of
+   * the two human player {@link VoiceProfile} speakers, which in turn fixes the player's gender for
+   * voice resolution on both backends.
+   */
+  public enum PlayerVoice {
+    TYPE_A(VoiceProfile.PLAYER_MALE, "Type A"),
+    TYPE_B(VoiceProfile.PLAYER_FEMALE, "Type B");
+
+    private final VoiceProfile voiceProfile;
+    private final String label;
+
+    PlayerVoice(VoiceProfile voiceProfile, String label) {
+      this.voiceProfile = voiceProfile;
+      this.label = label;
+    }
+
+    /** The underlying Kokoro speaker and gender this player voice resolves to. */
+    public VoiceProfile getVoiceProfile() {
+      return voiceProfile;
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
+  }
+
+  /**
    * Gender-appropriate Kokoro speaker pools for per-NPC voice variety (issue #78). Built once from
    * the {@link VoiceProfile} bank so they can only ever contain gender-correct, in-range English
    * voices: the male pool is every distinct {@code am_}/{@code bm_} NPC speaker, the female pool
@@ -201,9 +230,7 @@ public class VoiceManager {
     if ("player".equalsIgnoreCase(speaker)) {
       CharacterProfile profile =
           profileTable.resolvePlayer(
-              config.playerProfileAccent(),
-              config.playerProfileStyle(),
-              config.playerProfilePace());
+              config.playerAccent(), config.playerPersona(), config.playerPace());
       if (config.debugMode()) {
         log.info("[TTS profile] player -> '{}' accent='{}'", profile.name(), profile.accent());
       }
@@ -244,20 +271,14 @@ public class VoiceManager {
 
   /**
    * Resolves a backend-neutral {@link VoiceSpec} for a line of dialogue. The player uses the gender
-   * of the configured player voice; NPCs use their race/gender voice when automatic voices are
-   * enabled, otherwise the default NPC voice.
+   * of the configured player voice; NPCs use their per-NPC race/gender voice.
    */
   public VoiceSpec resolveVoice(String speaker, String npcName) {
     if ("player".equalsIgnoreCase(speaker)) {
       if (config != null && config.debugMode()) {
-        log.info(buildPlayerTrace(config.playerVoice()));
+        log.info(buildPlayerTrace(config.playerVoice().getVoiceProfile()));
       }
       return VoiceSpec.player(playerGender());
-    }
-    if (!config.enableRaceBasedVoices()) {
-      // Automatic voices off: every NPC uses the single default voice, no per-NPC variety.
-      VoiceProfile profile = getDefaultNPCVoice();
-      return VoiceSpec.npc(profile.getRace(), profile.getGender());
     }
     NpcVoice resolved = resolveNpcVoice(npcName);
     // Stamp the per-NPC Kokoro speaker (issue #78) onto the spec so it rides the wire and the cache
@@ -317,9 +338,9 @@ public class VoiceManager {
     return pool[Math.floorMod(hash, pool.length)];
   }
 
-  /** Gender implied by the configured player voice profile. */
+  /** Gender implied by the configured player voice. */
   private NPCGender playerGender() {
-    return config.playerVoice().getGender();
+    return config.playerVoice().getVoiceProfile().getGender();
   }
 
   /**

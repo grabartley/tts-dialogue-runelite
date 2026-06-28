@@ -35,7 +35,7 @@ public class OpenRouterTtsBackendTest {
     int maxChars = 600;
     int speedPercent = 100;
     String language = "English";
-    TTSDialogueConfig.GlobalQuirk quirk = TTSDialogueConfig.GlobalQuirk.NONE;
+    TTSDialogueConfig.SpeakingStyle quirk = TTSDialogueConfig.SpeakingStyle.NONE;
 
     @Override
     public String openRouterApiKey() {
@@ -43,22 +43,22 @@ public class OpenRouterTtsBackendTest {
     }
 
     @Override
-    public int maxCloudCharsPerLine() {
+    public int cloudMaxChars() {
       return maxChars;
     }
 
     @Override
-    public int cloudSpeedPercent() {
+    public int cloudPace() {
       return speedPercent;
     }
 
     @Override
-    public String targetLanguage() {
+    public String cloudLanguage() {
       return language;
     }
 
     @Override
-    public TTSDialogueConfig.GlobalQuirk globalQuirk() {
+    public TTSDialogueConfig.SpeakingStyle cloudSpeakingStyle() {
       return quirk;
     }
   }
@@ -487,19 +487,19 @@ public class OpenRouterTtsBackendTest {
     assertEquals(
         "no quirk leaves the language untouched",
         "English",
-        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.GlobalQuirk.NONE));
+        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.SpeakingStyle.NONE));
     assertEquals(
         "a quirk on English becomes a styled English target",
         "English Gen Z slang",
-        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.GlobalQuirk.GEN_Z));
+        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.SpeakingStyle.GEN_Z));
     assertEquals(
         "a quirk layers onto a non-English language too",
         "French pirate speak",
-        OpenRouterTtsBackend.combineLanguage("French", TTSDialogueConfig.GlobalQuirk.PIRATE));
+        OpenRouterTtsBackend.combineLanguage("French", TTSDialogueConfig.SpeakingStyle.PIRATE));
     assertEquals(
         "a blank language defaults to English before the quirk",
         "English Gen Z slang",
-        OpenRouterTtsBackend.combineLanguage("  ", TTSDialogueConfig.GlobalQuirk.GEN_Z));
+        OpenRouterTtsBackend.combineLanguage("  ", TTSDialogueConfig.SpeakingStyle.GEN_Z));
   }
 
   @Test
@@ -508,7 +508,7 @@ public class OpenRouterTtsBackendTest {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
     config.language = "English";
-    config.quirk = TTSDialogueConfig.GlobalQuirk.GEN_Z;
+    config.quirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
     // Even with English as the base, the quirk forces the translation hop; it is served first.
     server.enqueue(
         new MockResponse().setResponseCode(200).setBody(chatResponse("no cap, well met")));
@@ -552,7 +552,7 @@ public class OpenRouterTtsBackendTest {
     String plain = backend.cacheVariant(line);
     assertFalse("plain English with no quirk adds no language fragment", plain.contains("|l"));
 
-    config.quirk = TTSDialogueConfig.GlobalQuirk.GEN_Z;
+    config.quirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
     assertNotEquals(
         "a quirk must not collide with the unquirked line", plain, backend.cacheVariant(line));
   }
@@ -620,7 +620,7 @@ public class OpenRouterTtsBackendTest {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
     config.language = "French";
-    config.quirk = TTSDialogueConfig.GlobalQuirk.GEN_Z;
+    config.quirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
     // A skip-translation line bypasses the hop entirely, so only the speech call is enqueued.
     server.enqueue(
         new MockResponse()

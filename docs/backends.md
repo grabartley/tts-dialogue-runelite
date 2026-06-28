@@ -46,7 +46,7 @@ Because the cloud backend is billed per character, several guards keep cost boun
   voice, pace, profile, or language change therefore never replays the wrong audio, while a short
   English line stays on a stable key so changing a setting that cannot affect it does not force a
   needless re-bill.
-- **Per-line character cap.** When **Max Cloud Characters** is a positive value, each line is
+- **Per-line character cap.** When **Max Characters Per Line** is a positive value, each line is
   truncated to it at a sentence boundary, or a word boundary if there is none, before sending. `0`
   (the default) sends the whole line uncapped. OSRS lines are short, so a cap only bounds pathological
   cases.
@@ -55,7 +55,7 @@ Because the cloud backend is billed per character, several guards keep cost boun
 - **Timeout and stale-drop.** Cloud calls carry a 10-second `callTimeout` so a hung request cannot pin
   the single synthesis thread, and the pipeline's epoch check drops any response that arrives after the
   dialogue has advanced, so stale audio never plays late.
-- **Speaking pace.** **Cloud Speaking Pace** is sent as the OpenRouter `speed` parameter only when it
+- **Speaking pace.** **Speaking Pace** is sent as the OpenRouter `speed` parameter only when it
   is not 100%, so the default request body is unchanged; the active model may ignore it.
 - **Keepalive connection.** The backend reuses one long-lived client derived from the injected one
   (an 8-connection 5-minute keepalive pool, a 2s connect and 15s read budget), so back-to-back lines
@@ -81,7 +81,7 @@ Beyond per-line guards, two larger levers cut perceived latency and broaden reac
   which shares the in-flight dedup and both cache tiers but never plays audio or touches the playback
   epoch. A small fixed pool caps it at two requests in flight, a per-conversation cap bounds spend,
   already-cached lines are skipped, and leaving the node cancels still-queued prefetches. Gated by
-  **Prefetch Dialogue Audio**.
+  **Prefetch Dialogue**.
 - **Optional translation.** With **Spoken Language** set to anything but English, `OpenRouterTranslator`
   translates each line through `google/gemini-3.1-flash-lite-preview` (a fixed per-language system
   prompt for prompt-cache stability, preserving names and RuneScape terms) before the speech call,
@@ -90,11 +90,11 @@ Beyond per-line guards, two larger levers cut perceived latency and broaden reac
   language/quirk; a failed translation fails the line gracefully rather than voicing the wrong
   language. **Spoken Language** is free text (any name; a recognised one gets a `language_code`, an
   unrecognised one omits the optional code and lets the model detect language from the text).
-- **Global Quirk.** An optional language-agnostic delivery register (Gen Z slang, pirate speak,
+- **Speaking Style.** An optional language-agnostic delivery register (Gen Z slang, pirate speak,
   formal, and so on) is appended to the spoken language, so the translation hop rewrites every line
   in that style. It routes through the hop even for English, and composes with any language.
 
-The translation model is invoked only when there is something for it to do. With **Global Quirk** on
+The translation model is invoked only when there is something for it to do. With **Speaking Style** on
 `None` and **Spoken Language** English (or blank), the effective target is plain English, so the
 line bypasses the model entirely and the source text goes straight to speech: no chat-completions
 request, no added latency or cost. Setting a non-English language, a quirk, or both is what turns

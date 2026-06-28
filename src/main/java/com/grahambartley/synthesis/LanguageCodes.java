@@ -3,7 +3,7 @@ package com.grahambartley.synthesis;
 import java.util.Map;
 
 /**
- * Maps a human language name (the {@code targetLanguage} config value, e.g. {@code "French"}) to a
+ * Maps a human language name (the {@code cloudLanguage} config value, e.g. {@code "French"}) to a
  * BCP-47 code for the TTS {@code language_code} parameter, so a translated line is pronounced in
  * its own language rather than mis-read with an English phoneme set.
  *

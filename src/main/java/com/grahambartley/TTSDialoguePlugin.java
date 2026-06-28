@@ -34,6 +34,7 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.RuneLite;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -79,6 +80,25 @@ public class TTSDialoguePlugin extends Plugin {
 
   @Inject private Gson gson;
 
+  @Inject private ConfigManager configManager;
+
+  @Inject private ClientThread clientThread;
+
+  /**
+   * Hidden persisted flag marking that the first-run onboarding guide has been shown, so it appears
+   * exactly once ever rather than every login. Not a {@link ConfigItem} (nothing for the user to
+   * toggle); read and set directly through {@link ConfigManager}.
+   */
+  static final String ONBOARDING_SEEN_KEY = "onboardingSeen";
+
+  /** Chat-markup hex colour for plugin notices, so they stand out red from ordinary game chat. */
+  private static final String CHAT_NOTICE_COLOR = "ff3333";
+
+  /**
+   * Per-session guard so the onboarding check runs at most once per plugin lifetime, not per tick.
+   */
+  private boolean onboardingChecked;
+
   private String lastSpoken = "";
 
   /**
@@ -110,7 +130,7 @@ public class TTSDialoguePlugin extends Plugin {
   /**
    * Warms the audio cache for the dialogue options the player can currently see, so the line picked
    * next plays from cache. Off-thread behind {@link DialogueAudioService#prefetch}; gated by {@code
-   * enablePrefetch}; reset on dialogue close. Null until {@link #startUp}.
+   * prefetch}; reset on dialogue close. Null until {@link #startUp}.
    */
   private DialoguePrefetcher prefetcher;
 
@@ -138,7 +158,7 @@ public class TTSDialoguePlugin extends Plugin {
             new WikiNpcClient(okHttpClient, gson),
             learnedStore,
             wikiExecutor,
-            config::wikiLookupFallback);
+            config::autoLearnNewNpcs);
     voiceManager.enableLearning(learnedStore, learningService);
     // The local Kokoro backend now runs the engine as an external --stdio process. The installer
     // resolves the per-OS bundle from the bundled manifest and downloads it (off the game thread,
@@ -160,7 +180,7 @@ public class TTSDialoguePlugin extends Plugin {
     // config.
     DiskAudioCache diskCache =
         config.persistentCache()
-            ? new DiskAudioCache(ttsDir.resolve("cache"), config.diskCacheMaxMiB() * 1024L * 1024)
+            ? new DiskAudioCache(ttsDir.resolve("cache"), config.cacheSizeLimitMiB() * 1024L * 1024)
             : null;
     audioService =
         new DialogueAudioService(
@@ -176,10 +196,10 @@ public class TTSDialoguePlugin extends Plugin {
     audioService.prewarm(backendProvider::warmUpActive);
     // Speculative prefetch warms the cache for the dialogue options the player can see; it shares
     // the audio service's dedup and both cache tiers, runs off the game thread, and is gated by the
-    // enablePrefetch config (read live, so toggling it takes effect immediately).
+    // prefetch config (read live, so toggling it takes effect immediately).
     prefetcher =
         new DialoguePrefetcher(
-            audioService::prefetch, audioService::cancelPrefetch, config::enablePrefetch);
+            audioService::prefetch, audioService::cancelPrefetch, config::prefetch);
 
     log.info("TTSDialogue started");
   }
@@ -203,11 +223,56 @@ public class TTSDialoguePlugin extends Plugin {
   }
 
   /**
-   * Surfaces a one-time cloud-backend failure notice to the player. Logged at warn so it appears in
-   * the client log without a chat dependency; the message text is already user-facing.
+   * Surfaces a one-time cloud-backend notice (e.g. "add an OpenRouter API key") to the player. The
+   * message text is already user-facing: logged at warn for the client log, and echoed into game
+   * chat so a player who never opens the log still sees it. Fired from a backend thread, so the
+   * chat write is hopped onto the client thread.
    */
   private void notifyBackend(String message) {
     log.warn(message);
+    clientThread.invokeLater(() -> addGameMessage(message));
+  }
+
+  /**
+   * Shows the first-run onboarding guide exactly once, gated by the persisted {@link
+   * #ONBOARDING_SEEN_KEY} flag and a per-session guard. Called from {@link #onGameTick}, so it runs
+   * on the game thread with a live client; the chat write is therefore safe without a thread hop.
+   */
+  private void maybeShowOnboarding() {
+    if (onboardingChecked) {
+      return;
+    }
+    onboardingChecked = true;
+    Boolean seen = configManager.getConfiguration(CONFIG_GROUP, ONBOARDING_SEEN_KEY, Boolean.class);
+    if (!shouldShowOnboarding(seen)) {
+      return;
+    }
+    addGameMessage(
+        "Voiced Dialogue is on. The Cloud voice (recommended) needs a free OpenRouter API key: get"
+            + " one at openrouter.ai and paste it into the plugin's Cloud Voice settings. While Cloud"
+            + " is active your dialogue text is sent to OpenRouter to be voiced. Prefer to stay"
+            + " offline? Set Voice Backend to Local for a free, no-key voice (basic and"
+            + " neutral-only).");
+    configManager.setConfiguration(CONFIG_GROUP, ONBOARDING_SEEN_KEY, true);
+  }
+
+  /**
+   * Pure decision for {@link #maybeShowOnboarding}: show the guide unless the persisted seen flag
+   * is already true. A {@code null} flag (never set) means a fresh install, so the guide shows.
+   * Package-private so it is unit-testable without RuneLite injection.
+   */
+  static boolean shouldShowOnboarding(Boolean seenFlag) {
+    return !Boolean.TRUE.equals(seenFlag);
+  }
+
+  /**
+   * Posts a single red, plugin-tagged notice into the game chat box. Red marks it as a plugin
+   * notice that stands out from ordinary dialogue and game spam. Must be called on the client
+   * thread.
+   */
+  private void addGameMessage(String message) {
+    String line = "<col=" + CHAT_NOTICE_COLOR + ">[Voiced Dialogue] " + message + "</col>";
+    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", line, null);
   }
 
   /**
@@ -216,7 +281,7 @@ public class TTSDialoguePlugin extends Plugin {
    * there is no head); it is resolved to an {@link Emotion} here and ridden into the request.
    */
   private void speakWithTTS(String text, String speaker, String npcName, int headAnimationId) {
-    Emotion emotion = resolveLineEmotion(headAnimationId, config.enableEmotion());
+    Emotion emotion = resolveLineEmotion(headAnimationId, config.cloudEmotion());
     if (config.debugMode()) {
       log.info("[TTS voice] resolved emotion {} for head animation {}", emotion, headAnimationId);
     }
@@ -248,7 +313,7 @@ public class TTSDialoguePlugin extends Plugin {
    * the pre-profile behaviour. Shared by every synthesis path (dialogue, prefetch, public chat).
    */
   private CharacterProfile resolveProfile(String speaker, String npcName) {
-    return config.enableCharacterProfiles() ? voiceManager.resolveProfile(speaker, npcName) : null;
+    return config.cloudCharacterProfiles() ? voiceManager.resolveProfile(speaker, npcName) : null;
   }
 
   /**
@@ -321,6 +386,7 @@ public class TTSDialoguePlugin extends Plugin {
 
   @Subscribe
   public void onGameTick(final GameTick tick) {
+    maybeShowOnboarding();
     Widget npcDialogue = client.getWidget(WidgetInfo.DIALOG_NPC_TEXT);
     if (npcDialogue != null && !npcDialogue.isHidden()) {
       String text = npcDialogue.getText();
@@ -394,7 +460,7 @@ public class TTSDialoguePlugin extends Plugin {
    */
   @Subscribe
   public void onChatMessage(ChatMessage event) {
-    if (!config.enablePlayerPublicChat()) {
+    if (!config.voicePublicChat()) {
       return;
     }
     if (event.getType() != ChatMessageType.PUBLICCHAT) {
@@ -433,7 +499,7 @@ public class TTSDialoguePlugin extends Plugin {
    * throws.
    */
   private void prefetchVisibleOptions(Widget options) {
-    if (audioService == null || prefetcher == null || !config.enablePrefetch()) {
+    if (audioService == null || prefetcher == null || !config.prefetch()) {
       return;
     }
     if (!backendProvider.active().isAvailable()) {

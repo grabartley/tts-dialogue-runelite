@@ -25,7 +25,7 @@ public class TTSDialoguePluginEmotionTest {
     assertEquals(Emotion.NEUTRAL, plugin.resolveLineEmotion(588, true));
   }
 
-  /** The enableEmotion gate forces NEUTRAL even for an id that maps to a real emotion. */
+  /** The emotion gate forces NEUTRAL even for an id that maps to a real emotion. */
   @Test
   public void emotionDisabledForcesNeutral() {
     TTSDialoguePlugin plugin = new TTSDialoguePlugin();
