@@ -21,6 +21,15 @@ public record CharacterProfile(String name, String accent, String style, String 
   static final String TRANSCRIPT_DIVIDER = "#### TRANSCRIPT";
 
   /**
+   * Fixed instruction that leads every rendered block. It tells the model to voice only the
+   * transcript below the divider verbatim and invent no words of its own, which resists a
+   * persona-driven coax toward generating profanity (e.g. a "swears every line" persona) without a
+   * per-line cost. It is a compile-time constant, so it never re-keys Gemini's prompt-cache prefix.
+   */
+  static final String GUARD =
+      "VOICE ONLY THE TRANSCRIPT BELOW THE DIVIDER, WORD FOR WORD. ADD NO WORDS OF YOUR OWN.";
+
+  /**
    * Trailing whitespace is stripped from every field at construction so the rendered direction
    * block is byte-identical across calls for the same profile. That stability is what lets Gemini's
    * implicit prompt cache hit on the leading block (cheaper input, faster prefill) when the same
@@ -45,7 +54,9 @@ public record CharacterProfile(String name, String accent, String style, String 
    * of Style, Accent, and Pace.
    */
   public String renderPromptBlock() {
-    return "AUDIO PROFILE: "
+    return GUARD
+        + "\n\n"
+        + "AUDIO PROFILE: "
         + name
         + "\n\nDIRECTOR'S NOTES:\n- Style: "
         + style

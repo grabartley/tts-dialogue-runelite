@@ -279,7 +279,10 @@ public class OpenRouterTtsBackendTest {
     JsonObject body =
         new JsonParser().parse(server.takeRequest().getBody().readUtf8()).getAsJsonObject();
     String input = body.get("input").getAsString();
-    assertTrue("the AUDIO PROFILE block leads", input.startsWith("AUDIO PROFILE: Troll"));
+    assertTrue(
+        "the static guard line leads the block",
+        input.startsWith("VOICE ONLY THE TRANSCRIPT BELOW THE DIVIDER"));
+    assertTrue("the AUDIO PROFILE block follows the guard", input.contains("AUDIO PROFILE: Troll"));
     assertTrue("the director's notes carry the accent", input.contains("Brixton"));
     assertTrue(
         "the emotion-tagged transcript follows the divider, so the two layers compose",

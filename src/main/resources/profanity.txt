@@ -1,0 +1,62 @@
+# Bundled profanity blocklist for the offline ProfanityFilter.
+# One entry per line. Lines starting with '#' and blank lines are ignored.
+# Entries are matched in normalized space: lowercase, leetspeak-folded, separators
+# stripped (see ProfanityFilter.normalize), and matched whole-token, so place names
+# and lore words that merely contain a listed substring (Scunthorpe, assassin, Sussex)
+# are never masked. Keep entries as single normalized tokens; phrases do not match.
+# Seeded from the curated LDNOOBW open list, trimmed to terms a fantasy NPC line or
+# player chat could realistically carry. Bias is toward fewer false positives.
+
+# core profanity
+arse
+arsehole
+ass
+asshole
+bastard
+bitch
+bollocks
+bullshit
+bugger
+cock
+crap
+cunt
+damn
+dick
+dickhead
+dipshit
+dumbass
+fuck
+fucker
+fucking
+goddamn
+jackass
+jerkoff
+motherfucker
+piss
+prick
+pussy
+shit
+shite
+shitty
+slut
+twat
+wank
+wanker
+whore
+
+# slurs (voicing these is the moderation risk the filter exists to neutralize)
+chink
+coon
+dyke
+fag
+faggot
+gook
+kike
+nigga
+nigger
+paki
+retard
+retarded
+spastic
+spic
+tranny

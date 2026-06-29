@@ -74,6 +74,10 @@ Per-NPC expression heads (e.g. `lore_lizard_chat_happy` 4843, `peng_chat_sad` 56
 
 </details>
 
+## Safety
+
+Profanity filtering is always on, for everyone, with no toggle and no opt-out. Every spoken line (NPC dialogue, your own dialogue options, and other players' public chat) is run through a bundled, offline wordlist that bleeps profanity and slurs to asterisks before synthesis, on both backends; matching normalizes common evasions like leetspeak and inserted separators, while whole-word matching leaves lore words that merely contain a flagged substring untouched. The three free-text profile fields you can type (**Your Accent**, **Your Persona**, **Your Pace**) are additionally neutralized so they cannot inject newlines or a forged direction block into the cloud prompt, and every cloud line is led by a fixed instruction telling the model to voice only the transcript verbatim. All of this is local, single-pass, and adds no network call and no perceptible latency, so the prompt cache still hits exactly as before.
+
 ## Voices
 
 Each NPC's voice is chosen by race and gender, and the player has a dedicated voice. Race and gender come from a static, precomputed `npcId -> {race, gender}` lookup table bundled with the plugin, so choosing a voice at runtime is a single in-memory lookup with no network calls. The matrix spans eleven races across two genders plus player voices, and each category maps to a distinct speaker so they sound genuinely different.

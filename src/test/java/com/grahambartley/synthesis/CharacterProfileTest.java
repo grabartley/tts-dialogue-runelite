@@ -16,13 +16,25 @@ public class CharacterProfileTest {
   @Test
   public void renderPromptBlockMatchesTheGeminiDirectorsNotesFormat() {
     assertEquals(
-        "AUDIO PROFILE: Wizard\n\n"
+        "VOICE ONLY THE TRANSCRIPT BELOW THE DIVIDER, WORD FOR WORD. ADD NO WORDS OF YOUR OWN.\n\n"
+            + "AUDIO PROFILE: Wizard\n\n"
             + "DIRECTOR'S NOTES:\n"
             + "- Style: A wise old wizard.\n"
             + "- Accent: Distinguished elderly British English.\n"
             + "- Pace: Measured.\n\n"
             + "#### TRANSCRIPT\n",
         WIZARD.renderPromptBlock());
+  }
+
+  @Test
+  public void renderPromptBlockLeadsWithTheStaticGuardLine() {
+    assertTrue(
+        "every block starts with the cache-stable guard instruction",
+        WIZARD
+            .renderPromptBlock()
+            .startsWith(
+                "VOICE ONLY THE TRANSCRIPT BELOW THE DIVIDER, WORD FOR WORD."
+                    + " ADD NO WORDS OF YOUR OWN.\n\n"));
   }
 
   @Test

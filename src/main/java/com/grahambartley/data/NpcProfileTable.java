@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.grahambartley.synthesis.CharacterProfile;
+import com.grahambartley.synthesis.DirectionSanitizer;
+import com.grahambartley.synthesis.ProfanityFilter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -60,6 +62,13 @@ public final class NpcProfileTable {
 
   /** An ordered keyword rule: the layer applies when any keyword word-matches the display name. */
   private record CategoryRule(String id, List<String> keywords, Layer layer) {}
+
+  /**
+   * Neutralizes the three free-text player direction fields (injection break-out + profanity)
+   * before they are baked into the player {@link CharacterProfile}. Unconditional, no toggle.
+   */
+  private final DirectionSanitizer directionSanitizer =
+      new DirectionSanitizer(new ProfanityFilter());
 
   private CharacterProfile defaultProfile = BUILTIN_DEFAULT;
   private Layer playerLayer = null;
@@ -234,16 +243,26 @@ public final class NpcProfileTable {
 
   /**
    * Resolves the player's profile: the {@code player} layer over the default, then the three
-   * configured fields overriding when non-blank. The player's name label is never overridden by
-   * config.
+   * configured fields overriding when non-blank. Each configured field is run through {@link
+   * DirectionSanitizer} first, so newline/marker injection and profanity can never reach the
+   * prompt; a field that sanitizes down to blank falls back to the layer default rather than
+   * emitting an empty direction. The player's name label is never overridden by config.
    */
   public CharacterProfile resolvePlayer(String accent, String style, String pace) {
     CharacterProfile base = apply(defaultProfile, playerLayer);
     return new CharacterProfile(
         base.name(),
-        isBlank(accent) ? base.accent() : accent.trim(),
-        isBlank(style) ? base.style() : style.trim(),
-        isBlank(pace) ? base.pace() : pace.trim());
+        sanitizedOr(accent, base.accent()),
+        sanitizedOr(style, base.style()),
+        sanitizedOr(pace, base.pace()));
+  }
+
+  private String sanitizedOr(String configured, String fallback) {
+    if (isBlank(configured)) {
+      return fallback;
+    }
+    String sanitized = directionSanitizer.sanitize(configured);
+    return isBlank(sanitized) ? fallback : sanitized;
   }
 
   /** Whether the bundled {@code profiles} section loaded successfully. */
