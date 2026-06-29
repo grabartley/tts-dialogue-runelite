@@ -6,16 +6,16 @@
     "npc_pages": 5899,
     "count": 13663,
     "name_matched_ids": 713,
-    "overrides_applied": 730,
+    "overrides_applied": 737,
     "race_counts": {
       "Demon": 753,
       "Dwarf": 517,
       "Elf": 333,
       "Gnome": 263,
       "Goblin": 334,
-      "Gorilla": 4,
-      "Human": 10118,
-      "Monkey": 64,
+      "Gorilla": 11,
+      "Human": 10116,
+      "Monkey": 59,
       "Troll": 451,
       "Undead": 819,
       "Wizard": 7
@@ -28,7 +28,7 @@
       "asgarnia": 569,
       "easternlands": 2,
       "fremennik": 634,
-      "kandarin": 1068,
+      "kandarin": 1070,
       "karamja": 184,
       "kharidian": 522,
       "kourend": 796,
@@ -41200,12 +41200,12 @@
       "gender": "Male"
     },
     "5247": {
-      "race": "Monkey",
+      "race": "Gorilla",
       "gender": "Male",
       "ethnicity": "kandarin"
     },
     "5248": {
-      "race": "Monkey",
+      "race": "Gorilla",
       "gender": "Male",
       "ethnicity": "kandarin"
     },
@@ -41235,7 +41235,7 @@
       "ethnicity": "kandarin"
     },
     "5254": {
-      "race": "Monkey",
+      "race": "Gorilla",
       "gender": "Male",
       "ethnicity": "kandarin"
     },
@@ -41335,20 +41335,22 @@
       "gender": "Male"
     },
     "5275": {
-      "race": "Human",
-      "gender": "Male"
+      "race": "Gorilla",
+      "gender": "Male",
+      "ethnicity": "kandarin"
     },
     "5276": {
-      "race": "Human",
-      "gender": "Male"
+      "race": "Gorilla",
+      "gender": "Male",
+      "ethnicity": "kandarin"
     },
     "5277": {
-      "race": "Monkey",
+      "race": "Gorilla",
       "gender": "Male",
       "ethnicity": "kandarin"
     },
     "5278": {
-      "race": "Monkey",
+      "race": "Gorilla",
       "gender": "Male",
       "ethnicity": "kandarin"
     },

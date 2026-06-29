@@ -2,6 +2,13 @@
   "_comment": "Authoritative, hand-curated npcId -> {race, gender} entries. These take precedence over anything the generator infers from the full NPC summary. NPC ids here are RuneLite/OSRS cache ids (the same ids the live client reports via NPCComposition#getId and the osrsreboxed npcs-summary.json), verified against the osrs cache. Add high-traffic named dialogue NPCs whose gender/race cannot be read off the name (Hans, Cook, Bob), and any corrections. Race must be one of: Human, Elf, Dwarf, Goblin, Gnome, Monkey, Gorilla, Troll, Undead, Demon, Wizard. Gender must be Male or Female. The optional 'ethnicity' field sets (or, by omission, clears) the NPC's ethnicity accent: set it to a byEthnicity key to correct where an NPC is from (e.g. Ak-Haranu -> easternlands), or omit it to drop a wrong ethnicity the wiki inferred from where the NPC is found (e.g. a foreigner in Morytania who should not sound Morytanian). The optional 'name' field is documentation only and is ignored by the generator.",
   "npcs": {
     "5263": { "name": "Padulah", "race": "Monkey", "gender": "Male", "ethnicity": "kandarin" },
+    "5254": { "name": "Hafuba", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
+    "5248": { "name": "Aberab", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
+    "5247": { "name": "Trefaji", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
+    "5275": { "name": "Monkey Guard (religious)", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
+    "5276": { "name": "Monkey Guard (trapdoor)", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
+    "5277": { "name": "Elder Guard", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
+    "5278": { "name": "Elder Guard", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
     "1464": { "name": "Gorilla", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
     "1465": { "name": "Bearded gorilla", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
     "7098": { "name": "Tortured gorilla (small)", "race": "Gorilla", "gender": "Male", "ethnicity": "kandarin" },
