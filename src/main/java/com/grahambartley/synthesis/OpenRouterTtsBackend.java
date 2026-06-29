@@ -244,7 +244,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
    * English; the no-op quirk leaves the language untouched.
    */
   String effectiveSpokenLanguage() {
-    return combineLanguage(config.cloudLanguage(), config.cloudSpeakingStyle());
+    return combineLanguage(config.cloudLanguage().label(), config.cloudSpeakingStyle());
   }
 
   /**
@@ -334,15 +334,10 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
         log.info("[TTS cloud] speed {}", speed / 100.0);
       }
     }
-    // A translated line gets a BCP-47 language_code from the base language (not the quirk) when we
-    // can map the name, so the voice pronounces the text natively; an unmapped language omits it
-    // and
-    // lets the model detect language from the transcript.
+    // A translated line gets a BCP-47 language_code from the base language (not the quirk), so the
+    // voice pronounces the text natively rather than mis-reading it with an English phoneme set.
     if (translating) {
-      String code = LanguageCodes.codeFor(config.cloudLanguage());
-      if (code != null) {
-        payload.addProperty("language_code", code);
-      }
+      payload.addProperty("language_code", config.cloudLanguage().code());
     }
     // Route every call to the fastest provider (throughput sort, the :nitro equivalent). Identical
     // block on the translation hop, so routing is consistent.

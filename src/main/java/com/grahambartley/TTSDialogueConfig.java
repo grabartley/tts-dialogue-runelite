@@ -86,6 +86,96 @@ public interface TTSDialogueConfig extends Config {
     }
   }
 
+  /**
+   * The finite set of languages dialogue can be spoken in: the single source of truth for both the
+   * dropdown options and the BCP-47 {@code language_code} sent to the TTS model. Each constant
+   * carries a natural language name (fed verbatim to the translation model as the target language)
+   * and its BCP-47 code (sent so a translated line is pronounced natively rather than mis-read with
+   * an English phoneme set). {@link #ENGLISH} (the default) speaks the original line directly;
+   * every other value routes the line through the translation hop first. Cloud only.
+   */
+  enum SpokenLanguage {
+    ENGLISH("English", "en-US"),
+    BRITISH_ENGLISH("British English", "en-GB"),
+    SPANISH("Spanish", "es-ES"),
+    LATIN_AMERICAN_SPANISH("Latin American Spanish", "es-419"),
+    MEXICAN_SPANISH("Mexican Spanish", "es-MX"),
+    FRENCH("French", "fr-FR"),
+    CANADIAN_FRENCH("Canadian French", "fr-CA"),
+    GERMAN("German", "de-DE"),
+    ITALIAN("Italian", "it-IT"),
+    PORTUGUESE("Portuguese", "pt-PT"),
+    BRAZILIAN_PORTUGUESE("Brazilian Portuguese", "pt-BR"),
+    DUTCH("Dutch", "nl-NL"),
+    POLISH("Polish", "pl-PL"),
+    RUSSIAN("Russian", "ru-RU"),
+    UKRAINIAN("Ukrainian", "uk-UA"),
+    JAPANESE("Japanese", "ja-JP"),
+    KOREAN("Korean", "ko-KR"),
+    CHINESE("Chinese", "zh-CN"),
+    TRADITIONAL_CHINESE("Traditional Chinese", "zh-TW"),
+    CANTONESE("Cantonese", "yue-HK"),
+    ARABIC("Arabic", "ar-XA"),
+    HINDI("Hindi", "hi-IN"),
+    BENGALI("Bengali", "bn-IN"),
+    TAMIL("Tamil", "ta-IN"),
+    TURKISH("Turkish", "tr-TR"),
+    SWEDISH("Swedish", "sv-SE"),
+    NORWEGIAN("Norwegian", "nb-NO"),
+    DANISH("Danish", "da-DK"),
+    FINNISH("Finnish", "fi-FI"),
+    ICELANDIC("Icelandic", "is-IS"),
+    GREEK("Greek", "el-GR"),
+    CZECH("Czech", "cs-CZ"),
+    SLOVAK("Slovak", "sk-SK"),
+    ROMANIAN("Romanian", "ro-RO"),
+    HUNGARIAN("Hungarian", "hu-HU"),
+    BULGARIAN("Bulgarian", "bg-BG"),
+    CROATIAN("Croatian", "hr-HR"),
+    SERBIAN("Serbian", "sr-RS"),
+    CATALAN("Catalan", "ca-ES"),
+    HEBREW("Hebrew", "he-IL"),
+    PERSIAN("Persian", "fa-IR"),
+    VIETNAMESE("Vietnamese", "vi-VN"),
+    THAI("Thai", "th-TH"),
+    INDONESIAN("Indonesian", "id-ID"),
+    MALAY("Malay", "ms-MY"),
+    FILIPINO("Filipino", "fil-PH"),
+    WELSH("Welsh", "cy-GB"),
+    IRISH("Irish", "ga-IE"),
+    LATIN("Latin", "la"),
+    AFRIKAANS("Afrikaans", "af-ZA"),
+    SWAHILI("Swahili", "sw-KE");
+
+    private final String label;
+    private final String code;
+
+    SpokenLanguage(String label, String code) {
+      this.label = label;
+      this.code = code;
+    }
+
+    /** Whether this is English, the no-translation default. */
+    public boolean isEnglish() {
+      return this == ENGLISH;
+    }
+
+    /** The natural language name fed to the translation model as the target language. */
+    public String label() {
+      return label;
+    }
+
+    /** The BCP-47 code sent as {@code language_code} so the line is pronounced natively. */
+    public String code() {
+      return code;
+    }
+
+    @Override
+    public String toString() {
+      return label + " (" + code + ")";
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // General
   // ---------------------------------------------------------------------------
@@ -249,15 +339,14 @@ public interface TTSDialogueConfig extends Config {
       keyName = "cloudLanguage",
       name = "Spoken Language",
       description =
-          "Language dialogue is spoken in. Type any language name (e.g. French, Brazilian"
-              + " Portuguese, Japanese). English (default) speaks the original line directly. Any"
+          "Language dialogue is spoken in. English (default) speaks the original line directly. Any"
               + " other language routes each line through a translation model first, preserving"
               + " names, places, and item terms, then voices the translation. Adds a translation"
               + " request per new line.",
       position = 6,
       section = cloudSection)
-  default String cloudLanguage() {
-    return "English";
+  default SpokenLanguage cloudLanguage() {
+    return SpokenLanguage.ENGLISH;
   }
 
   @ConfigItem(

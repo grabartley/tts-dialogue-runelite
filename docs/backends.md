@@ -88,14 +88,15 @@ Beyond per-line guards, two larger levers cut perceived latency and broaden reac
   which then carries a BCP-47 `language_code` derived from the base language. The language (with any
   quirk) is folded into the cache key, so a line is translated and billed at most once per
   language/quirk; a failed translation fails the line gracefully rather than voicing the wrong
-  language. **Spoken Language** is free text (any name; a recognised one gets a `language_code`, an
-  unrecognised one omits the optional code and lets the model detect language from the text).
+  language. **Spoken Language** is a fixed dropdown (the `SpokenLanguage` enum in `TTSDialogueConfig`,
+  one entry per supported language), so every selection carries a known-good BCP-47 `language_code`;
+  the enum is the single source of truth for both the options and their codes.
 - **Speaking Style.** An optional language-agnostic delivery register (Gen Z slang, pirate speak,
   formal, and so on) is appended to the spoken language, so the translation hop rewrites every line
   in that style. It routes through the hop even for English, and composes with any language.
 
 The translation model is invoked only when there is something for it to do. With **Speaking Style** on
-`None` and **Spoken Language** English (or blank), the effective target is plain English, so the
+`None` and **Spoken Language** English, the effective target is plain English, so the
 line bypasses the model entirely and the source text goes straight to speech: no chat-completions
 request, no added latency or cost. Setting a non-English language, a quirk, or both is what turns
 the hop on.
