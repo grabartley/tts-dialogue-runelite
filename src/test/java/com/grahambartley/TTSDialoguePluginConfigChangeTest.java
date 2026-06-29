@@ -57,6 +57,26 @@ public class TTSDialoguePluginConfigChangeTest {
   }
 
   /**
+   * Missing-cloud-key startup decision: warn only when Cloud is the active backend and its key is
+   * unavailable; a set key or the Local backend stays quiet.
+   */
+  @Test
+  public void shouldWarnMissingCloudKeyOnlyForCloudWithNoKey() {
+    assertTrue(
+        "Cloud with a blank key warns",
+        TTSDialoguePlugin.shouldWarnMissingCloudKey(VoiceBackend.CLOUD, false));
+    assertFalse(
+        "Cloud with a key set stays quiet",
+        TTSDialoguePlugin.shouldWarnMissingCloudKey(VoiceBackend.CLOUD, true));
+    assertFalse(
+        "Local needs no key, so it never warns",
+        TTSDialoguePlugin.shouldWarnMissingCloudKey(VoiceBackend.LOCAL, false));
+    assertFalse(
+        "Local with a key set still never warns",
+        TTSDialoguePlugin.shouldWarnMissingCloudKey(VoiceBackend.LOCAL, true));
+  }
+
+  /**
    * A backend-key change in the plugin group drives the real off-thread pipeline end to end: {@code
    * prewarm} -> executor -> {@code warmUpActive} -> the selected (non-Kokoro) backend's {@code
    * warmUp}, exactly once.

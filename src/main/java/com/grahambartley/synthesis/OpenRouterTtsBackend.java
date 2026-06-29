@@ -97,6 +97,13 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   private static final long BACKOFF_MAX_MILLIS = 30_000;
 
+  /**
+   * User-facing notice shown when Cloud is selected but no API key is set. Shared with the plugin's
+   * startup check so the two paths never drift.
+   */
+  public static final String NO_KEY_NOTICE =
+      "Add an OpenRouter API key to use cloud voices, or switch Voice Backend to Local.";
+
   private final OkHttpClient httpClient;
   private final TTSDialogueConfig config;
   private final Gson gson;
@@ -265,7 +272,8 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   @Override
   public Pcm synthesize(SynthesisRequest request) {
     if (!isAvailable()) {
-      warnOnce("Add an OpenRouter API key to use cloud voices, or switch Voice Backend to Local.");
+      log.debug(NO_KEY_NOTICE);
+      notice.accept(NO_KEY_NOTICE);
       return null;
     }
     String key = config.openRouterApiKey().trim();
