@@ -46,8 +46,8 @@ public class TTSDialogueConfigTest {
   }
 
   @Test
-  public void toStringShowsTheNameAndCodeForDiscoverability() {
-    assertEquals("English (en-US)", SpokenLanguage.ENGLISH.toString());
-    assertEquals("Brazilian Portuguese (pt-BR)", SpokenLanguage.BRAZILIAN_PORTUGUESE.toString());
+  public void toStringShowsTheNameOnlyWithoutTheCode() {
+    assertEquals("English", SpokenLanguage.ENGLISH.toString());
+    assertEquals("Brazilian Portuguese", SpokenLanguage.BRAZILIAN_PORTUGUESE.toString());
   }
 }

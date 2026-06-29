@@ -173,7 +173,7 @@ public interface TTSDialogueConfig extends Config {
 
     @Override
     public String toString() {
-      return label + " (" + code + ")";
+      return label;
     }
   }
 
