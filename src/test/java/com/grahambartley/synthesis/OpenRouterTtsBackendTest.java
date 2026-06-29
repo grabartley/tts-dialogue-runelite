@@ -817,12 +817,35 @@ public class OpenRouterTtsBackendTest {
     TestConfig config = new TestConfig(); // no key
     OpenRouterTtsBackend backend = backend(config);
 
+    String[] last = {null};
     int[] notices = {0};
-    backend.setNotice(msg -> notices[0]++);
+    backend.setNotice(
+        msg -> {
+          notices[0]++;
+          last[0] = msg;
+        });
 
     assertNull(backend.synthesize(req()));
     assertEquals("no HTTP request when unavailable", 0, server.getRequestCount());
-    assertEquals("the missing-key notice fires once", 1, notices[0]);
+    assertEquals("the missing-key notice fires", 1, notices[0]);
+    assertEquals(
+        "it surfaces the shared no-key message", OpenRouterTtsBackend.NO_KEY_NOTICE, last[0]);
+  }
+
+  @Test
+  public void missingKeyNoticeFiresOnEveryAttempt() {
+    TestConfig config = new TestConfig(); // no key
+    OpenRouterTtsBackend backend = backend(config);
+
+    int[] notices = {0};
+    backend.setNotice(msg -> notices[0]++);
+
+    for (int i = 0; i < 3; i++) {
+      assertNull("each no-key line fails gracefully", backend.synthesize(req()));
+    }
+
+    assertEquals("the no-key notice is not deduped: it fires on every attempt", 3, notices[0]);
+    assertEquals("still never hits the network", 0, server.getRequestCount());
   }
 
   @Test

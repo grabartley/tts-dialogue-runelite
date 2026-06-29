@@ -100,6 +100,13 @@ public class TTSDialoguePlugin extends Plugin {
    */
   private boolean onboardingChecked;
 
+  /**
+   * Per-session guard so the missing-cloud-key notice fires at most once per plugin lifetime, not
+   * per tick. Unlike onboarding it is not persisted, so it re-fires on every startup that is still
+   * Cloud-with-no-key; reset in {@link #shutDown} so a stop/start re-evaluates.
+   */
+  private boolean cloudKeyNoticeChecked;
+
   private String lastSpoken = "";
 
   /**
@@ -214,6 +221,7 @@ public class TTSDialoguePlugin extends Plugin {
 
   @Override
   protected void shutDown() {
+    cloudKeyNoticeChecked = false;
     prefetcher = null;
     if (audioService != null) {
       audioService.close();
@@ -271,6 +279,33 @@ public class TTSDialoguePlugin extends Plugin {
    */
   static boolean shouldShowOnboarding(Boolean seenFlag) {
     return !Boolean.TRUE.equals(seenFlag);
+  }
+
+  /**
+   * Posts the missing-cloud-key notice once per session when the plugin is running
+   * Cloud-with-no-key so a player who selected Cloud but never set a key is told their voice is
+   * effectively off, even before any dialogue line is attempted. Called from {@link #onGameTick},
+   * so it runs on the game thread with a live client; the chat write is therefore safe without a
+   * thread hop.
+   */
+  private void maybeWarnMissingCloudKey() {
+    if (cloudKeyNoticeChecked) {
+      return;
+    }
+    cloudKeyNoticeChecked = true;
+    if (shouldWarnMissingCloudKey(config.voiceBackend(), backendProvider.active().isAvailable())) {
+      addGameMessage(OpenRouterTtsBackend.NO_KEY_NOTICE);
+    }
+  }
+
+  /**
+   * Pure decision for {@link #maybeWarnMissingCloudKey}: warn only when Cloud is the active backend
+   * and its key is unavailable. Local needs no key, so it never warns. Package-private so it is
+   * unit-testable without a live client.
+   */
+  static boolean shouldWarnMissingCloudKey(
+      TTSDialogueConfig.VoiceBackend backend, boolean keyAvailable) {
+    return backend == TTSDialogueConfig.VoiceBackend.CLOUD && !keyAvailable;
   }
 
   /**
@@ -403,6 +438,7 @@ public class TTSDialoguePlugin extends Plugin {
   @Subscribe
   public void onGameTick(final GameTick tick) {
     maybeShowOnboarding();
+    maybeWarnMissingCloudKey();
     Widget npcDialogue = client.getWidget(WidgetInfo.DIALOG_NPC_TEXT);
     if (npcDialogue != null && !npcDialogue.isHidden()) {
       String text = npcDialogue.getText();
