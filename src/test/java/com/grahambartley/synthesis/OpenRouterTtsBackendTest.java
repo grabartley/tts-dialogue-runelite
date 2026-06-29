@@ -34,7 +34,7 @@ public class OpenRouterTtsBackendTest {
     String key = "";
     int maxChars = 600;
     int speedPercent = 100;
-    String language = "English";
+    TTSDialogueConfig.SpokenLanguage language = TTSDialogueConfig.SpokenLanguage.ENGLISH;
     TTSDialogueConfig.SpeakingStyle quirk = TTSDialogueConfig.SpeakingStyle.NONE;
 
     @Override
@@ -53,7 +53,7 @@ public class OpenRouterTtsBackendTest {
     }
 
     @Override
-    public String cloudLanguage() {
+    public TTSDialogueConfig.SpokenLanguage cloudLanguage() {
       return language;
     }
 
@@ -474,15 +474,6 @@ public class OpenRouterTtsBackendTest {
   }
 
   @Test
-  public void blankLanguageWithNoQuirkAlsoBypassesTranslation() {
-    TestConfig config = new TestConfig();
-    config.language = "";
-    assertFalse(
-        "a blank language with no quirk needs no translation",
-        OpenRouterTtsBackend.needsTranslation(backend(config).effectiveSpokenLanguage()));
-  }
-
-  @Test
   public void combineLanguageAppendsTheQuirkOnlyWhenSet() {
     assertEquals(
         "no quirk leaves the language untouched",
@@ -516,7 +507,7 @@ public class OpenRouterTtsBackendTest {
       throws Exception {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
-    config.language = "English";
+    config.language = TTSDialogueConfig.SpokenLanguage.ENGLISH;
     config.quirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
     // Even with English as the base, the quirk forces the translation hop; it is served first.
     server.enqueue(
@@ -585,7 +576,7 @@ public class OpenRouterTtsBackendTest {
     String english = backend.cacheVariant(line);
     assertFalse("English (default) adds no language fragment", english.contains("|l"));
 
-    config.language = "French";
+    config.language = TTSDialogueConfig.SpokenLanguage.FRENCH;
     String french = backend.cacheVariant(line);
     assertNotEquals(
         "the same line in another language must not share a cache key", english, french);
@@ -596,7 +587,7 @@ public class OpenRouterTtsBackendTest {
   public void nonEnglishTargetTranslatesBeforeVoicingAndSetsLanguageCode() throws Exception {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
-    config.language = "French";
+    config.language = TTSDialogueConfig.SpokenLanguage.FRENCH;
     // The translator call is served first, then the speech call (same mock server, queue order).
     server.enqueue(new MockResponse().setResponseCode(200).setBody(chatResponse("Bonjour")));
     server.enqueue(
@@ -628,7 +619,7 @@ public class OpenRouterTtsBackendTest {
   public void skipTranslationVoicesVerbatimUnderANonEnglishTarget() throws Exception {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
-    config.language = "French";
+    config.language = TTSDialogueConfig.SpokenLanguage.FRENCH;
     config.quirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
     // A skip-translation line bypasses the hop entirely, so only the speech call is enqueued.
     server.enqueue(
@@ -663,7 +654,7 @@ public class OpenRouterTtsBackendTest {
   public void normalLineStillTranslatesWhenSkipTranslationIsOff() throws Exception {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
-    config.language = "French";
+    config.language = TTSDialogueConfig.SpokenLanguage.FRENCH;
     server.enqueue(new MockResponse().setResponseCode(200).setBody(chatResponse("Bonjour")));
     server.enqueue(
         new MockResponse()
@@ -688,7 +679,7 @@ public class OpenRouterTtsBackendTest {
   @Test
   public void skipTranslationOmitsTheLanguageFragmentFromTheCacheVariant() {
     TestConfig config = new TestConfig();
-    config.language = "French";
+    config.language = TTSDialogueConfig.SpokenLanguage.FRENCH;
     OpenRouterTtsBackend backend = backend(config);
     VoiceSpec voice = VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE);
 
@@ -712,7 +703,7 @@ public class OpenRouterTtsBackendTest {
   public void translationFailureFailsTheLineWithoutCallingSpeech() {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
-    config.language = "French";
+    config.language = TTSDialogueConfig.SpokenLanguage.FRENCH;
     server.enqueue(new MockResponse().setResponseCode(500).setBody("translation down"));
 
     int[] notices = {0};
