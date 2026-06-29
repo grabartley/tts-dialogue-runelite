@@ -35,7 +35,8 @@ public class OpenRouterTtsBackendTest {
     int maxChars = 600;
     int speedPercent = 100;
     TTSDialogueConfig.SpokenLanguage language = TTSDialogueConfig.SpokenLanguage.ENGLISH;
-    TTSDialogueConfig.SpeakingStyle quirk = TTSDialogueConfig.SpeakingStyle.NONE;
+    TTSDialogueConfig.SpeakingStyle playerQuirk = TTSDialogueConfig.SpeakingStyle.NONE;
+    TTSDialogueConfig.SpeakingStyle npcQuirk = TTSDialogueConfig.SpeakingStyle.NONE;
 
     @Override
     public String openRouterApiKey() {
@@ -58,8 +59,13 @@ public class OpenRouterTtsBackendTest {
     }
 
     @Override
-    public TTSDialogueConfig.SpeakingStyle cloudSpeakingStyle() {
-      return quirk;
+    public TTSDialogueConfig.SpeakingStyle cloudPlayerSpeakingStyle() {
+      return playerQuirk;
+    }
+
+    @Override
+    public TTSDialogueConfig.SpeakingStyle cloudNpcSpeakingStyle() {
+      return npcQuirk;
     }
   }
 
@@ -511,8 +517,8 @@ public class OpenRouterTtsBackendTest {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
     config.language = TTSDialogueConfig.SpokenLanguage.ENGLISH;
-    config.quirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
-    // Even with English as the base, the quirk forces the translation hop; it is served first.
+    config.npcQuirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
+    // Even with English as the base, the NPC style forces the translation hop; it is served first.
     server.enqueue(
         new MockResponse().setResponseCode(200).setBody(chatResponse("no cap, well met")));
     server.enqueue(
@@ -553,11 +559,94 @@ public class OpenRouterTtsBackendTest {
         new SynthesisRequest("a", VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE), Emotion.NEUTRAL);
 
     String plain = backend.cacheVariant(line);
-    assertFalse("plain English with no quirk adds no language fragment", plain.contains("|l"));
+    assertFalse("plain English with no style adds no language fragment", plain.contains("|l"));
 
-    config.quirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
+    config.npcQuirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
     assertNotEquals(
-        "a quirk must not collide with the unquirked line", plain, backend.cacheVariant(line));
+        "a style must not collide with the unstyled line", plain, backend.cacheVariant(line));
+  }
+
+  @Test
+  public void speakerClassPicksTheStyleForTranslation() throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    config.playerQuirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
+    config.npcQuirk = TTSDialogueConfig.SpeakingStyle.NONE;
+    VoiceSpec voice = VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE);
+
+    // The NPC line: NPC style None -> straight to speech, a single call, no translation hop.
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
+    backend(config)
+        .synthesize(
+            new SynthesisRequest(
+                "Well met.", voice, Emotion.NEUTRAL, null, false, /* player= */ false));
+    assertEquals("an NPC line with NPC style None skips translation", 1, server.getRequestCount());
+    assertTrue(
+        "the NPC line's only request is the speech call",
+        server.takeRequest().getPath().endsWith("/audio/speech"));
+
+    // The player line: player style Gen Z -> translation hop first, then speech.
+    server.enqueue(
+        new MockResponse().setResponseCode(200).setBody(chatResponse("no cap, well met")));
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1}))));
+    backend(config)
+        .synthesize(
+            new SynthesisRequest(
+                "Well met.", voice, Emotion.NEUTRAL, null, false, /* player= */ true));
+    RecordedRequest translation = server.takeRequest();
+    assertTrue(
+        "the player line routes through translation because the player style is set",
+        translation.getPath().endsWith("/chat/completions"));
+    assertTrue(
+        "the player style is carried into the prompt",
+        translation.getBody().readUtf8().contains("Gen Z slang"));
+    assertTrue(
+        "then the player line's speech call",
+        server.takeRequest().getPath().endsWith("/audio/speech"));
+  }
+
+  @Test
+  public void perSpeakerClassStylePartitionsTheCacheKey() {
+    TestConfig config = new TestConfig();
+    config.playerQuirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
+    config.npcQuirk = TTSDialogueConfig.SpeakingStyle.PIRATE;
+    OpenRouterTtsBackend backend = backend(config);
+    VoiceSpec voice = VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE);
+    SynthesisRequest playerLine =
+        new SynthesisRequest("a", voice, Emotion.NEUTRAL, null, false, /* player= */ true);
+    SynthesisRequest npcLine =
+        new SynthesisRequest("a", voice, Emotion.NEUTRAL, null, false, /* player= */ false);
+
+    assertNotEquals(
+        "a player-styled and an NPC-styled line of the same text get distinct cache keys",
+        backend.cacheVariant(playerLine),
+        backend.cacheVariant(npcLine));
+  }
+
+  @Test
+  public void styleOnOneClassLeavesTheOtherClassUntranslated() {
+    TestConfig config = new TestConfig();
+    config.playerQuirk = TTSDialogueConfig.SpeakingStyle.NONE;
+    config.npcQuirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
+    OpenRouterTtsBackend backend = backend(config);
+    VoiceSpec voice = VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE);
+    SynthesisRequest playerLine =
+        new SynthesisRequest("a", voice, Emotion.NEUTRAL, null, false, /* player= */ true);
+    SynthesisRequest npcLine =
+        new SynthesisRequest("a", voice, Emotion.NEUTRAL, null, false, /* player= */ false);
+
+    assertFalse(
+        "the player line, player style None, carries no language fragment so it skips translation",
+        backend.cacheVariant(playerLine).contains("|l"));
+    assertTrue(
+        "the NPC line, NPC style Gen Z, folds the styled language into its key",
+        backend.cacheVariant(npcLine).contains("|l"));
   }
 
   @Test
@@ -623,7 +712,7 @@ public class OpenRouterTtsBackendTest {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
     config.language = TTSDialogueConfig.SpokenLanguage.FRENCH;
-    config.quirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
+    config.npcQuirk = TTSDialogueConfig.SpeakingStyle.GEN_Z;
     // A skip-translation line bypasses the hop entirely, so only the speech call is enqueued.
     server.enqueue(
         new MockResponse()

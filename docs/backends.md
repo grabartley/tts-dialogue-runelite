@@ -91,15 +91,20 @@ Beyond per-line guards, two larger levers cut perceived latency and broaden reac
   language. **Spoken Language** is a fixed dropdown (the `SpokenLanguage` enum in `TTSDialogueConfig`,
   one entry per supported language), so every selection carries a known-good BCP-47 `language_code`;
   the enum is the single source of truth for both the options and their codes.
-- **Speaking Style.** An optional language-agnostic delivery register (Gen Z slang, pirate speak,
-  formal, and so on) is appended to the spoken language, so the translation hop rewrites every line
-  in that style. It routes through the hop even for English, and composes with any language.
+- **Player / NPC Speaking Style.** Two independent settings, one for your own lines (**Player
+  Speaking Style**) and one for NPC lines (**NPC Speaking Style**), drawn from the same option set
+  (Gen Z slang, pirate speak, formal, and so on). The style for the line's speaker class is appended
+  to the spoken language, so the translation hop rewrites that line in that style. It routes through
+  the hop even for English, and composes with any language. Each class is selected from the
+  `player` flag on `SynthesisRequest`, so the cache key already differs between a player and an NPC
+  line of identical text under different styles. Either class can be `None` independently (e.g. a
+  roadman player among posh NPCs).
 
-The translation model is invoked only when there is something for it to do. With **Speaking Style** on
-`None` and **Spoken Language** English, the effective target is plain English, so the
-line bypasses the model entirely and the source text goes straight to speech: no chat-completions
-request, no added latency or cost. Setting a non-English language, a quirk, or both is what turns
-the hop on.
+The translation model is invoked only when there is something for it to do. For a given line, with
+that speaker class's Speaking Style on `None` and **Spoken Language** English, the effective target
+is plain English, so the line bypasses the model entirely and the source text goes straight to
+speech: no chat-completions request, no added latency or cost. Setting a non-English language, a
+style for that class, or both is what turns the hop on.
 
 Streaming the audio response to start playback sooner was evaluated and deferred: OSRS lines are short,
 the full-buffer decode is already fast, and streaming would complicate the raw-PCM decode and the

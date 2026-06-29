@@ -19,32 +19,49 @@ package com.grahambartley.synthesis;
  * {@code |l<language>} cache segment for such a request. It is {@code true} only for the player's
  * own public chat (voiced as typed); every dialogue line leaves it {@code false}, so the request
  * body and cache key stay byte-for-byte as before.
+ *
+ * <p>{@code player} marks the line as the player's own speech rather than an NPC's, so the cloud
+ * backend can pick the per-speaker-class Speaking Style (Player vs NPC). It is {@code true} for
+ * player dialogue, public chat, and prefetched options (all lines the player speaks) and {@code
+ * false} for NPC lines. The legacy constructors default it {@code false}, so an unmarked request
+ * voices as an NPC line as before.
  */
 public record SynthesisRequest(
     String text,
     VoiceSpec voice,
     Emotion emotion,
     CharacterProfile profile,
-    boolean skipTranslation) {
+    boolean skipTranslation,
+    boolean player) {
 
   /** A request with no character profile (backward-compatible 3-arg form). */
   public SynthesisRequest(String text, VoiceSpec voice, Emotion emotion) {
-    this(text, voice, emotion, null, false);
+    this(text, voice, emotion, null, false, false);
   }
 
   /** A translating request with a character profile (backward-compatible 4-arg form). */
   public SynthesisRequest(String text, VoiceSpec voice, Emotion emotion, CharacterProfile profile) {
-    this(text, voice, emotion, profile, false);
+    this(text, voice, emotion, profile, false, false);
+  }
+
+  /** A request with explicit translation behaviour but no speaker-class flag (5-arg form). */
+  public SynthesisRequest(
+      String text,
+      VoiceSpec voice,
+      Emotion emotion,
+      CharacterProfile profile,
+      boolean skipTranslation) {
+    this(text, voice, emotion, profile, skipTranslation, false);
   }
 
   /**
    * Returns a copy of this request with a different emotion, leaving text, voice, profile, and the
-   * translation behaviour intact.
+   * translation and speaker-class behaviour intact.
    */
   public SynthesisRequest withEmotion(Emotion newEmotion) {
     if (newEmotion == emotion) {
       return this;
     }
-    return new SynthesisRequest(text, voice, newEmotion, profile, skipTranslation);
+    return new SynthesisRequest(text, voice, newEmotion, profile, skipTranslation, player);
   }
 }

@@ -38,4 +38,30 @@ public class SynthesisRequestTest {
         "a normal line stays translating after a downgrade",
         dialogue.withEmotion(Emotion.NEUTRAL).skipTranslation());
   }
+
+  @Test
+  public void legacyConstructorsDefaultToNpcSpeakerClass() {
+    assertFalse(
+        "the 3-arg form voices as an NPC line",
+        new SynthesisRequest("hi", VOICE, Emotion.NEUTRAL).player());
+    assertFalse(
+        "the 4-arg form voices as an NPC line",
+        new SynthesisRequest("hi", VOICE, Emotion.NEUTRAL, null).player());
+    assertFalse(
+        "the 5-arg form voices as an NPC line",
+        new SynthesisRequest("hi", VOICE, Emotion.NEUTRAL, null, true).player());
+  }
+
+  @Test
+  public void withEmotionPreservesPlayerClass() {
+    SynthesisRequest playerLine =
+        new SynthesisRequest("hi", VOICE, Emotion.NEUTRAL, null, false, true);
+    assertTrue(
+        "a re-emotioned player line stays a player line, so it keeps the player Speaking Style",
+        playerLine.withEmotion(Emotion.HAPPY).player());
+
+    SynthesisRequest npcLine = new SynthesisRequest("hi", VOICE, Emotion.HAPPY, null, false, false);
+    assertFalse(
+        "a re-emotioned NPC line stays an NPC line", npcLine.withEmotion(Emotion.NEUTRAL).player());
+  }
 }

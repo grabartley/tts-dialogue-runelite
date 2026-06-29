@@ -223,7 +223,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     // quirks. Plain English with no quirk adds nothing, so pre-translation cache entries stay
     // valid. A skip-translation request (public chat) is voiced verbatim, so it keeps the plain
     // pre-translation key and never collides with a translated dialogue line of the same text.
-    String language = effectiveSpokenLanguage();
+    String language = effectiveSpokenLanguage(request);
     if (needsTranslation(language) && !request.skipTranslation()) {
       variant.append("|l").append(language.toLowerCase());
     }
@@ -238,13 +238,17 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   }
 
   /**
-   * The spoken language actually requested of the model: the configured language with any global
-   * quirk appended, so "English" plus a Gen Z quirk becomes an "English Gen Z slang" target that
-   * routes through the translation hop and is rewritten in that style. A blank language defaults to
-   * English; the no-op quirk leaves the language untouched.
+   * The spoken language actually requested of the model for this line: the configured language with
+   * the speaker-class Speaking Style appended (Player style for the player's own lines, NPC style
+   * for everything else), so "English" plus a Gen Z style becomes an "English Gen Z slang" target
+   * that routes through the translation hop and is rewritten in that style. A blank language
+   * defaults to English; the no-op style leaves the language untouched, so a class set to None
+   * skips the hop while the other class can still be styled.
    */
-  String effectiveSpokenLanguage() {
-    return combineLanguage(config.cloudLanguage().label(), config.cloudSpeakingStyle());
+  String effectiveSpokenLanguage(SynthesisRequest request) {
+    TTSDialogueConfig.SpeakingStyle style =
+        request.player() ? config.cloudPlayerSpeakingStyle() : config.cloudNpcSpeakingStyle();
+    return combineLanguage(config.cloudLanguage().label(), style);
   }
 
   /**
@@ -273,7 +277,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     // language or caching a mistranslation under the language key. A skip-translation request
     // (public chat) is voiced exactly as typed, so it bypasses the hop even under a non-English
     // target or a global quirk.
-    String language = effectiveSpokenLanguage();
+    String language = effectiveSpokenLanguage(request);
     boolean translating = needsTranslation(language) && !request.skipTranslation();
     String spokenText = cappedText;
     if (translating) {
