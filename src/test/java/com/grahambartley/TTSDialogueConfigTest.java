@@ -14,7 +14,7 @@ public class TTSDialogueConfigTest {
 
   @Test
   public void englishIsTheDefaultNoTranslationLanguage() {
-    assertEquals("en-US", SpokenLanguage.ENGLISH.code());
+    assertEquals("en-GB", SpokenLanguage.ENGLISH.code());
     assertTrue("English is the no-translation default", SpokenLanguage.ENGLISH.isEnglish());
     for (SpokenLanguage language : SpokenLanguage.values()) {
       assertEquals(
@@ -46,8 +46,21 @@ public class TTSDialogueConfigTest {
   }
 
   @Test
-  public void toStringShowsTheNameAndCodeForDiscoverability() {
-    assertEquals("English (en-US)", SpokenLanguage.ENGLISH.toString());
-    assertEquals("Brazilian Portuguese (pt-BR)", SpokenLanguage.BRAZILIAN_PORTUGUESE.toString());
+  public void toStringShowsTheDisplayNameWithoutTheCode() {
+    assertEquals("English", SpokenLanguage.ENGLISH.toString());
+    assertEquals("Spanish", SpokenLanguage.SPANISH.toString());
+    for (SpokenLanguage language : SpokenLanguage.values()) {
+      assertFalse(
+          "the dropdown never exposes the BCP-47 code: " + language,
+          language.toString().contains(language.code()));
+    }
+  }
+
+  @Test
+  public void regionalVariantsShortenTheDropdownTextButKeepTheFullTranslationName() {
+    assertEquals("Portuguese (BR)", SpokenLanguage.BRAZILIAN_PORTUGUESE.toString());
+    assertEquals("Brazilian Portuguese", SpokenLanguage.BRAZILIAN_PORTUGUESE.label());
+    assertEquals("Spanish (LatAm)", SpokenLanguage.LATIN_AMERICAN_SPANISH.toString());
+    assertEquals("Latin American Spanish", SpokenLanguage.LATIN_AMERICAN_SPANISH.label());
   }
 }

@@ -547,7 +547,7 @@ public class OpenRouterTtsBackendTest {
         speech.get("input").getAsString());
     assertEquals(
         "the language_code stays the base language, not the quirk",
-        "en-US",
+        "en-GB",
         speech.get("language_code").getAsString());
   }
 

@@ -90,23 +90,25 @@ public interface TTSDialogueConfig extends Config {
   /**
    * The finite set of languages dialogue can be spoken in: the single source of truth for both the
    * dropdown options and the BCP-47 {@code language_code} sent to the TTS model. Each constant
-   * carries a natural language name (fed verbatim to the translation model as the target language)
-   * and its BCP-47 code (sent so a translated line is pronounced natively rather than mis-read with
-   * an English phoneme set). {@link #ENGLISH} (the default) speaks the original line directly;
-   * every other value routes the line through the translation hop first. Cloud only.
+   * carries a natural language name (fed verbatim to the translation model as the target language),
+   * its BCP-47 code (sent so a translated line is pronounced natively rather than mis-read with an
+   * English phoneme set), and a display name shown in the dropdown. The display name defaults to
+   * the natural name but is shortened for regional variants (e.g. {@code Spanish (LatAm)}) so the
+   * combo box does not crowd out the setting label. {@link #ENGLISH} (the default) speaks the
+   * original line directly; every other value routes the line through the translation hop first.
+   * Cloud only.
    */
   enum SpokenLanguage {
-    ENGLISH("English", "en-US"),
-    BRITISH_ENGLISH("British English", "en-GB"),
+    ENGLISH("English", "en-GB"),
     SPANISH("Spanish", "es-ES"),
-    LATIN_AMERICAN_SPANISH("Latin American Spanish", "es-419"),
-    MEXICAN_SPANISH("Mexican Spanish", "es-MX"),
+    LATIN_AMERICAN_SPANISH("Latin American Spanish", "es-419", "Spanish (LatAm)"),
+    MEXICAN_SPANISH("Mexican Spanish", "es-MX", "Spanish (MX)"),
     FRENCH("French", "fr-FR"),
-    CANADIAN_FRENCH("Canadian French", "fr-CA"),
+    CANADIAN_FRENCH("Canadian French", "fr-CA", "French (CA)"),
     GERMAN("German", "de-DE"),
     ITALIAN("Italian", "it-IT"),
     PORTUGUESE("Portuguese", "pt-PT"),
-    BRAZILIAN_PORTUGUESE("Brazilian Portuguese", "pt-BR"),
+    BRAZILIAN_PORTUGUESE("Brazilian Portuguese", "pt-BR", "Portuguese (BR)"),
     DUTCH("Dutch", "nl-NL"),
     POLISH("Polish", "pl-PL"),
     RUSSIAN("Russian", "ru-RU"),
@@ -114,7 +116,7 @@ public interface TTSDialogueConfig extends Config {
     JAPANESE("Japanese", "ja-JP"),
     KOREAN("Korean", "ko-KR"),
     CHINESE("Chinese", "zh-CN"),
-    TRADITIONAL_CHINESE("Traditional Chinese", "zh-TW"),
+    TRADITIONAL_CHINESE("Traditional Chinese", "zh-TW", "Chinese (Trad.)"),
     CANTONESE("Cantonese", "yue-HK"),
     ARABIC("Arabic", "ar-XA"),
     HINDI("Hindi", "hi-IN"),
@@ -150,10 +152,16 @@ public interface TTSDialogueConfig extends Config {
 
     private final String label;
     private final String code;
+    private final String displayName;
 
     SpokenLanguage(String label, String code) {
+      this(label, code, label);
+    }
+
+    SpokenLanguage(String label, String code, String displayName) {
       this.label = label;
       this.code = code;
+      this.displayName = displayName;
     }
 
     /** Whether this is English, the no-translation default. */
@@ -173,7 +181,7 @@ public interface TTSDialogueConfig extends Config {
 
     @Override
     public String toString() {
-      return label + " (" + code + ")";
+      return displayName;
     }
   }
 
