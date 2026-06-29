@@ -500,6 +500,15 @@ public class OpenRouterTtsBackendTest {
         "a blank language defaults to English before the quirk",
         "English Gen Z slang",
         OpenRouterTtsBackend.combineLanguage("  ", TTSDialogueConfig.SpeakingStyle.GEN_Z));
+    assertEquals(
+        "UK Slang layers London roadman slang onto English",
+        "English with London Roadman Slang",
+        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.SpeakingStyle.UK_SLANG));
+    assertEquals(
+        "Irish Slang layers Dublin slang onto English",
+        "English with Dublin Slang",
+        OpenRouterTtsBackend.combineLanguage(
+            "English", TTSDialogueConfig.SpeakingStyle.IRISH_SLANG));
   }
 
   @Test

@@ -58,7 +58,9 @@ public interface TTSDialogueConfig extends Config {
     FORMAL("Formal & Posh", "very formal and posh"),
     DRAMATIC("Over-Dramatic", "wildly over-dramatic and theatrical"),
     CUTESY("Cutesy & Bubbly", "cutesy, bubbly and over-enthusiastic"),
-    PIRATE("Pirate Speak", "pirate speak");
+    PIRATE("Pirate Speak", "pirate speak"),
+    UK_SLANG("UK Slang", "with London Roadman Slang"),
+    IRISH_SLANG("Irish Slang", "with Dublin Slang");
 
     private final String label;
     private final String phrase;
