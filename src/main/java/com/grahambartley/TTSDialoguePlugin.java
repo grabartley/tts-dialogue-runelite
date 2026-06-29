@@ -408,17 +408,44 @@ public class TTSDialoguePlugin extends Plugin {
         client.isInInstancedRegion() && lp != null
             ? WorldPoint.fromLocalInstance(client, lp)
             : local.getWorldLocation();
-    return wp != null && isUndergroundPoint(wp);
+    if (wp == null) {
+      return false;
+    }
+    boolean underground = isUndergroundPoint(wp);
+    if (config.debugMode()) {
+      log.info(
+          "[TTS echo] x={} y={} plane={} region={} instanced={} underground={}",
+          wp.getX(),
+          wp.getY(),
+          wp.getPlane(),
+          wp.getRegionID(),
+          client.isInInstancedRegion(),
+          underground);
+    }
+    return underground;
   }
+
+  /**
+   * Player-owned house instance template regions. A POH is built from a fixed block of template
+   * chunks that straddles region boundaries, so {@link WorldPoint#fromLocalInstance} resolves house
+   * tiles into more than one region. These all sit in the high-{@code Y} band like a cave but are
+   * an enclosed surface instance, so they are excluded from the underground test.
+   */
+  static final java.util.Set<Integer> POH_REGION_IDS =
+      java.util.Set.of(7257, 7534, 7535, 7790, 7791, 8046, 8047, 8302, 8303);
 
   /**
    * Pure, client-free core of the underground test: a point is underground when its
    * mirror-corrected world {@code Y} sits at or above {@link Constants#OVERWORLD_MAX_Y}, the
    * coordinate convention the game map is built on (every cave/dungeon is displaced north of the
    * overworld). The mirror step normalises Prifddinas, the one surface area whose real geometry
-   * sits in that band.
+   * sits in that band, and the player-owned house ({@link #POH_REGION_IDS}) is carved out as an
+   * enclosed surface instance that also lands in the band.
    */
   static boolean isUndergroundPoint(WorldPoint wp) {
+    if (POH_REGION_IDS.contains(wp.getRegionID())) {
+      return false;
+    }
     return WorldPoint.getMirrorPoint(wp, true).getY() >= Constants.OVERWORLD_MAX_Y;
   }
 

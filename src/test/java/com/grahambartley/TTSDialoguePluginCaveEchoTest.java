@@ -45,6 +45,24 @@ public class TTSDialoguePluginCaveEchoTest {
   }
 
   @Test
+  public void playerOwnedHouseIsCarvedOutDespiteSittingInTheBand() {
+    // A POH straddles region boundaries (observed live in regions 7790 and 7791): every house tile
+    // lands in the high-Y band but is an enclosed surface instance, not a cave, so it reads
+    // surface.
+    for (WorldPoint inPoh :
+        new WorldPoint[] {new WorldPoint(1960, 7045, 0), new WorldPoint(1944, 7107, 0)}) {
+      assertTrue(
+          "the POH point is in a carved-out region",
+          TTSDialoguePlugin.POH_REGION_IDS.contains(inPoh.getRegionID()));
+      assertTrue(
+          "the raw point is in the underground band", inPoh.getY() >= Constants.OVERWORLD_MAX_Y);
+      assertFalse(
+          "the player-owned house must read as surface",
+          TTSDialoguePlugin.isUndergroundPoint(inPoh));
+    }
+  }
+
+  @Test
   public void echoesOnlyForCloudToggleOnUnderground() {
     assertTrue(TTSDialoguePlugin.shouldEchoLine(VoiceBackend.CLOUD, true, true));
   }
