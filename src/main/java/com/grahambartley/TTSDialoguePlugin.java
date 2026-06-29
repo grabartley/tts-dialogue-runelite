@@ -28,7 +28,10 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.Constants;
 import net.runelite.api.Player;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.InterfaceID;
@@ -377,7 +380,46 @@ public class TTSDialoguePlugin extends Plugin {
     if (audioService == null || !backendProvider.active().isAvailable()) {
       return;
     }
-    audioService.speak(request);
+    boolean echo = shouldEchoLine(config.voiceBackend(), config.cloudCaveEcho(), isUnderground());
+    audioService.speak(request, echo);
+  }
+
+  /**
+   * Pure gate for the cave echo: render an echo only on the Cloud backend, with the toggle on,
+   * while the player is underground. Package-private so it is unit-testable without a live client.
+   */
+  static boolean shouldEchoLine(
+      TTSDialogueConfig.VoiceBackend backend, boolean caveEchoEnabled, boolean underground) {
+    return backend == TTSDialogueConfig.VoiceBackend.CLOUD && caveEchoEnabled && underground;
+  }
+
+  /**
+   * Whether the local player is below the overworld (a cave, dungeon, sewer or basement). Reads the
+   * client only on the game thread, where every {@link #dispatch} caller already runs. Resolves
+   * instanced chunks to their template world coordinate so an instanced cave still reads as a cave.
+   */
+  private boolean isUnderground() {
+    Player local = client.getLocalPlayer();
+    if (local == null) {
+      return false;
+    }
+    LocalPoint lp = local.getLocalLocation();
+    WorldPoint wp =
+        client.isInInstancedRegion() && lp != null
+            ? WorldPoint.fromLocalInstance(client, lp)
+            : local.getWorldLocation();
+    return wp != null && isUndergroundPoint(wp);
+  }
+
+  /**
+   * Pure, client-free core of the underground test: a point is underground when its
+   * mirror-corrected world {@code Y} sits at or above {@link Constants#OVERWORLD_MAX_Y}, the
+   * coordinate convention the game map is built on (every cave/dungeon is displaced north of the
+   * overworld). The mirror step normalises Prifddinas, the one surface area whose real geometry
+   * sits in that band.
+   */
+  static boolean isUndergroundPoint(WorldPoint wp) {
+    return WorldPoint.getMirrorPoint(wp, true).getY() >= Constants.OVERWORLD_MAX_Y;
   }
 
   /**

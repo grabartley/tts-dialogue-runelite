@@ -408,6 +408,20 @@ public interface TTSDialogueConfig extends Config {
     return false;
   }
 
+  @ConfigItem(
+      keyName = "cloudCaveEcho",
+      name = "Cave Echo",
+      description =
+          "Add a cave echo to dialogue spoken underground. When you are below the overworld (a cave,"
+              + " dungeon, sewer or basement), spoken lines get a decaying echo so they sound"
+              + " enclosed. Cloud backend only; off by default. The echo is added at playback, so"
+              + " cached audio is unchanged and nothing is re-billed.",
+      position = 11,
+      section = cloudSection)
+  default boolean cloudCaveEcho() {
+    return false;
+  }
+
   // ---------------------------------------------------------------------------
   // Advanced
   // ---------------------------------------------------------------------------

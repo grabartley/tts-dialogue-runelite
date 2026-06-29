@@ -139,6 +139,7 @@ Settings are split into three categories that mirror the in-game panel: **Genera
 | **NPC Speaking Style** | `None` | Optional delivery register layered onto NPC dialogue lines on top of the language, from the same option set. `None` changes nothing; any other value rewrites NPC lines in that style via the translation model. Registers are language-agnostic, so they compose with any Spoken Language. |
 | **Speaking Pace** | `100` | Speaking pace for the Cloud voice as a percent of normal. Sent to OpenRouter only when not `100`; the active model may ignore it. |
 | **Auto-learn New NPCs** | `Off` | For an NPC not in the bundled table (e.g. one added since the last plugin update), looks its race, gender and ethnicity up on the OSRS Wiki once and caches the result locally. The first line still uses the default voice while the lookup runs. When on, makes a one-time wiki request (the NPC's name); the Local backend stays fully offline regardless. |
+| **Cave Echo** | `Off` | Adds a decaying echo to dialogue spoken while you are below the overworld (a cave, dungeon, sewer or basement), so lines sound enclosed. Cloud backend only. The echo is local DSP applied at playback, so cached audio is unchanged and nothing is re-billed. |
 
 ### Advanced
 

@@ -1,5 +1,6 @@
 package com.grahambartley.tts;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -80,11 +81,13 @@ public class DialogueAudioServiceTest {
     int streamCalls;
     int stopCalls;
     int lastVolume = -1;
+    float[] lastSamples;
 
     @Override
     public void stream(float[] samples, int sampleRate, int volumePercent) {
       streamCalls++;
       lastVolume = volumePercent;
+      lastSamples = samples;
     }
 
     @Override
@@ -582,6 +585,44 @@ public class DialogueAudioServiceTest {
 
     assertEquals(
         "prefetch then speak bills the cloud backend exactly once", 1, warm.requests.size());
+  }
+
+  @Test
+  public void echoPlaysALongerDifferentBufferThanTheDrySynth() {
+    FakeBackend backend = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    FakeOutput output = new FakeOutput();
+    DeferredExecutor executor = new DeferredExecutor();
+    DialogueAudioService svc = service(provider(backend), output, executor, 8, 100);
+
+    svc.speak(req("Echoing cave line", NPCRace.HUMAN, NPCGender.MALE), true);
+    executor.runAll();
+
+    assertEquals("the echoed line still plays once", 1, output.streamCalls);
+    assertTrue("the echoed buffer is longer than the dry synth", output.lastSamples.length > 2);
+  }
+
+  @Test
+  public void echoIsRenderOnlyAndTheCacheStaysDry() {
+    // Speaking with echo, then again without, for the same key must reuse the cached DRY audio:
+    // one synth call, and the dry replay streams the original short buffer.
+    FakeBackend backend = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
+    FakeOutput output = new FakeOutput();
+    DeferredExecutor executor = new DeferredExecutor();
+    DialogueAudioService svc = service(provider(backend), output, executor, 8, 100);
+
+    svc.speak(req("Same line", NPCRace.HUMAN, NPCGender.MALE), true);
+    executor.runAll();
+    int echoedLength = output.lastSamples.length;
+
+    svc.speak(req("Same line", NPCRace.HUMAN, NPCGender.MALE), false);
+    executor.runAll();
+
+    assertEquals("echo never triggers a second synth", 1, backend.requests.size());
+    assertEquals(
+        "the dry replay streams the original two-sample buffer", 2, output.lastSamples.length);
+    assertTrue("the echoed buffer was longer than the dry one", echoedLength > 2);
+    assertArrayEquals(
+        "the cached audio stayed dry", new float[] {0.1f, -0.1f}, output.lastSamples, 0f);
   }
 
   @Test

@@ -144,6 +144,16 @@ public final class DialogueAudioService {
    * advancement replaces the previous line rather than overlapping it.
    */
   public void speak(SynthesisRequest request) {
+    speak(request, false);
+  }
+
+  /**
+   * As {@link #speak(SynthesisRequest)}, but renders a cave echo over the dry audio just before
+   * playback when {@code applyEcho} is set. The echo is pure local DSP on a fresh buffer: both
+   * cache tiers still store the dry line under the unchanged key, so toggling the effect never
+   * invalidates the cache and the cloud backend is never re-billed.
+   */
+  public void speak(SynthesisRequest request, boolean applyEcho) {
     if (request == null || request.text() == null || request.text().isEmpty()) {
       return;
     }
@@ -154,7 +164,7 @@ public final class DialogueAudioService {
     SynthesisBackend backend = backends.active();
     SynthesisRequest effective = BackendProvider.downgradeFor(backend, request);
     CacheKey key = keyFor(backend, effective);
-    submit(() -> run(mine, backend, effective, key));
+    submit(() -> run(mine, backend, effective, key, applyEcho));
   }
 
   /**
@@ -254,7 +264,12 @@ public final class DialogueAudioService {
     }
   }
 
-  private void run(long mine, SynthesisBackend backend, SynthesisRequest request, CacheKey key) {
+  private void run(
+      long mine,
+      SynthesisBackend backend,
+      SynthesisRequest request,
+      CacheKey key,
+      boolean applyEcho) {
     if (epoch.get() != mine) {
       return;
     }
@@ -274,7 +289,9 @@ public final class DialogueAudioService {
     if (epoch.get() != mine) {
       return;
     }
-    output.stream(pcm.getSamples(), pcm.getSampleRate(), volume.getAsInt());
+    // Echo is render-only on a fresh buffer; the dry pcm stays in both cache tiers untouched.
+    Pcm toPlay = applyEcho ? CaveEcho.apply(pcm) : pcm;
+    output.stream(toPlay.getSamples(), toPlay.getSampleRate(), volume.getAsInt());
   }
 
   /** Memory then disk lookup; a disk hit is promoted into memory. {@code null} when both miss. */

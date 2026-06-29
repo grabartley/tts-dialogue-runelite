@@ -117,6 +117,17 @@ never rescues an old entry, and the just-written clip always survives. Setting t
 out of eviction entirely, so the cache keeps every clip for users who would rather spend disk than
 ever re-bill a line.
 
+### Cave echo
+
+**Cave Echo** (off by default, Cloud only) adds a decaying echo to lines spoken while the player is
+underground, so dialogue in a cave, dungeon, sewer or basement sounds enclosed. Underground is a pure
+coordinate test: the player's mirror-corrected world `Y` at or above `Constants.OVERWORLD_MAX_Y`,
+since every cave and dungeon is displaced north of the overworld. The echo is local DSP (a damped
+feedback comb) applied to a fresh buffer at playback, after both cache tiers. Both tiers still store
+the dry line under the unchanged cache key, so toggling the effect never invalidates the cache and the
+cloud backend is never re-billed for it: it is free, adds no network call, and does not affect billing
+or privacy.
+
 ## Local (Kokoro) backend
 
 An external CPU engine reached over a process transport (one JSON request line per synthesis, one
