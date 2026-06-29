@@ -35,6 +35,7 @@ public class VoiceManager {
     UNDEAD,
     DEMON,
     WIZARD,
+    TORTUGAN,
     UNKNOWN
   }
 
@@ -95,7 +96,11 @@ public class VoiceManager {
 
     // Wizard voices (wise, mystical) - storyteller British male, distinct female
     WIZARD_MALE(25, "bm_fable", "Wizard Male", NPCRace.WIZARD, NPCGender.MALE),
-    WIZARD_FEMALE(0, "af_alloy", "Wizard Female", NPCRace.WIZARD, NPCGender.FEMALE);
+    WIZARD_FEMALE(0, "af_alloy", "Wizard Female", NPCRace.WIZARD, NPCGender.FEMALE),
+
+    // Tortugan voices (warm, sun-warmed island folk) - relaxed, easy timbres
+    TORTUGAN_MALE(19, "am_santa", "Tortugan Male", NPCRace.TORTUGAN, NPCGender.MALE),
+    TORTUGAN_FEMALE(7, "af_nova", "Tortugan Female", NPCRace.TORTUGAN, NPCGender.FEMALE);
 
     private final int speakerId;
     private final String kokoroVoice;
@@ -541,6 +546,8 @@ public class VoiceManager {
         return female ? VoiceProfile.DEMON_FEMALE : VoiceProfile.DEMON_MALE;
       case WIZARD:
         return female ? VoiceProfile.WIZARD_FEMALE : VoiceProfile.WIZARD_MALE;
+      case TORTUGAN:
+        return female ? VoiceProfile.TORTUGAN_FEMALE : VoiceProfile.TORTUGAN_MALE;
       case HUMAN:
       default:
         return female ? VoiceProfile.HUMAN_FEMALE : VoiceProfile.HUMAN_MALE;
@@ -593,6 +600,8 @@ public class VoiceManager {
         return NPCRace.MONKEY;
       } else if (raceLower.contains("wizard") || raceLower.contains("mage")) {
         return NPCRace.WIZARD;
+      } else if (raceLower.contains("tortugan") || raceLower.contains("tortuga")) {
+        return NPCRace.TORTUGAN;
       }
 
       log.debug("Unknown race '{}', using default voice", race);

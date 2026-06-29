@@ -62,6 +62,8 @@ final class GeminiVoiceMap {
     put(NPCRace.DEMON, male("Algenib", "Rasalgethi"), female("Gacrux", "Despina"));
     // Wizard (wise, mystical): knowledgeable/informative, weighty.
     put(NPCRace.WIZARD, male("Sadaltager", "Charon"), female("Sulafat", "Vindemiatrix"));
+    // Tortugan (warm island folk): friendly/clear and warm/gentle, relaxed mid-depth.
+    put(NPCRace.TORTUGAN, male("Achird", "Iapetus"), female("Sulafat", "Vindemiatrix"));
   }
 
   private static String[] male(String... voices) {
