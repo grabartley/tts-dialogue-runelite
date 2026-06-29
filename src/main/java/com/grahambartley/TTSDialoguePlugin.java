@@ -11,6 +11,7 @@ import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.ExpressionEmotionTable;
 import com.grahambartley.synthesis.LocalKokoroBackend;
 import com.grahambartley.synthesis.OpenRouterTtsBackend;
+import com.grahambartley.synthesis.ProfanityFilter;
 import com.grahambartley.synthesis.SynthesisRequest;
 import com.grahambartley.synthesis.VoiceSpec;
 import com.grahambartley.synthesis.engine.EngineInstaller;
@@ -122,6 +123,13 @@ public class TTSDialoguePlugin extends Plugin {
    * reused for every line; owns the {@code -1}/unmapped -> NEUTRAL contract.
    */
   private final ExpressionEmotionTable expressionEmotions = ExpressionEmotionTable.load();
+
+  /**
+   * Always-on offline profanity masker (#149). Loaded once and applied in {@link
+   * #cleanDialogueText}, the single seam every spoken source funnels through (NPC dialogue, player
+   * options, and attacker-controlled public chat), so masking covers both backends with no toggle.
+   */
+  private final ProfanityFilter profanityFilter = new ProfanityFilter();
 
   private BackendProvider backendProvider;
 
@@ -358,7 +366,15 @@ public class TTSDialoguePlugin extends Plugin {
   }
 
   private String cleanDialogueText(String raw) {
-    return raw.replaceAll("<[^>]+>", "").trim();
+    return cleanDialogueText(raw, profanityFilter);
+  }
+
+  /**
+   * Strips HTML-ish tags, trims, then masks profanity. Static and filter-injected so the masking
+   * behaviour every spoken source depends on is verifiable without a live client.
+   */
+  static String cleanDialogueText(String raw, ProfanityFilter profanityFilter) {
+    return profanityFilter.mask(raw.replaceAll("<[^>]+>", "").trim());
   }
 
   /** Extracts NPC name from dialogue widget or uses current interacting NPC. */
