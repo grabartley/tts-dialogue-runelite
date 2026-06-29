@@ -43,12 +43,13 @@ public interface TTSDialogueConfig extends Config {
   }
 
   /**
-   * An optional global delivery quirk layered onto every spoken line. {@link #NONE} (the default)
-   * changes nothing; any other value appends its {@link #phrase()} to the configured spoken
-   * language, so the line is routed through the translation model and rewritten in that register
-   * (for example "English" plus Gen Z slang behaves like a "English Gen Z slang" target). Every
-   * value is a register or tone, not a dialect, so it stays language-agnostic and composes with any
-   * spoken language ("French pirate speak", "Japanese Gen Z slang"). Cloud only.
+   * An optional delivery quirk layered onto a spoken line, selected per speaker class (Player vs
+   * NPC). {@link #NONE} (the default) changes nothing; any other value appends its {@link
+   * #phrase()} to the configured spoken language, so the line is routed through the translation
+   * model and rewritten in that register (for example "English" plus Gen Z slang behaves like a
+   * "English Gen Z slang" target). Every value is a register or tone, not a dialect, so it stays
+   * language-agnostic and composes with any spoken language ("French pirate speak", "Japanese Gen Z
+   * slang"). Cloud only.
    */
   enum SpeakingStyle {
     NONE("None", ""),
@@ -350,17 +351,32 @@ public interface TTSDialogueConfig extends Config {
   }
 
   @ConfigItem(
-      keyName = "cloudSpeakingStyle",
-      name = "Speaking Style",
+      keyName = "cloudPlayerSpeakingStyle",
+      name = "Player Speaking Style",
       description =
-          "Optional delivery register layered onto every line, on top of the Spoken Language. None"
-              + " (default) changes nothing; any other value rewrites each line in that style (Gen Z"
-              + " slang, pirate speak, and so on) via the translation model, so it routes through"
-              + " that hop even for English. Leave this on None with English to skip the translation"
-              + " model entirely.",
+          "Optional delivery register layered onto your own dialogue lines, on top of the Spoken"
+              + " Language. None (default) changes nothing; any other value rewrites your lines in"
+              + " that style (Gen Z slang, pirate speak, and so on) via the translation model, so"
+              + " they route through that hop even for English. Leave this on None with English to"
+              + " skip the translation model entirely for your lines.",
       position = 7,
       section = cloudSection)
-  default SpeakingStyle cloudSpeakingStyle() {
+  default SpeakingStyle cloudPlayerSpeakingStyle() {
+    return SpeakingStyle.NONE;
+  }
+
+  @ConfigItem(
+      keyName = "cloudNpcSpeakingStyle",
+      name = "NPC Speaking Style",
+      description =
+          "Optional delivery register layered onto NPC dialogue lines, on top of the Spoken"
+              + " Language. None (default) changes nothing; any other value rewrites NPC lines in"
+              + " that style (Gen Z slang, pirate speak, and so on) via the translation model, so"
+              + " they route through that hop even for English. Leave this on None with English to"
+              + " skip the translation model entirely for NPC lines.",
+      position = 8,
+      section = cloudSection)
+  default SpeakingStyle cloudNpcSpeakingStyle() {
     return SpeakingStyle.NONE;
   }
 
@@ -370,7 +386,7 @@ public interface TTSDialogueConfig extends Config {
       description =
           "Speaking pace for the Cloud voice, as a percentage of normal (100 = normal). Sent to"
               + " OpenRouter only when not 100; the active model may ignore it.",
-      position = 8,
+      position = 9,
       section = cloudSection)
   @Range(min = 50, max = 200)
   default int cloudPace() {
@@ -386,7 +402,7 @@ public interface TTSDialogueConfig extends Config {
               + " Wiki once, then cache the result locally so it voices correctly from then on. The"
               + " first line for such an NPC still uses the default voice while the lookup runs. Off"
               + " by default; when on it makes a network request (the NPC's name) to the wiki.",
-      position = 9,
+      position = 10,
       section = cloudSection)
   default boolean autoLearnNewNpcs() {
     return false;

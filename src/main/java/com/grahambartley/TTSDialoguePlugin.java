@@ -329,7 +329,15 @@ public class TTSDialoguePlugin extends Plugin {
       log.info("[TTS voice] resolved emotion {} for head animation {}", emotion, headAnimationId);
     }
     VoiceSpec voice = voiceManager.resolveVoice(speaker, npcName);
-    dispatch(new SynthesisRequest(text, voice, emotion, resolveProfile(speaker, npcName)));
+    boolean player = "player".equals(speaker);
+    dispatch(
+        new SynthesisRequest(
+            text,
+            voice,
+            emotion,
+            resolveProfile(speaker, npcName),
+            /* skipTranslation= */ false,
+            player));
   }
 
   /**
@@ -347,7 +355,8 @@ public class TTSDialoguePlugin extends Plugin {
             voice,
             Emotion.NEUTRAL,
             resolveProfile("player", null),
-            /* skipTranslation= */ true));
+            /* skipTranslation= */ true,
+            /* player= */ true));
   }
 
   /**
@@ -576,7 +585,14 @@ public class TTSDialoguePlugin extends Plugin {
       if (cleaned.isEmpty() || "Select an Option".equalsIgnoreCase(cleaned)) {
         continue;
       }
-      candidates.add(new SynthesisRequest(cleaned, voice, Emotion.NEUTRAL, profile));
+      candidates.add(
+          new SynthesisRequest(
+              cleaned,
+              voice,
+              Emotion.NEUTRAL,
+              profile,
+              /* skipTranslation= */ false,
+              /* player= */ true));
     }
     prefetcher.offer(candidates);
   }
