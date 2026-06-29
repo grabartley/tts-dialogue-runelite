@@ -4,9 +4,9 @@
     "schema": "npcs[id] = { race, gender, ethnicity? }",
     "source": "oldschool.runescape.wiki Infobox NPC (race/gender/leagueRegion/location), cross-referenced by name against a full id dump for variant ids, + curated tools/overrides.json; profiles from tools/profiles.json.",
     "npc_pages": 5899,
-    "count": 13663,
+    "count": 13679,
     "name_matched_ids": 713,
-    "overrides_applied": 882,
+    "overrides_applied": 946,
     "race_counts": {
       "Demon": 721,
       "Dwarf": 517,
@@ -14,15 +14,16 @@
       "Gnome": 263,
       "Goblin": 335,
       "Gorilla": 11,
-      "Human": 10126,
+      "Human": 10078,
       "Monkey": 59,
+      "Tortugan": 64,
       "Troll": 451,
       "Undead": 821,
       "Wizard": 7
     },
     "gender_counts": {
-      "Female": 1913,
-      "Male": 11750
+      "Female": 1918,
+      "Male": 11761
     },
     "ethnicity_counts": {
       "asgarnia": 571,
@@ -121,6 +122,12 @@
         "accent": "Distinguished elderly British English, Received Pronunciation.",
         "style": "A wise and learned old wizard, a sage and storyteller. Warm, knowing, and unhurried, weighty with deep arcane knowledge.",
         "pace": "Measured and thoughtful, with deliberate, knowing pauses."
+      },
+      "Tortugan": {
+        "name": "Tortugan Islander",
+        "accent": "A warm Caribbean accent, the lilting Bajan English of Barbados, melodic and unhurried with a gentle sing-song rhythm.",
+        "style": "A turtle-like islander of the Great Conch. Peaceful, self-reliant and easy-going, with a sun-warmed, seafaring calm that turns firm and steady when the island is threatened.",
+        "pace": "Relaxed and unhurried, with a natural island lilt."
       }
     },
     "byCategory": [
@@ -79578,15 +79585,15 @@
       "gender": "Male"
     },
     "14820": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14821": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14822": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14823": {
@@ -79605,80 +79612,104 @@
       "race": "Human",
       "gender": "Male"
     },
+    "14827": {
+      "race": "Tortugan",
+      "gender": "Male"
+    },
     "14828": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14829": {
-      "race": "Human",
+      "race": "Tortugan",
+      "gender": "Male"
+    },
+    "14830": {
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14831": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14832": {
-      "race": "Human",
+      "race": "Tortugan",
+      "gender": "Male"
+    },
+    "14833": {
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14834": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14835": {
-      "race": "Human",
+      "race": "Tortugan",
+      "gender": "Male"
+    },
+    "14836": {
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14837": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14838": {
-      "race": "Human",
+      "race": "Tortugan",
+      "gender": "Male"
+    },
+    "14839": {
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14840": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14841": {
-      "race": "Human",
+      "race": "Tortugan",
+      "gender": "Male"
+    },
+    "14842": {
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14843": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14844": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14845": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14846": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14847": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14848": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14849": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14850": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14851": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14852": {
@@ -79718,11 +79749,15 @@
       "gender": "Male"
     },
     "14861": {
-      "race": "Human",
+      "race": "Tortugan",
+      "gender": "Male"
+    },
+    "14862": {
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14863": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14866": {
@@ -79754,7 +79789,7 @@
       "gender": "Male"
     },
     "14873": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14874": {
@@ -79858,7 +79893,7 @@
       "gender": "Male"
     },
     "14900": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14901": {
@@ -80157,68 +80192,96 @@
       "gender": "Female",
       "ethnicity": "karamja"
     },
+    "14986": {
+      "race": "Tortugan",
+      "gender": "Female"
+    },
+    "14987": {
+      "race": "Tortugan",
+      "gender": "Female"
+    },
+    "14988": {
+      "race": "Tortugan",
+      "gender": "Female"
+    },
+    "14989": {
+      "race": "Tortugan",
+      "gender": "Female"
+    },
     "14990": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Female"
     },
     "14991": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Female"
     },
     "14992": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Female"
     },
     "14993": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Female"
     },
     "14994": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Female"
     },
+    "14995": {
+      "race": "Tortugan",
+      "gender": "Male"
+    },
+    "14996": {
+      "race": "Tortugan",
+      "gender": "Male"
+    },
+    "14997": {
+      "race": "Tortugan",
+      "gender": "Male"
+    },
     "14998": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "14999": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15000": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15001": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15002": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15003": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15004": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15005": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15006": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15007": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15008": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15009": {
@@ -80229,8 +80292,12 @@
       "race": "Human",
       "gender": "Male"
     },
+    "15011": {
+      "race": "Tortugan",
+      "gender": "Female"
+    },
     "15012": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Female"
     },
     "15013": {
@@ -80390,20 +80457,24 @@
       "race": "Human",
       "gender": "Male"
     },
+    "15061": {
+      "race": "Tortugan",
+      "gender": "Male"
+    },
     "15062": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15063": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15064": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15065": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15066": {
@@ -80787,7 +80858,7 @@
       "gender": "Male"
     },
     "15170": {
-      "race": "Human",
+      "race": "Tortugan",
       "gender": "Male"
     },
     "15171": {

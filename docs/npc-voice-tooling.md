@@ -55,7 +55,9 @@ name still resolves to a documented NPC is covered too.
   sound country Irish) even though they share the small/high goblin voice timbre.
   Gorillas are their own `Gorilla` race (deep and booming, matched before monkey)
   so apes are kept off the chattery island-monkey voice; the explicitly demonic
-  Monkey Madness 2 gorillas stay `Demon` via overrides.
+  Monkey Madness 2 gorillas stay `Demon` via overrides. Tortugans (the turtle-like
+  folk of the Great Conch) are their own `Tortugan` race, carrying a warm Bajan
+  accent everywhere they are found.
 - **Gender.** Taken verbatim (`Male`/`Female`); defaults to `Male` only when the
   wiki has none.
 - **Ethnicity.** The wiki `leagueRegion` (where the NPC is found) is the default

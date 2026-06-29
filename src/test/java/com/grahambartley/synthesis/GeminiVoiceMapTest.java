@@ -27,7 +27,8 @@ public class GeminiVoiceMapTest {
     NPCRace.TROLL,
     NPCRace.UNDEAD,
     NPCRace.DEMON,
-    NPCRace.WIZARD
+    NPCRace.WIZARD,
+    NPCRace.TORTUGAN
   };
 
   /**

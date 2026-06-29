@@ -67,6 +67,7 @@ CATEGORY_RACE_RULES = [
     ("elves", "Elf"), ("elf", "Elf"),
     ("troll", "Troll"), ("ogre", "Troll"), ("cyclop", "Troll"), ("giant", "Troll"),
     ("wizard", "Wizard"), ("sorcerer", "Wizard"),
+    ("tortugan", "Tortugan"), ("tortuga", "Tortugan"),
     ("human", "Human"),
 ]
 
@@ -80,7 +81,7 @@ DEFAULT_SUMMARY_URL = (
 )
 
 VALID_RACES = {"Human", "Elf", "Dwarf", "Goblin", "Gnome", "Monkey", "Gorilla", "Troll", "Undead",
-               "Demon", "Wizard"}
+               "Demon", "Wizard", "Tortugan"}
 VALID_GENDERS = {"Male", "Female"}
 PROFILE_FIELDS = {"name", "accent", "style", "pace"}
 
@@ -100,6 +101,7 @@ RACE_BUCKET_RULES = [
     (r"troll|\bgiant\b|cyclops|ogre|\bent\b|\bgolem\b|\bhuman.*giant", "Troll"),
     (r"gorilla", "Gorilla"),
     (r"monkey|primate|baboon|mandril", "Monkey"),
+    (r"tortugan|tortuga", "Tortugan"),
     (r"\bhuman\b|\bman\b|\bwoman\b|\bgnome child\b", "Human"),
 ]
 RACE_BUCKET_RULES = [(re.compile(p, re.IGNORECASE), b) for p, b in RACE_BUCKET_RULES]

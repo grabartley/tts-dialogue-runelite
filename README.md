@@ -76,7 +76,7 @@ Per-NPC expression heads (e.g. `lore_lizard_chat_happy` 4843, `peng_chat_sad` 56
 
 ## Voices
 
-Each NPC's voice is chosen by race and gender, and the player has a dedicated voice. Race and gender come from a static, precomputed `npcId -> {race, gender}` lookup table bundled with the plugin, so choosing a voice at runtime is a single in-memory lookup with no network calls. The matrix spans ten races across two genders plus player voices, and each category maps to a distinct speaker so they sound genuinely different.
+Each NPC's voice is chosen by race and gender, and the player has a dedicated voice. Race and gender come from a static, precomputed `npcId -> {race, gender}` lookup table bundled with the plugin, so choosing a voice at runtime is a single in-memory lookup with no network calls. The matrix spans eleven races across two genders plus player voices, and each category maps to a distinct speaker so they sound genuinely different.
 
 | Category | Male | Female |
 |----------|------|--------|
@@ -91,6 +91,7 @@ Each NPC's voice is chosen by race and gender, and the player has a dedicated vo
 | **Undead** | `am_echo` | `af_nicole` |
 | **Demon** | `bm_daniel` | `af_river` |
 | **Wizard** | `bm_fable` | `af_alloy` |
+| **Tortugan** | `am_santa` | `af_nova` |
 
 An NPC missing from the table uses the default Human voice. The lookup table is generated offline and can be grown over time; see [docs/npc-voice-tooling.md](docs/npc-voice-tooling.md) for how it is built and how to add or correct entries.
 

@@ -40,6 +40,8 @@ final class SpeakerMatrix {
   private static final int DEMON_FEMALE = 8; // af_river
   private static final int WIZARD_MALE = 25; // bm_fable
   private static final int WIZARD_FEMALE = 0; // af_alloy
+  private static final int TORTUGAN_MALE = 19; // am_santa
+  private static final int TORTUGAN_FEMALE = 7; // af_nova
 
   /**
    * Resolves the Kokoro speaker id for the given voice request. Unknown races collapse to the human
@@ -71,6 +73,8 @@ final class SpeakerMatrix {
         return female ? MONKEY_FEMALE : MONKEY_MALE;
       case "GORILLA":
         return female ? GORILLA_FEMALE : GORILLA_MALE;
+      case "TORTUGAN":
+        return female ? TORTUGAN_FEMALE : TORTUGAN_MALE;
       case "HUMAN":
       default:
         return female ? HUMAN_FEMALE : HUMAN_MALE;

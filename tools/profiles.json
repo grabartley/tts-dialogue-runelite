@@ -78,6 +78,12 @@
       "accent": "Distinguished elderly British English, Received Pronunciation.",
       "style": "A wise and learned old wizard, a sage and storyteller. Warm, knowing, and unhurried, weighty with deep arcane knowledge.",
       "pace": "Measured and thoughtful, with deliberate, knowing pauses."
+    },
+    "Tortugan": {
+      "name": "Tortugan Islander",
+      "accent": "A warm Caribbean accent, the lilting Bajan English of Barbados, melodic and unhurried with a gentle sing-song rhythm.",
+      "style": "A turtle-like islander of the Great Conch. Peaceful, self-reliant and easy-going, with a sun-warmed, seafaring calm that turns firm and steady when the island is threatened.",
+      "pace": "Relaxed and unhurried, with a natural island lilt."
     }
   },
   "byCategory": [
