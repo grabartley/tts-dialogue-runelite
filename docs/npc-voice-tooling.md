@@ -147,7 +147,7 @@ the most specific layer that sets each one wins.
    Sophanem/Menaphos -> Egyptian, Karamja -> West African, Fremennik -> Norse,
    Morytania -> Eastern European gothic, Varlamore -> Mediterranean), the central
    kingdoms use distinct English regional accents (Misthalin, Asgarnia West
-   Country, Kandarin Yorkshire, Kourend, Wilderness), and Tirannwn is Welsh.
+   Country, Kandarin Liverpudlian, Kourend, Wilderness), and Tirannwn is Welsh.
 4. `byCategory[]` - an ordered list; **every** entry whose `keywords` word-match
    the display name contributes. This expresses categories the race buckets cannot
    (leprechaun -> Irish, vampyre -> Dracula-esque, gnome, imp, ghost, pirate,
