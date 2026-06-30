@@ -15,7 +15,7 @@ Out of the box it runs entirely on your machine: no accounts, no cloud calls, no
 
 ## Install
 
-Install from the **RuneLite Plugin Hub**: open RuneLite, click the wrench (Configuration) icon, open the **Plugin Hub**, search for **Voiced Dialogue**, and install it. The plugin jar itself is tiny and pure-JVM. The text-to-speech engine and its voice model live outside the jar and are obtained at runtime: the first time the local voice speaks, the plugin downloads and installs the matching engine for your operating system into `~/.runelite/tts-dialogue/`, verifies it, and reuses it from then on. Give that first line a moment; everything after is fast.
+Install from the **RuneLite Plugin Hub**: open RuneLite, click the wrench (Configuration) icon, open the **Plugin Hub**, search for **Voiced Dialogue**, and install it. The plugin jar itself is tiny and pure-JVM. The text-to-speech engine and its voice model live outside the jar and are obtained at runtime: the first time the local voice speaks, the plugin downloads and installs the matching engine for your operating system into `~/.runelite/tts-dialogue/`, verifies it, and reuses it from then on.
 
 ## Backends
 
@@ -109,7 +109,7 @@ Settings are split into three categories that mirror the in-game panel: **Genera
 
 | Setting | Default | What it does |
 |---------|---------|--------------|
-| **Voice Backend** | `Cloud` | Selects the synthesis engine. `Cloud` (recommended) needs a free OpenRouter API key and, while active, sends your dialogue text to OpenRouter to be voiced. `Local` is a free, offline, no-key voice that is basic and neutral-only. The selected backend is the only one used; there is no fallback between them, so Cloud lines stay silent until a key is set. |
+| **Voice Backend** | `Cloud` | Selects the synthesis engine. `Cloud` (default) needs a free OpenRouter API key and, while active, sends your dialogue text to OpenRouter to be voiced. `Local` is a free, offline, no-key voice that is basic and neutral-only. The selected backend is the only one used; there is no fallback between them, so Cloud lines stay silent until a key is set. |
 | **Player Voice** | `Type A` | The voice used for your own character's dialogue and public chat, on both backends. |
 | **Dialogue Volume** | `20` | Loudness of the spoken dialogue, from `0` (muted) to `100`. |
 | **Voice My Public Chat** | `Off` | Speaks your own public chat messages aloud in your player voice. Only your own messages are voiced (other players' public chat is ignored), and chat is spoken exactly as typed: Spoken Language and the Player/NPC Speaking Style are never applied to it. |

@@ -1,6 +1,6 @@
 ---
 name: fill-npc-profiles-batch
-description: Bulk-author bespoke per-NPC voice profiles (and race/gender/ethnicity corrections) for a whole league region, researching each from the OSRS Wiki and osrs MCP. Use for the region-by-region rollout (umbrella issue #122; batches #123-125...) or when asked to "fill in NPC profiles" for an area.
+description: Bulk-author bespoke per-NPC voice profiles (and race/gender/ethnicity corrections) for a whole league region, researching each from the OSRS Wiki and osrs MCP. Use for the region-by-region rollout or when asked to "fill in NPC profiles" for an area.
 ---
 
 # Fill in NPC profiles for a league region

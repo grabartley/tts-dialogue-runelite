@@ -89,9 +89,3 @@ Windows SmartScreen may warn on an unsigned bundle; choose **More info -> Run an
 ## Versioning
 
 The plugin and engine versions are **decoupled**. The manifest is the contract between them: a given plugin build points at exactly one engine release through the bundled manifest. When the engine or its `--stdio` protocol changes, bump the engine version, re-run `kokoro-engine-release.yml`, merge the new manifest, and re-tag the plugin commit submitted to the Hub. A plugin-only change that does not touch the protocol can ship against the existing engine release without cutting a new one.
-
-## Current status / gaps
-
-State as of now, so the runbook is not read as already-done:
-
-- **No engine Release exists yet.** `kokoro-engine-release.yml` has not been run, so there is no published GitHub Release and the bundled `engine-manifest.json` still ships the dev placeholder (empty `url`/`sha256`). The installer correctly treats that as "no engine to install." Step 1 of the runbook is the first thing that produces a real engine.
