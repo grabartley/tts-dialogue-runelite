@@ -9,14 +9,14 @@ Runs the RuneLite dev client with the TTS Dialogue plugin loaded for manual test
 
 ## Quick Start
 
-Ensure Java 17 is active (`jenv local 17` or `sdk use java 17-amzn`), build the plugin, then launch via the `com.grahambartley.TTSDialoguePluginTest` entry point (the shadow jar's `Main-Class`), passing `--developer-mode` so the dev client logs in and exposes developer tooling:
+Ensure Java 17 is active (`jenv local 17` or `sdk use java 17-amzn`), build the plugin, then launch via the `com.grahambartley.TTSDialoguePluginRunner` entry point (the shadow jar's `Main-Class`), passing `--developer-mode` so the dev client logs in and exposes developer tooling:
 
 ```bash
 ./gradlew shadowJar
 java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/tTSDialogue-1.0-SNAPSHOT-all.jar --developer-mode --debug 2>&1 | tee /tmp/tts-client.log
 ```
 
-`TTSDialoguePluginTest.main` forwards these program arguments to `RuneLite.main`. `--developer-mode` belongs only with this launcher and is required for login to work; omit it and login fails. `--debug` is optional and turns on RuneLite debug-level logging, which pairs well with the plugin's Debug Mode config toggle.
+`TTSDialoguePluginRunner.main` forwards these program arguments to `RuneLite.main`. `--developer-mode` belongs only with this launcher and is required for login to work; omit it and login fails. `--debug` is optional and turns on RuneLite debug-level logging, which pairs well with the plugin's Debug Mode config toggle.
 
 **Always write the client output to `/tmp/tts-client.log`** (the `tee` above, or `> /tmp/tts-client.log 2>&1 &` when launching in the background) so the logs can be read and grepped during and after testing. With Debug Mode on, that file carries the `[TTS profile]` / `[TTS voice]` / `[TTS cloud]` traces used to diagnose voice issues (see the `diagnose-npc-voice` skill).
 
@@ -30,7 +30,7 @@ To write or refresh the credentials (requires RuneLite launcher 2.6.3+):
 
 1. macOS: `/Applications/RuneLite.app/Contents/MacOS/RuneLite --configure`, then add `--insecure-write-credentials` to the `Client arguments` box and save.
 2. Launch RuneLite once through the Jagex launcher so it writes fresh `JX_*` tokens into `~/.runelite/credentials.properties`.
-3. Re-run the dev client (`TTSDialoguePluginTest`); it picks up the saved credentials and logs in without a password.
+3. Re-run the dev client (`TTSDialoguePluginRunner`); it picks up the saved credentials and logs in without a password.
 
 Keep `credentials.properties` private, and delete it (or use "End sessions" on the account site) to return the client to normal.
 
