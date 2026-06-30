@@ -5,9 +5,9 @@ import static org.junit.Assert.assertTrue;
 
 import com.grahambartley.TTSDialogueConfig;
 import com.grahambartley.TTSDialogueConfig.VoiceBackend;
-import com.grahambartley.VoiceManager.NPCGender;
-import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.tts.Pcm;
+import com.grahambartley.voice.VoiceManager.NPCGender;
+import com.grahambartley.voice.VoiceManager.NPCRace;
 import java.util.EnumSet;
 import org.junit.Test;
 

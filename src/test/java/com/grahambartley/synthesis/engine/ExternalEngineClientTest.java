@@ -8,12 +8,12 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.grahambartley.VoiceManager.NPCGender;
-import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.SynthesisRequest;
 import com.grahambartley.synthesis.VoiceSpec;
 import com.grahambartley.tts.Pcm;
+import com.grahambartley.voice.VoiceManager.NPCGender;
+import com.grahambartley.voice.VoiceManager.NPCRace;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

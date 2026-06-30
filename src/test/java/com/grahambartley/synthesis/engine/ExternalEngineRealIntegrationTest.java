@@ -5,12 +5,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import com.google.gson.Gson;
-import com.grahambartley.VoiceManager.NPCGender;
-import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.SynthesisRequest;
 import com.grahambartley.synthesis.VoiceSpec;
 import com.grahambartley.tts.Pcm;
+import com.grahambartley.voice.VoiceManager.NPCGender;
+import com.grahambartley.voice.VoiceManager.NPCRace;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

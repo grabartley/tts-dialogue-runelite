@@ -2,9 +2,9 @@ package com.grahambartley.synthesis;
 
 import static org.junit.Assert.assertEquals;
 
-import com.grahambartley.VoiceManager.NPCGender;
-import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.tts.Pcm;
+import com.grahambartley.voice.VoiceManager.NPCGender;
+import com.grahambartley.voice.VoiceManager.NPCRace;
 import java.util.EnumSet;
 import org.junit.Test;
 

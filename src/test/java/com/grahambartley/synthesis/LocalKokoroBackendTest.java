@@ -7,11 +7,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.grahambartley.VoiceManager.NPCGender;
-import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.synthesis.engine.EngineInstaller;
 import com.grahambartley.synthesis.engine.ExternalEngineClient;
 import com.grahambartley.tts.Pcm;
+import com.grahambartley.voice.VoiceManager.NPCGender;
+import com.grahambartley.voice.VoiceManager.NPCRace;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;

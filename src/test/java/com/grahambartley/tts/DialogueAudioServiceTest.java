@@ -8,13 +8,13 @@ import static org.junit.Assert.assertTrue;
 
 import com.grahambartley.TTSDialogueConfig;
 import com.grahambartley.TTSDialogueConfig.VoiceBackend;
-import com.grahambartley.VoiceManager.NPCGender;
-import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.synthesis.BackendProvider;
 import com.grahambartley.synthesis.Emotion;
 import com.grahambartley.synthesis.SynthesisBackend;
 import com.grahambartley.synthesis.SynthesisRequest;
 import com.grahambartley.synthesis.VoiceSpec;
+import com.grahambartley.voice.VoiceManager.NPCGender;
+import com.grahambartley.voice.VoiceManager.NPCRace;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;

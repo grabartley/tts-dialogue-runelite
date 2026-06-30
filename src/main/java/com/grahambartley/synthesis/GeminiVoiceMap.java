@@ -1,7 +1,7 @@
 package com.grahambartley.synthesis;
 
-import com.grahambartley.VoiceManager.NPCGender;
-import com.grahambartley.VoiceManager.NPCRace;
+import com.grahambartley.voice.VoiceManager.NPCGender;
+import com.grahambartley.voice.VoiceManager.NPCRace;
 import java.util.EnumMap;
 import java.util.Map;
 

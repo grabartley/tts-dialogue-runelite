@@ -1,6 +1,6 @@
 package com.grahambartley.synthesis;
 
-import com.grahambartley.VoiceManager;
+import com.grahambartley.voice.VoiceManager;
 
 /**
  * Backend-neutral description of <em>who</em> is speaking: the player, or an NPC of a given race

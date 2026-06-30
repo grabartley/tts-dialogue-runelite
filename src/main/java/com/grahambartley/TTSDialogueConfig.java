@@ -1,5 +1,6 @@
 package com.grahambartley;
 
+import com.grahambartley.voice.VoiceManager;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
