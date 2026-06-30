@@ -512,9 +512,6 @@ public class OpenRouterTtsBackendTest {
       new Object[] {
         "English", TTSDialogueConfig.SpeakingStyle.IRISH_SLANG, "English with Dublin Slang"
       },
-      new Object[] {
-        "English", TTSDialogueConfig.SpeakingStyle.COCKNEY, "English with Cockney rhyming slang"
-      },
       new Object[] {"English", TTSDialogueConfig.SpeakingStyle.RHYMING, "English as rhyming verse"},
       new Object[] {
         "French", TTSDialogueConfig.SpeakingStyle.SURFER, "French with laid-back surfer slang"

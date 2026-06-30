@@ -75,7 +75,7 @@ NPCs added to the game since the last plugin update will not be in the bundled t
 <details>
 <summary><b>Languages and speaking styles</b> (Cloud)</summary>
 
-Set **Spoken Language** to anything other than English and each line is translated before it is voiced, with names and RuneScape terms preserved and translations cached per language. On top of that, a **Speaking Style** (Gen Z slang, pirate speak, and more) layers a delivery register, set independently for your own lines (**Player Speaking Style**) and NPC lines (**NPC Speaking Style**). So you can be a roadman among posh nobles, or turn the realm into a pirate crew.
+Set **Spoken Language** to anything other than English and each line is translated before it is voiced, with names and RuneScape terms preserved and translations cached per language. On top of that, a **Speaking Style** (Gen Z slang, pirate speak, Shakespearean, cyberpunk, Westeros, and more) layers a delivery register, set independently for your own lines (**Player Speaking Style**) and NPC lines (**NPC Speaking Style**). So you can be a roadman among posh nobles, or turn the realm into a pirate crew.
 
 </details>
 
