@@ -38,7 +38,8 @@ repo; copy it into the fork and fill in the commit.
 - `runelite-plugin.properties` is non-placeholder (no `Example` / `Nobody` /
   `An example greeter plugin`, which the packager rejects).
 - The plugin jar builds clean: no native libraries, no model, well under the 10 MiB
-  source/jar limit. `./gradlew jar` produces a ~90 KiB jar.
+  source/jar limit. `./gradlew jar` produces a ~362 KiB jar (mostly the bundled
+  `npc-voices.json` data table).
 
 ## Step 1: Tag a release commit on this repo
 
@@ -105,7 +106,7 @@ Common automated-audit failures and how this repo already avoids them:
 | No bundled native libraries / no model in the jar | The engine + model are downloaded at runtime by `EngineInstaller`; the jar is classes + four JSON resources only. |
 | No `new OkHttpClient()` / `new OkHttpClient.Builder()` / `new Gson()` / `new GsonBuilder()` (disallowed APIs) | All HTTP/JSON uses the injected `OkHttpClient` / `Gson`. |
 | Resources via `getResourceAsStream` (jar not unpacked) | All bundled JSON loads via `getResourceAsStream`. |
-| Jar under 10 MiB | ~90 KiB. No `jarSizeLimitMiB` override needed. |
+| Jar under 10 MiB | ~362 KiB. No `jarSizeLimitMiB` override needed. |
 | `displayName` / `author` / `description` not the template placeholders | Set to real values. |
 
 ## Step 6: Updating later
