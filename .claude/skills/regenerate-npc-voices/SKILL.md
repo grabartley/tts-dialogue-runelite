@@ -42,4 +42,5 @@ edit the README figures in the same commit so they never drift.
 
 - The full run scrapes a few thousand pages (minutes). Race/gender/ethnicity come from the wiki, so accuracy tracks the wiki.
 - Coverage gaps that fall to overrides or the runtime wiki fallback: variant ids in neither the wiki id-lists nor the id dump; talkable monsters whose category gives no race; disambiguation-named NPCs ("Citizen", "Priest") with no page data.
+- To find which NPCs still **need** a bespoke profile, the authoritative talkable signal is the existence of a `Transcript:<name>` page (wiki namespace 120), not the infobox `Talk-to` options line, which is blank on many genuine talkers (monster-infobox bosses, the Dorgesh-Kaan cave goblins). See `fill-npc-profiles-batch` section 1 for the batch query.
 - See `add-npc-profile` to make a change and `diagnose-npc-voice` to investigate one.

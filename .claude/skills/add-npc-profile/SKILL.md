@@ -44,6 +44,12 @@ multiloc NPCs differs from the base composition id. Get it from **Debug Mode**
 (it logs `id=` per line), the OSRS Wiki infobox, or the osrs MCP `search_npctypes`.
 An NPC can have several variant ids, list them all in overrides.
 
+To check whether an NPC even **speaks** (so it deserves a profile rather than being
+a silent mob/critter), the reliable signal is whether the wiki has a
+`Transcript:<name>` page (namespace 120), not the infobox `Talk-to` line, which is
+blank on many genuine talkers (monster-infobox bosses, cave goblins). See
+`fill-npc-profiles-batch` for the batch sweep.
+
 ## World rules (keep consistent)
 
 - British medieval fantasy. Commoners speak **common** British; royalty/knights/nobles/high society are **posh** RP, carried by the role's **style register**, not an accent. Distinctive races and lore creatures keep their accents (dwarf Scottish, troll Brixton, gnome country Irish, leprechaun Irish, vampyre Dracula, Fremennik Norse, wizard wise).

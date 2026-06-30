@@ -56,7 +56,7 @@ public class NPCDemographicAnalyzerTest {
     // human-male default. Ids are real cache ids verified against the osrs data.
     assertAttributes(3105, "Human", "Male"); // Hans
     assertAttributes(306, "Human", "Male"); // Lumbridge Guide
-    assertAttributes(225, "Human", "Male"); // Cook
+    assertAttributes(225, "Human", "Female"); // Cook (servant), female per the wiki
     assertAttributes(2812, "Human", "Male"); // Father Aereck
     assertAttributes(5037, "Human", "Male"); // Romeo
     assertAttributes(5035, "Human", "Female"); // Juliet
