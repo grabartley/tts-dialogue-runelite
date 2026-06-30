@@ -142,6 +142,27 @@ public class NpcProfilesResourceTest {
   }
 
   @Test
+  public void newlyAddedBespokeNpcsResolveByIdFromTheBundledTable() {
+    NpcProfileTable.Resolution roald = table.resolveNpc(1399, "King Roald", "Human", "misthalin");
+    assertTrue("King Roald resolves by his bespoke id", roald.source().contains("id:1399"));
+    assertEquals("King Roald's bespoke name wins", "King Roald", roald.profile().name());
+
+    NpcProfileTable.Resolution aubury = table.resolveNpc(10681, "Aubury", "Human", "misthalin");
+    assertEquals("Aubury's bespoke name wins", "Aubury", aubury.profile().name());
+  }
+
+  @Test
+  public void barrowsBrothersResolveGhostlyUndeadWithBespokeId() {
+    NpcProfileTable.Resolution ahrim =
+        table.resolveNpc(1672, "Ahrim the Blighted", "Undead", "misthalin");
+    assertTrue("Ahrim keeps his bespoke id layer", ahrim.source().contains("id:1672"));
+    assertEquals("Ahrim's bespoke name wins", "Ahrim the Blighted", ahrim.profile().name());
+    assertTrue(
+        "the Undead racial accent drives the ghostly timbre, not the British default",
+        ahrim.source().contains("race:Undead"));
+  }
+
+  @Test
   public void thePlayerProfileResolvesFromTheBundledTable() {
     CharacterProfile p = table.resolvePlayer(null, null, null);
     assertTrue("the player has a name label", p.name() != null && !p.name().isEmpty());

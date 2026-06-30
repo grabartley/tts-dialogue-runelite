@@ -18,7 +18,7 @@ makes sense if a reviewer asks for it.
 
 ## 1. Build the candidate list: league region UNION location UNION category, deduped
 
-Select on **three** signals and take the **union, deduped by id**, so nothing
+Select on **four** signals and take the **union, deduped by id**, so nothing
 between or under the towns is missed:
 
 1. **By `leagueRegion`** equal to the region (single-region only).
@@ -37,10 +37,25 @@ between or under the towns is missed:
    is what catches the Canifis citizens (ids 2613-2632: Boris, Galina, Svetlana,
    ...), tagged only `Category:Canifis` + `Category:Monsters`, with an otherwise
    empty infobox.
+4. **By `Transcript:<name>` existence.** This is the **authoritative talkable
+   signal** and the one that does not depend on the infobox at all. If the wiki
+   has a `Transcript:<page title>` page (namespace 120), the NPC speaks readable
+   in-game dialogue, full stop, even when its `|options=` line is blank, its page
+   is an `Infobox Monster`, and it carries no `leagueRegion`/`location`/category.
+   This is what catches the talkable **monster-infobox** characters the `Talk-to`
+   filter misses on its own (quest bosses with battle lines, the Weiss/Death
+   Plateau trolls, the Dorgesh-Kaan cave goblins, Generals Bentnoze/Wartface,
+   ...). Batch-query it: `action=query&titles=Transcript:<A>|Transcript:<B>|...`
+   and keep every title whose page is not `missing`. **Do not gate on the
+   `Talk-to` options line alone, it silently drops every blank-options talker.**
+   Caveat: a `Transcript` page exists for some non-speech critters too (a few
+   cats/cows whose "dialogue" is meows/quacks) and for combat-only mobs whose only
+   lines are death taunts, so it surfaces for triage; the per-NPC research pass
+   (does it speak intelligible words?) still decides `voiced`.
 
-Do **not** rely on `leagueRegion` alone, and do **not** filter by town as the
-*only* axis either. Union all three. The generator already enumerates and parses
-every NPC page; reuse its functions:
+Do **not** rely on `leagueRegion` alone, do **not** filter by town as the *only*
+axis, and do **not** rely on the `Talk-to` options line alone. Union all four. The
+generator already enumerates and parses every NPC page; reuse its functions:
 
 ```python
 import sys; sys.path.insert(0, "tools"); import generate_npc_voices as g
@@ -69,19 +84,21 @@ below, keep the named humanoid residents. Never trust a single axis to be
 complete; the union plus the sweeps in section 4 are the only safety net.
 
 Then:
-- **Talkable filter:** keep NPCs whose `|options...=` line contains `Talk-to`
-  (case-insensitive), **plus** every category-axis hit whose page is a named
-  humanoid resident even though its options line is blank. This drops museum
+- **Talkable filter:** keep NPCs whose page has a `Transcript:<name>` page (the
+  authoritative talkable signal, axis 4) **or** whose `|options...=` line contains
+  `Talk-to` (case-insensitive), **plus** every category-axis hit whose page is a
+  named humanoid resident even though its options line is blank. This drops museum
   displays, livestock, pets, furniture, and fake-player NPCs. **Caveat:** many
   NPCs that genuinely talk in-game have a blank options line, only an
   `Infobox Monster` page, or a near-empty infobox (the Dorgesh-Kaan cave goblin
-  miners/guards; the Canifis citizens). The Talk-to line, `leagueRegion`, and
-  `location` are **all** empty on those, so only the **category axis** above
-  surfaces them, and then only a human/agent eyeball separates the talkable
-  resident from the pure mob (the wiki tags an attackable townsperson
-  `Category:Monsters` exactly like a Basilisk). Treat the **category sweep**, the
-  **race-sanity sweep**, and the **in-game QA pass** (sections 1, 4, 6) as the
-  safety nets; do not assume the wiki is complete or the options line is present.
+  miners/guards; the Canifis citizens; talkable bosses). The Talk-to line,
+  `leagueRegion`, and `location` are **all** empty on those, so the **Transcript
+  axis** (and secondarily the **category axis**) is what surfaces them, and then a
+  human/agent eyeball separates the talkable resident from the pure mob (the wiki
+  tags an attackable townsperson `Category:Monsters` exactly like a Basilisk).
+  Treat the **Transcript axis**, the **category sweep**, the **race-sanity
+  sweep**, and the **in-game QA pass** (sections 1, 4, 6) as the safety nets; do
+  not assume the wiki is complete or the options line is present.
 - **Subtract the already-bespoke:** skip any NPC whose ids are already in
   `tools/profiles.json` `byId`.
 - **Cache** the enumeration/fetch to a temp file. The full wiki crawl takes
@@ -132,6 +149,18 @@ differs; most locals need none.
 
 ## 4. Gotchas (learned the hard way)
 
+- **Transcript sweep (catches blank-options + monster-infobox talkers).** Run this
+  as the primary talkable detector, not an afterthought. A `Transcript:<page>` page
+  (wiki namespace 120) existing means the NPC speaks readable dialogue in-game,
+  independent of the infobox, so it surfaces the talkers that the `Talk-to`
+  options line, `leagueRegion`, `location`, and category all miss: quest bosses
+  with battle lines, the Weiss/Death Plateau trolls, the Dorgesh-Kaan cave goblins,
+  Generals Bentnoze/Wartface, and so on. Batch-query
+  `action=query&titles=Transcript:<A>|Transcript:<B>|...` (50 at a time) over every
+  not-yet-bespoke page and keep the non-`missing` hits. It is noisy in one
+  direction only (a few non-speech critters and combat-taunt mobs also have a
+  transcript), so it surfaces for triage; the per-NPC `voiced` decision still drops
+  the meowers. Do **not** gate the candidate list on the `Talk-to` line alone.
 - **Ethnicity applies only to plain folk.** The resolver
   (`NpcProfileTable.resolveNpc`) layers `byEthnicity` only when race is
   `Human`/`Unknown`. For a Dwarf/Goblin/Gnome/Troll/etc. the ethnicity field is a
