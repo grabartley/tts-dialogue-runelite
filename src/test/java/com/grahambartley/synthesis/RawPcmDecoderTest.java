@@ -6,9 +6,13 @@ import static org.junit.Assert.assertTrue;
 
 import com.grahambartley.tts.Pcm;
 import java.io.ByteArrayOutputStream;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /** Decoding OpenRouter's headerless 16-bit LE mono PCM into Pcm at a known sample rate. */
+@RunWith(JUnitParamsRunner.class)
 public class RawPcmDecoderTest {
 
   /** Builds the raw, headerless little-endian byte stream for the given 16-bit samples. */
@@ -55,10 +59,18 @@ public class RawPcmDecoderTest {
         RawPcmDecoder.decode(new byte[] {1, 2, 3}, 24_000));
   }
 
+  private Object[] rejectedInputs() {
+    return new Object[] {
+      new Object[] {null, 24_000},
+      new Object[] {new byte[] {1}, 24_000},
+      // a non-positive rate is rejected
+      new Object[] {raw(new short[] {1}), 0},
+    };
+  }
+
   @Test
-  public void rejectsNullEmptyOrBadRate() {
-    assertNull(RawPcmDecoder.decode(null, 24_000));
-    assertNull(RawPcmDecoder.decode(new byte[] {1}, 24_000));
-    assertNull("a non-positive rate is rejected", RawPcmDecoder.decode(raw(new short[] {1}), 0));
+  @Parameters(method = "rejectedInputs")
+  public void rejectsNullEmptyOrBadRate(byte[] data, int rate) {
+    assertNull(RawPcmDecoder.decode(data, rate));
   }
 }

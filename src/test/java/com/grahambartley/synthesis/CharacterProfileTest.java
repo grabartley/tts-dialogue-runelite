@@ -4,9 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /** The rendered AUDIO PROFILE block format and the content-derived cache key. */
+@RunWith(JUnitParamsRunner.class)
 public class CharacterProfileTest {
 
   private static final CharacterProfile WIZARD =
@@ -74,26 +78,18 @@ public class CharacterProfileTest {
   }
 
   @Test
-  public void cacheKeyChangesWhenAnyFieldChanges() {
-    assertNotEquals(
-        "a changed style re-keys",
-        WIZARD.cacheKey(),
-        new CharacterProfile(
-                "Wizard",
-                "Distinguished elderly British English.",
-                "A foolish wizard.",
-                "Measured.")
-            .cacheKey());
-    assertNotEquals(
-        "a changed accent re-keys",
-        WIZARD.cacheKey(),
-        new CharacterProfile("Wizard", "Irish English.", "A wise old wizard.", "Measured.")
-            .cacheKey());
-    assertNotEquals(
-        "a changed name re-keys",
-        WIZARD.cacheKey(),
-        new CharacterProfile(
-                "Mage", "Distinguished elderly British English.", "A wise old wizard.", "Measured.")
-            .cacheKey());
+  @Parameters(method = "changedFieldProfiles")
+  public void cacheKeyChangesWhenAnyFieldChanges(CharacterProfile changed) {
+    assertNotEquals(WIZARD.cacheKey(), changed.cacheKey());
+  }
+
+  private Object[] changedFieldProfiles() {
+    return new Object[] {
+      new CharacterProfile(
+          "Wizard", "Distinguished elderly British English.", "A foolish wizard.", "Measured."),
+      new CharacterProfile("Wizard", "Irish English.", "A wise old wizard.", "Measured."),
+      new CharacterProfile(
+          "Mage", "Distinguished elderly British English.", "A wise old wizard.", "Measured."),
+    };
   }
 }

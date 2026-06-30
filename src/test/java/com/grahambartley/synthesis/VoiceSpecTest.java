@@ -7,26 +7,51 @@ import static org.junit.Assert.assertTrue;
 
 import com.grahambartley.VoiceManager.NPCGender;
 import com.grahambartley.VoiceManager.NPCRace;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(JUnitParamsRunner.class)
 public class VoiceSpecTest {
 
   @Test
-  public void playerKeyOmitsRace() {
-    assertEquals("player:MALE", VoiceSpec.player(NPCGender.MALE).key());
-    assertEquals("player:FEMALE", VoiceSpec.player(NPCGender.FEMALE).key());
+  @Parameters(method = "playerKeyCases")
+  public void playerKeyOmitsRace(NPCGender gender, String expected) {
+    assertEquals(expected, VoiceSpec.player(gender).key());
+  }
+
+  private Object[] playerKeyCases() {
+    return new Object[] {
+      new Object[] {NPCGender.MALE, "player:MALE"},
+      new Object[] {NPCGender.FEMALE, "player:FEMALE"},
+    };
   }
 
   @Test
-  public void npcKeyCarriesRaceAndGender() {
-    assertEquals("npc:ELF:FEMALE", VoiceSpec.npc(NPCRace.ELF, NPCGender.FEMALE).key());
-    assertEquals("npc:DEMON:MALE", VoiceSpec.npc(NPCRace.DEMON, NPCGender.MALE).key());
+  @Parameters(method = "npcKeyCases")
+  public void npcKeyCarriesRaceAndGender(NPCRace race, NPCGender gender, String expected) {
+    assertEquals(expected, VoiceSpec.npc(race, gender).key());
+  }
+
+  private Object[] npcKeyCases() {
+    return new Object[] {
+      new Object[] {NPCRace.ELF, NPCGender.FEMALE, "npc:ELF:FEMALE"},
+      new Object[] {NPCRace.DEMON, NPCGender.MALE, "npc:DEMON:MALE"},
+    };
   }
 
   @Test
-  public void playerSpecIsFlaggedAsPlayer() {
-    assertTrue(VoiceSpec.player(NPCGender.MALE).player());
-    assertFalse(VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE).player());
+  @Parameters(method = "playerFlagCases")
+  public void playerSpecIsFlaggedAsPlayer(VoiceSpec spec, boolean expected) {
+    assertEquals(expected, spec.player());
+  }
+
+  private Object[] playerFlagCases() {
+    return new Object[] {
+      new Object[] {VoiceSpec.player(NPCGender.MALE), true},
+      new Object[] {VoiceSpec.npc(NPCRace.HUMAN, NPCGender.MALE), false},
+    };
   }
 
   @Test

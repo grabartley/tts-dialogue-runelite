@@ -7,9 +7,13 @@ import static org.junit.Assert.assertTrue;
 
 import com.grahambartley.VoiceManager.KokoroVoice;
 import com.grahambartley.VoiceManager.NPCGender;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /** Gender-segregated British speaker pools and the stable per-NPC speaker hashing (#78). */
+@RunWith(JUnitParamsRunner.class)
 public class KokoroSpeakerPoolTest {
 
   @Test
@@ -30,10 +34,14 @@ public class KokoroSpeakerPoolTest {
     }
   }
 
+  private Object[] playerSpeakerGenderCases() {
+    return new Object[] {NPCGender.MALE, NPCGender.FEMALE};
+  }
+
   @Test
-  public void playerSpeakerIsBritishAndGenderCorrect() {
-    assertEquals(NPCGender.MALE, genderOf(KokoroSpeakerPool.playerSpeaker(NPCGender.MALE)));
-    assertEquals(NPCGender.FEMALE, genderOf(KokoroSpeakerPool.playerSpeaker(NPCGender.FEMALE)));
+  @Parameters(method = "playerSpeakerGenderCases")
+  public void playerSpeakerIsGenderCorrect(NPCGender gender) {
+    assertEquals(gender, genderOf(KokoroSpeakerPool.playerSpeaker(gender)));
   }
 
   @Test

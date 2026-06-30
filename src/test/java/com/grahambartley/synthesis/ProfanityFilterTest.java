@@ -3,54 +3,98 @@ package com.grahambartley.synthesis;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * The offline masker (#149): base-word hits, leetspeak/separator evasions, Scunthorpe-style
  * false-positive safety, casing/punctuation preservation, idempotency, and the load-once latency
  * budget. Exercises the bundled {@code /profanity.txt} via the no-arg constructor.
  */
+@RunWith(JUnitParamsRunner.class)
 public class ProfanityFilterTest {
 
   private final ProfanityFilter filter = new ProfanityFilter();
 
-  @Test
-  public void masksABaseWordButKeepsSurroundingTextAndCasing() {
-    assertEquals("Oh **** off, adventurer.", filter.mask("Oh shit off, adventurer."));
-    assertEquals("casing of clean words is preserved", "You ****!", filter.mask("You Twat!"));
+  private Object[] baseWordCases() {
+    return new Object[] {
+      new Object[] {"Oh shit off, adventurer.", "Oh **** off, adventurer."},
+      // casing of clean words is preserved
+      new Object[] {"You Twat!", "You ****!"},
+    };
   }
 
   @Test
-  public void resolvesLeetspeakEvasions() {
-    assertEquals("****", filter.mask("sh1t"));
-    assertEquals("leading symbol substitution", "***", filter.mask("@ss"));
-    assertEquals("trailing symbol substitution", "***", filter.mask("a$$"));
-    assertEquals("*****", filter.mask("b1tch"));
+  @Parameters(method = "baseWordCases")
+  public void masksABaseWordButKeepsSurroundingTextAndCasing(String input, String expected) {
+    assertEquals(expected, filter.mask(input));
+  }
+
+  private Object[] leetspeakCases() {
+    return new Object[] {
+      new Object[] {"sh1t", "****"},
+      // leading symbol substitution
+      new Object[] {"@ss", "***"},
+      // trailing symbol substitution
+      new Object[] {"a$$", "***"},
+      new Object[] {"b1tch", "*****"},
+    };
   }
 
   @Test
-  public void resolvesInteriorSeparatorEvasions() {
-    assertEquals("*******", filter.mask("f.u.c.k"));
-    assertEquals("*******", filter.mask("s-h-i-t"));
-    assertEquals(
-        "a separator-laced word inside a sentence", "you ******", filter.mask("you b.itch"));
+  @Parameters(method = "leetspeakCases")
+  public void resolvesLeetspeakEvasions(String input, String expected) {
+    assertEquals(expected, filter.mask(input));
+  }
+
+  private Object[] interiorSeparatorCases() {
+    return new Object[] {
+      new Object[] {"f.u.c.k", "*******"},
+      new Object[] {"s-h-i-t", "*******"},
+      // a separator-laced word inside a sentence
+      new Object[] {"you b.itch", "you ******"},
+    };
   }
 
   @Test
-  public void leavesScunthorpeStyleSubstringsAlone() {
-    assertEquals(
-        "whole-token match spares lore substrings", "Scunthorpe", filter.mask("Scunthorpe"));
-    assertEquals("an assassin lurks", filter.mask("an assassin lurks"));
-    assertEquals("Welcome to Sussex", filter.mask("Welcome to Sussex"));
-    assertEquals("a class of mages", filter.mask("a class of mages"));
+  @Parameters(method = "interiorSeparatorCases")
+  public void resolvesInteriorSeparatorEvasions(String input, String expected) {
+    assertEquals(expected, filter.mask(input));
+  }
+
+  private Object[] scunthorpeCases() {
+    return new Object[] {
+      // whole-token match spares lore substrings
+      new Object[] {"Scunthorpe", "Scunthorpe"},
+      new Object[] {"an assassin lurks", "an assassin lurks"},
+      new Object[] {"Welcome to Sussex", "Welcome to Sussex"},
+      new Object[] {"a class of mages", "a class of mages"},
+    };
   }
 
   @Test
-  public void cleanTextPassesThroughUnchangedAndNullsSurvive() {
-    String clean = "Greetings, traveller! The bank is to the north.";
-    assertEquals(clean, filter.mask(clean));
-    assertEquals(null, filter.mask(null));
-    assertEquals("", filter.mask(""));
+  @Parameters(method = "scunthorpeCases")
+  public void leavesScunthorpeStyleSubstringsAlone(String input, String expected) {
+    assertEquals(expected, filter.mask(input));
+  }
+
+  private Object[] cleanPassthroughCases() {
+    return new Object[] {
+      new Object[] {
+        "Greetings, traveller! The bank is to the north.",
+        "Greetings, traveller! The bank is to the north."
+      },
+      new Object[] {null, null},
+      new Object[] {"", ""},
+    };
+  }
+
+  @Test
+  @Parameters(method = "cleanPassthroughCases")
+  public void cleanTextPassesThroughUnchangedAndNullsSurvive(String input, String expected) {
+    assertEquals(expected, filter.mask(input));
   }
 
   @Test

@@ -4,21 +4,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /** The cloud 429 back-off window growth and the throttle state transitions. */
+@RunWith(JUnitParamsRunner.class)
 public class RateLimitBackoffTest {
 
   @Test
-  public void windowGrowsGeometricallyAndCaps() {
-    assertEquals(
-        "first 429 backs off the base window", 1_000, RateLimitBackoff.backoffWindowMillis(1));
-    assertEquals("second doubles", 2_000, RateLimitBackoff.backoffWindowMillis(2));
-    assertEquals("third doubles again", 4_000, RateLimitBackoff.backoffWindowMillis(3));
-    assertEquals(
-        "the window is capped so it never grows without bound",
-        30_000,
-        RateLimitBackoff.backoffWindowMillis(50));
+  @Parameters({
+    "1, 1000",
+    "2, 2000",
+    "3, 4000",
+    "50, 30000",
+  })
+  public void windowGrowsGeometricallyAndCaps(int attempt, int expectedWindow) {
+    assertEquals(expectedWindow, RateLimitBackoff.backoffWindowMillis(attempt));
   }
 
   @Test

@@ -6,36 +6,49 @@ import static org.junit.Assert.assertNotNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.Map;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Verifies the {@link ExpressionEmotionTable} loader and the documented default contract that #26's
  * resolver and the backends depend on: a documented expression id returns its mapped {@link
  * Emotion}, while any unmapped id and {@code -1} resolve to {@link Emotion#NEUTRAL}.
  */
+@RunWith(JUnitParamsRunner.class)
 public class ExpressionEmotionTableTest {
 
   @Test
-  public void documentedIdsResolveToTheirEmotion() {
-    ExpressionEmotionTable table = ExpressionEmotionTable.load();
+  public void loadsTheFullNonNeutralExpressionTable() {
     // Every non-neutral chat-head expression seq harvested from the cache (generic block +
     // per-NPC).
-    assertEquals("full non-neutral expression table is expected", 41, table.size());
+    assertEquals(
+        "full non-neutral expression table is expected", 41, ExpressionEmotionTable.load().size());
+  }
 
-    // Generic universal block: chathap=happy, chatscared/chatshock=scared, chatsad, chatang.
-    assertEquals(Emotion.HAPPY, table.resolve(567));
-    assertEquals(Emotion.SCARED, table.resolve(571));
-    assertEquals(Emotion.SCARED, table.resolve(596));
-    assertEquals(Emotion.HAPPY, table.resolve(605));
-    assertEquals(Emotion.SAD, table.resolve(610));
-    assertEquals(Emotion.ANGRY, table.resolve(614));
-    // Per-NPC expression heads: lore_lizard_chat_happy/sad, kahlith_chat_disapproving.
-    assertEquals(Emotion.HAPPY, table.resolve(4843));
-    assertEquals(Emotion.SAD, table.resolve(4844));
-    assertEquals(Emotion.ANGRY, table.resolve(8215));
+  private Object[] documentedIdCases() {
+    return new Object[] {
+      // Generic universal block: chathap=happy, chatscared/chatshock=scared, chatsad, chatang.
+      new Object[] {567, Emotion.HAPPY},
+      new Object[] {571, Emotion.SCARED},
+      new Object[] {596, Emotion.SCARED},
+      new Object[] {605, Emotion.HAPPY},
+      new Object[] {610, Emotion.SAD},
+      new Object[] {614, Emotion.ANGRY},
+      // Per-NPC expression heads: lore_lizard_chat_happy/sad, kahlith_chat_disapproving.
+      new Object[] {4843, Emotion.HAPPY},
+      new Object[] {4844, Emotion.SAD},
+      new Object[] {8215, Emotion.ANGRY},
+      // A generic neutral expression (chatneu1) is intentionally absent and defaults to NEUTRAL.
+      new Object[] {588, Emotion.NEUTRAL},
+    };
+  }
 
-    // A generic neutral expression (chatneu1) is intentionally absent and defaults to NEUTRAL.
-    assertEquals(Emotion.NEUTRAL, table.resolve(588));
+  @Test
+  @Parameters(method = "documentedIdCases")
+  public void documentedIdResolvesToItsEmotion(int id, Emotion expected) {
+    assertEquals(expected, ExpressionEmotionTable.load().resolve(id));
   }
 
   @Test
@@ -53,12 +66,14 @@ public class ExpressionEmotionTableTest {
     assertEquals(Emotion.NEUTRAL, table.resolve(-1));
   }
 
+  private Object[] neverNullIds() {
+    return new Object[] {-1, 9760, 987654};
+  }
+
   @Test
-  public void resolveNeverReturnsNull() {
-    ExpressionEmotionTable table = ExpressionEmotionTable.load();
-    assertNotNull(table.resolve(-1));
-    assertNotNull(table.resolve(9760));
-    assertNotNull(table.resolve(987654));
+  @Parameters(method = "neverNullIds")
+  public void resolveNeverReturnsNull(int id) {
+    assertNotNull(ExpressionEmotionTable.load().resolve(id));
   }
 
   @Test

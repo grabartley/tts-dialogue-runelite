@@ -30,6 +30,9 @@ dependencies {
 	// dependencies here.
 
 	testImplementation 'junit:junit:4.12'
+	// Method-level data providers for case-driven tests (@Parameters), so repeated case assertions
+	// reuse one test body and each case is reported as its own row.
+	testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
 	testImplementation 'org.mockito:mockito-core:5.12.0'
 	// OkHttp's MockWebServer drives the Azure backend's HTTP path in tests with no live key. The
 	// version tracks the okhttp the RuneLite client pulls in (3.14.x) so the client and server agree.

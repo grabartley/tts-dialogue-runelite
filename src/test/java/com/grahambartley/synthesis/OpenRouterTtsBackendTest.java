@@ -15,6 +15,8 @@ import com.grahambartley.VoiceManager.NPCGender;
 import com.grahambartley.VoiceManager.NPCRace;
 import com.grahambartley.tts.Pcm;
 import java.util.EnumSet;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -23,10 +25,12 @@ import okio.Buffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * HTTP path, headers, JSON body, decode, availability gating, cache variant, and graceful failure.
  */
+@RunWith(JUnitParamsRunner.class)
 public class OpenRouterTtsBackendTest {
 
   /** Config with a settable key, char cap, and pace; everything else uses interface defaults. */
@@ -364,10 +368,17 @@ public class OpenRouterTtsBackendTest {
   }
 
   @Test
-  public void capLengthLeavesShortLinesAndDisabledCapUntouched() {
-    assertEquals("Hello there", OpenRouterTtsBackend.capLength("Hello there", 600));
-    assertEquals(
-        "a cap of 0 disables truncation", "long", OpenRouterTtsBackend.capLength("long", 0));
+  @Parameters(method = "capLengthUnchangedCases")
+  public void capLengthLeavesShortLinesAndDisabledCapUntouched(
+      String text, int cap, String expected) {
+    assertEquals(expected, OpenRouterTtsBackend.capLength(text, cap));
+  }
+
+  private Object[] capLengthUnchangedCases() {
+    return new Object[] {
+      new Object[] {"Hello there", 600, "Hello there"},
+      new Object[] {"long", 0, "long"},
+    };
   }
 
   @Test
@@ -483,32 +494,25 @@ public class OpenRouterTtsBackendTest {
   }
 
   @Test
-  public void combineLanguageAppendsTheQuirkOnlyWhenSet() {
-    assertEquals(
-        "no quirk leaves the language untouched",
-        "English",
-        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.SpeakingStyle.NONE));
-    assertEquals(
-        "a quirk on English becomes a styled English target",
-        "English Gen Z slang",
-        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.SpeakingStyle.GEN_Z));
-    assertEquals(
-        "a quirk layers onto a non-English language too",
-        "French pirate speak",
-        OpenRouterTtsBackend.combineLanguage("French", TTSDialogueConfig.SpeakingStyle.PIRATE));
-    assertEquals(
-        "a blank language defaults to English before the quirk",
-        "English Gen Z slang",
-        OpenRouterTtsBackend.combineLanguage("  ", TTSDialogueConfig.SpeakingStyle.GEN_Z));
-    assertEquals(
-        "UK Slang layers London roadman slang onto English",
-        "English with London Roadman Slang",
-        OpenRouterTtsBackend.combineLanguage("English", TTSDialogueConfig.SpeakingStyle.UK_SLANG));
-    assertEquals(
-        "Irish Slang layers Dublin slang onto English",
-        "English with Dublin Slang",
-        OpenRouterTtsBackend.combineLanguage(
-            "English", TTSDialogueConfig.SpeakingStyle.IRISH_SLANG));
+  @Parameters(method = "combineLanguageCases")
+  public void combineLanguageAppendsTheQuirkOnlyWhenSet(
+      String language, TTSDialogueConfig.SpeakingStyle style, String expected) {
+    assertEquals(expected, OpenRouterTtsBackend.combineLanguage(language, style));
+  }
+
+  private Object[] combineLanguageCases() {
+    return new Object[] {
+      new Object[] {"English", TTSDialogueConfig.SpeakingStyle.NONE, "English"},
+      new Object[] {"English", TTSDialogueConfig.SpeakingStyle.GEN_Z, "English Gen Z slang"},
+      new Object[] {"French", TTSDialogueConfig.SpeakingStyle.PIRATE, "French pirate speak"},
+      new Object[] {"  ", TTSDialogueConfig.SpeakingStyle.GEN_Z, "English Gen Z slang"},
+      new Object[] {
+        "English", TTSDialogueConfig.SpeakingStyle.UK_SLANG, "English with London Roadman Slang"
+      },
+      new Object[] {
+        "English", TTSDialogueConfig.SpeakingStyle.IRISH_SLANG, "English with Dublin Slang"
+      },
+    };
   }
 
   @Test
@@ -650,12 +654,20 @@ public class OpenRouterTtsBackendTest {
   }
 
   @Test
-  public void needsTranslationTreatsBlankAndEnglishAsNoTranslation() {
-    assertFalse(OpenRouterTtsBackend.needsTranslation("English"));
-    assertFalse(OpenRouterTtsBackend.needsTranslation("  english  "));
-    assertFalse(OpenRouterTtsBackend.needsTranslation(""));
-    assertFalse(OpenRouterTtsBackend.needsTranslation(null));
-    assertTrue(OpenRouterTtsBackend.needsTranslation("French"));
+  @Parameters(method = "needsTranslationCases")
+  public void needsTranslationTreatsBlankAndEnglishAsNoTranslation(
+      String language, boolean expected) {
+    assertEquals(expected, OpenRouterTtsBackend.needsTranslation(language));
+  }
+
+  private Object[] needsTranslationCases() {
+    return new Object[] {
+      new Object[] {"English", false},
+      new Object[] {"  english  ", false},
+      new Object[] {"", false},
+      new Object[] {null, false},
+      new Object[] {"French", true},
+    };
   }
 
   @Test

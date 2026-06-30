@@ -4,53 +4,63 @@ import static org.junit.Assert.assertEquals;
 
 import com.grahambartley.VoiceManager.NPCGender;
 import com.grahambartley.VoiceManager.NPCRace;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /** Maps raw wiki/learned race and gender strings onto the voice enums. */
+@RunWith(JUnitParamsRunner.class)
 public class NpcDemographicParserTest {
 
-  @Test
-  public void exactEnumNamesMapDirectly() {
-    assertEquals(NPCRace.DWARF, NpcDemographicParser.toRace("DWARF"));
-    assertEquals(NPCRace.GOBLIN, NpcDemographicParser.toRace("goblin"));
-    assertEquals(NPCGender.FEMALE, NpcDemographicParser.toGender("FEMALE"));
+  private Object[] raceCases() {
+    return new Object[] {
+      // Exact enum names map directly.
+      new Object[] {"DWARF", NPCRace.DWARF},
+      new Object[] {"goblin", NPCRace.GOBLIN},
+      // Keyword variants bucket onto the nearest race.
+      new Object[] {"Old man", NPCRace.HUMAN},
+      new Object[] {"Elven warrior", NPCRace.ELF},
+      new Object[] {"Imcando dwarf", NPCRace.DWARF},
+      new Object[] {"Gnome child", NPCRace.GOBLIN},
+      new Object[] {"Mountain giant", NPCRace.TROLL},
+      new Object[] {"Skeleton mage", NPCRace.UNDEAD},
+      new Object[] {"Restless ghost", NPCRace.UNDEAD},
+      new Object[] {"Green dragon", NPCRace.DEMON},
+      new Object[] {"Jungle gorilla", NPCRace.GORILLA},
+      new Object[] {"Karamja primate", NPCRace.MONKEY},
+      new Object[] {"Battle mage", NPCRace.WIZARD},
+      new Object[] {"Tortuga elder", NPCRace.TORTUGAN},
+      // Unknown or empty falls through to UNKNOWN.
+      new Object[] {null, NPCRace.UNKNOWN},
+      new Object[] {"", NPCRace.UNKNOWN},
+      new Object[] {"Penguin", NPCRace.UNKNOWN},
+    };
   }
 
   @Test
-  public void raceKeywordsBucketCommonVariants() {
-    assertEquals(NPCRace.HUMAN, NpcDemographicParser.toRace("Old man"));
-    assertEquals(NPCRace.ELF, NpcDemographicParser.toRace("Elven warrior"));
-    assertEquals(NPCRace.DWARF, NpcDemographicParser.toRace("Imcando dwarf"));
-    assertEquals(NPCRace.GOBLIN, NpcDemographicParser.toRace("Gnome child"));
-    assertEquals(NPCRace.TROLL, NpcDemographicParser.toRace("Mountain giant"));
-    assertEquals(NPCRace.UNDEAD, NpcDemographicParser.toRace("Skeleton mage"));
-    assertEquals(NPCRace.UNDEAD, NpcDemographicParser.toRace("Restless ghost"));
-    assertEquals(NPCRace.DEMON, NpcDemographicParser.toRace("Green dragon"));
-    assertEquals(NPCRace.GORILLA, NpcDemographicParser.toRace("Jungle gorilla"));
-    assertEquals(NPCRace.MONKEY, NpcDemographicParser.toRace("Karamja primate"));
-    assertEquals(NPCRace.WIZARD, NpcDemographicParser.toRace("Battle mage"));
-    assertEquals(NPCRace.TORTUGAN, NpcDemographicParser.toRace("Tortuga elder"));
+  @Parameters(method = "raceCases")
+  public void mapsRawRaceToEnum(String raw, NPCRace expected) {
+    assertEquals(expected, NpcDemographicParser.toRace(raw));
+  }
+
+  private Object[] genderCases() {
+    return new Object[] {
+      new Object[] {"FEMALE", NPCGender.FEMALE},
+      new Object[] {"Woman", NPCGender.FEMALE},
+      new Object[] {"Noble lady", NPCGender.FEMALE},
+      new Object[] {"Old man", NPCGender.MALE},
+      new Object[] {"Lord of the manor", NPCGender.MALE},
+      // Empty is UNKNOWN; an unrecognised non-empty value defaults to MALE.
+      new Object[] {null, NPCGender.UNKNOWN},
+      new Object[] {"", NPCGender.UNKNOWN},
+      new Object[] {"indeterminate", NPCGender.MALE},
+    };
   }
 
   @Test
-  public void unknownOrEmptyRaceIsUnknown() {
-    assertEquals(NPCRace.UNKNOWN, NpcDemographicParser.toRace(null));
-    assertEquals(NPCRace.UNKNOWN, NpcDemographicParser.toRace(""));
-    assertEquals(NPCRace.UNKNOWN, NpcDemographicParser.toRace("Penguin"));
-  }
-
-  @Test
-  public void genderKeywordsBucketCommonVariants() {
-    assertEquals(NPCGender.FEMALE, NpcDemographicParser.toGender("Woman"));
-    assertEquals(NPCGender.FEMALE, NpcDemographicParser.toGender("Noble lady"));
-    assertEquals(NPCGender.MALE, NpcDemographicParser.toGender("Old man"));
-    assertEquals(NPCGender.MALE, NpcDemographicParser.toGender("Lord of the manor"));
-  }
-
-  @Test
-  public void emptyGenderIsUnknownButUnrecognisedDefaultsToMale() {
-    assertEquals(NPCGender.UNKNOWN, NpcDemographicParser.toGender(null));
-    assertEquals(NPCGender.UNKNOWN, NpcDemographicParser.toGender(""));
-    assertEquals(NPCGender.MALE, NpcDemographicParser.toGender("indeterminate"));
+  @Parameters(method = "genderCases")
+  public void mapsRawGenderToEnum(String raw, NPCGender expected) {
+    assertEquals(expected, NpcDemographicParser.toGender(raw));
   }
 }
