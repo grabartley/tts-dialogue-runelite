@@ -4,25 +4,18 @@ name: CI/CD
 # test suite (plugin tests + engine --stdio framing/manifest conformance), and build the standalone
 # shadow jar as a downloadable artifact.
 #
-# workflow_dispatch is the single deploy: it computes the next semver, runs the gate, builds the
-# shadow jar AND the cross-platform Kokoro engine bundles, then publishes ONE GitHub release under
-# one v<semver> tag carrying the jar and every engine bundle, and refreshes engine-manifest.json to
-# point at that release. There is no separate engine-only or jar-only release.
+# workflow_dispatch is the single deploy: it reads the source-pinned version (gradle.properties),
+# runs the gate, builds the thin + shadow jars AND the cross-platform Kokoro engine bundles, then
+# publishes ONE GitHub release under one v<version> tag carrying both jars, the engine bundles, and
+# the engine-manifest.json asset. The Hub builds its own jar from this source at the tagged commit,
+# so it carries the same version and resolves the engine published under the same tag. There is no
+# separate engine-only or jar-only release, and no manifest commit-back.
 on:
   pull_request:
     branches:
       - main
   workflow_dispatch:
     inputs:
-      bump:
-        description: "Version bump"
-        required: true
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-        default: patch
       release_type:
         description: "Release type"
         required: true
@@ -88,12 +81,12 @@ jobs:
           name: voiced-dialogue-${{ github.sha }}
           path: build/libs/*-all.jar
 
-  # ---------- Deploy: compute version, gate, build release shadow jar ----------
+  # ---------- Deploy: read source version, gate, build thin + shadow jars ----------
   plugin:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.semver.outputs.new_version }}
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Checkout repository
@@ -127,35 +120,34 @@ jobs:
           detailed_summary: true
           include_passed: true
 
-      - name: Compute next version
-        id: semver
+      - name: Read source-pinned version
+        id: version
         run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0 --match='v*' 2>/dev/null || echo "v0.0.0")
-          LATEST_VERSION=${LATEST_TAG#v}
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_VERSION"
-          case "${{ inputs.bump }}" in
-            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
-            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
-            patch) PATCH=$((PATCH + 1)) ;;
-          esac
-          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-          echo "Previous: ${LATEST_VERSION}"
-          echo "New:      ${NEW_VERSION}"
-          echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          VERSION=$(./gradlew -q printVersion | tail -1 | tr -d '[:space:]')
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not read the project version from gradle.properties"
+            exit 1
+          fi
+          if [[ "$VERSION" == *-SNAPSHOT ]]; then
+            echo "::error::Refusing to release a SNAPSHOT version ($VERSION). Set a release version in gradle.properties on the commit you are releasing."
+            exit 1
+          fi
+          echo "Releasing version: ${VERSION}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
-      - name: Build release shadow JAR
-        run: ./gradlew shadowJar -PreleaseVersion=${{ steps.semver.outputs.new_version }}
+      - name: Build shadow JAR
+        run: ./gradlew shadowJar
 
-      - name: Upload release shadow JAR
+      - name: Upload plugin jars
         uses: actions/upload-artifact@v4
         with:
           name: plugin-jar
-          path: build/libs/*-all.jar
+          path: build/libs/*.jar
 
   # ---------- Deploy: cross-platform Kokoro engine bundles ----------
   # One job per target, each on a runner whose OS/arch matches the bundle so the jlink runtime and
   # native libs are native to that platform. Versioned from the plugin job so every artifact in the
-  # release shares one v<semver> tag.
+  # release shares one v<version> tag.
   engine:
     if: github.event_name == 'workflow_dispatch'
     needs: plugin
@@ -472,11 +464,11 @@ jobs:
               --notes-file release-notes.md \
               $PRERELEASE_FLAG
           fi
-          # Attach the plugin shadow jar, the engine-manifest.json asset, and every engine bundle +
-          # sha256. The plugin fetches engine-manifest.json from this release at runtime, so it is a
-          # release asset, not a committed resource: no manifest commit-back. A per-file loop (not
-          # find -exec) so any failed upload fails the step.
+          # Attach both plugin jars (thin + shadow), the engine-manifest.json asset, and every
+          # engine bundle + sha256. The plugin fetches engine-manifest.json from this release at
+          # runtime, so it is a release asset, not a committed resource: no manifest commit-back. A
+          # per-file loop (not find -exec) so any failed upload fails the step.
           while IFS= read -r -d '' f; do
             gh release upload "${{ env.VERSION }}" "$f" --clobber \
               || { echo "::error::release asset upload failed for $f"; exit 1; }
-          done < <(find plugin-dist dist-manifest release-artifacts -type f \( -name '*-all.jar' -o -name 'engine-manifest.json' -o -name '*.tar.gz' -o -name '*.zip' -o -name '*.sha256' \) -print0)
+          done < <(find plugin-dist dist-manifest release-artifacts -type f \( -name '*.jar' -o -name 'engine-manifest.json' -o -name '*.tar.gz' -o -name '*.zip' -o -name '*.sha256' \) -print0)

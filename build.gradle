@@ -50,7 +50,14 @@ dependencies {
 }
 
 group = 'com.grahambartley'
-version = project.findProperty('releaseVersion') ?: '1.0-SNAPSHOT'
+
+// version is source-pinned in gradle.properties: it is the single source of truth the Hub build,
+// the deploy tag, and the engine release all share. Bump it in the commit you tag for a release.
+tasks.register('printVersion') {
+	doLast {
+		println version
+	}
+}
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
@@ -58,8 +65,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 // Stamp the build version into a bundled resource so EngineInstaller resolves the engine release
-// (v<version>) matching the running jar. A release jar (-PreleaseVersion) gets its real version; a
-// plain/dev build stays 1.0-SNAPSHOT, which has no matching release and degrades to "no engine".
+// (v<version>) matching the running jar. The Hub builds this jar from source, so it carries the
+// gradle.properties version and resolves the engine published under the same tag.
 def versionResourceDir = layout.buildDirectory.dir('generated/plugin-version')
 
 tasks.register('generateVersionResource') {

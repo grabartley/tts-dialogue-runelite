@@ -31,26 +31,28 @@ repo; copy it into the fork and fill in the commit.
 
 - The repository is public.
 - A `LICENSE` exists at the repo root (this repo ships MIT).
-- The Kokoro engine release bundle is published to GitHub Releases and the committed
-  `engine-manifest.json` points at real, sha256-verified download URLs. Until that release is
-  cut, the local backend cannot install at runtime, so do not submit before the engine pipeline
-  (epic #34) ships it.
+- A `v<version>` GitHub Release matching the `version` in `gradle.properties` is published, with
+  the engine bundles and the `engine-manifest.json` asset attached (the `CI/CD` deploy does this).
+  The Hub-built jar carries that same version and fetches the manifest from the matching release at
+  runtime, so until that release is cut the local backend cannot install. Do not submit before the
+  deploy has published the matching release.
 - `runelite-plugin.properties` is non-placeholder (no `Example` / `Nobody` /
   `An example greeter plugin`, which the packager rejects).
 - The plugin jar builds clean: no native libraries, no model, well under the 10 MiB
   source/jar limit. `./gradlew jar` produces a ~362 KiB jar (mostly the bundled
   `npc-voices.json` data table).
 
-## Step 1: Tag a release commit on this repo
+## Step 1: Cut the matching release
 
-Pick the commit you want the Hub to build and tag it so the descriptor points at an
-immutable sha.
+The `CI/CD` deploy creates the tag and the release the descriptor points at. Bump `version` in
+`gradle.properties` to the release version, merge it, then dispatch `CI/CD` (Actions tab -> "Run
+workflow") with the `release_type`. It tags `v<version>` and publishes the release with both jars,
+the engine bundles, and the `engine-manifest.json` asset. Then copy that tag's commit sha for the
+descriptor:
 
 ```bash
-git checkout main && git pull
-git tag -a v1.0.0 -m "Voiced Dialogue v1.0.0"
-git push origin v1.0.0
-git rev-parse v1.0.0   # copy the full 40-char sha for the descriptor
+git fetch --tags
+git rev-parse v1.0.0   # the tag the deploy created; copy the full 40-char sha for the descriptor
 ```
 
 ## Step 2: Fork and branch plugin-hub
