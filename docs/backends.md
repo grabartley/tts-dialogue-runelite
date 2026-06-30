@@ -94,7 +94,9 @@ Beyond per-line guards, two larger levers cut perceived latency and broaden reac
   the enum is the single source of truth for both the options and their codes.
 - **Player / NPC Speaking Style.** Two independent settings, one for your own lines (**Player
   Speaking Style**) and one for NPC lines (**NPC Speaking Style**), drawn from the same option set
-  (Gen Z slang, pirate speak, formal, and so on). The style for the line's speaker class is appended
+  (Gen Z slang, pirate speak, formal, Shakespearean, cyberpunk, and so on). Each style
+  shifts word choice and phrasing only, never the voice or accent. The style for the line's speaker
+  class is appended
   to the spoken language, so the translation hop rewrites that line in that style. It routes through
   the hop even for English, and composes with any language. Each class is selected from the
   `player` flag on `SynthesisRequest`, so the cache key already differs between a player and an NPC

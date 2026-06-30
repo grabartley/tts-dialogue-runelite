@@ -59,13 +59,22 @@ public interface TTSDialogueConfig extends Config {
     NONE("None", ""),
     GEN_Z("Gen Z Slang", "Gen Z slang"),
     MILLENNIAL("Millennial Slang", "millennial slang"),
+    NINETIES_STREET("90s Street", "with 90s hip-hop street slang"),
     STREET("Street Slang", "casual street slang"),
+    US_SLANG("US Slang", "with casual American slang"),
+    UK_SLANG("UK Slang", "with London Roadman Slang"),
+    IRISH_SLANG("Irish Slang", "with Dublin Slang"),
+    SURFER("Surfer", "with laid-back surfer slang"),
+    VALLEY_GIRL("Valley Girl", "with Valley Girl slang"),
     FORMAL("Formal & Posh", "very formal and posh"),
+    VICTORIAN("Victorian", "in formal Victorian English"),
+    SHAKESPEAREAN("Shakespearean", "in Shakespearean Early Modern English"),
     DRAMATIC("Over-Dramatic", "wildly over-dramatic and theatrical"),
     CUTESY("Cutesy & Bubbly", "cutesy, bubbly and over-enthusiastic"),
     PIRATE("Pirate Speak", "pirate speak"),
-    UK_SLANG("UK Slang", "with London Roadman Slang"),
-    IRISH_SLANG("Irish Slang", "with Dublin Slang");
+    COWBOY("Cowboy", "with Wild West cowboy slang"),
+    CYBERPUNK("Cyberpunk", "with gritty cyberpunk netrunner slang"),
+    RHYMING("Rhyming", "as rhyming verse");
 
     private final String label;
     private final String phrase;
