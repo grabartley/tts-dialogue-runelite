@@ -5,12 +5,14 @@ import com.google.gson.JsonObject;
 import com.grahambartley.VoicedDialogueConfig;
 import com.grahambartley.tts.Pcm;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
@@ -64,25 +66,39 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   /**
    * Per-call ceiling so a hung cloud request cannot pin the single synthesis thread indefinitely. A
-   * line that does not return within this window is abandoned (left unvoiced); OSRS lines are
-   * short, so a healthy synth finishes well inside it.
+   * line that does not return within this window is abandoned (left unvoiced). Sized comfortably
+   * above {@link #READ_TIMEOUT} so the per-read budget is actually reachable (it caps connect plus
+   * the full streamed read, not a single read), giving a slow-but-valid gemini-tts generation room
+   * to land instead of being killed early (#196).
    */
-  private static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
+  private static final Duration CALL_TIMEOUT = Duration.ofSeconds(30);
 
   /** TCP/TLS handshake budget. Short: a slow connect should fail the line fast rather than hang. */
   private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
 
   /**
-   * Per-read budget, generous enough for the model's prefill while still under the call timeout.
+   * Per-read budget, generous enough for the model's prefill while staying under the call timeout.
    */
   private static final Duration READ_TIMEOUT = Duration.ofSeconds(15);
+
+  /** Base spacing before a backed-off retry of a transient network failure; doubled per attempt. */
+  private static final long NETWORK_RETRY_BASE_MILLIS = 400;
+
+  /**
+   * Upper bound of the random jitter added to the backoff so concurrent lines do not retry in
+   * lockstep.
+   */
+  private static final long NETWORK_RETRY_JITTER_MILLIS = 250;
 
   /** Idle connections kept warm so back-to-back lines reuse a pooled connection. */
   private static final int MAX_IDLE_CONNECTIONS = 8;
 
   private static final Duration KEEP_ALIVE = Duration.ofMinutes(5);
 
-  /** One speech call plus a single retry, for a transient empty 200 body or a truncated line. */
+  /**
+   * One speech call plus a single retry, for a transient empty 200 body, a truncated line, or a
+   * read/call timeout (the retry for the latter is spaced by a backoff, the others are immediate).
+   */
   private static final int MAX_SPEECH_ATTEMPTS = 2;
 
   /** Speaking pace as a percentage of normal: the default (skipped on the wire) and clamp range. */
@@ -118,6 +134,11 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   private final RateLimitBackoff backoff = new RateLimitBackoff();
 
+  /** Backoff budget for the network-timeout retry; overridable in tests to run in milliseconds. */
+  private final long networkRetryBaseMillis;
+
+  private final long networkRetryJitterMillis;
+
   /** One-time user notice hook for cloud failures; defaults to a no-op. */
   private Consumer<String> notice = msg -> {};
 
@@ -134,6 +155,19 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
    */
   OpenRouterTtsBackend(
       OkHttpClient httpClient, VoicedDialogueConfig config, Gson gson, String endpoint) {
+    this(httpClient, config, gson, endpoint, RetryTuning.defaults());
+  }
+
+  /**
+   * Test seam: also lets a test shrink the timeout and retry-backoff budget so the network-timeout
+   * retry path runs in milliseconds instead of the multi-second production budget.
+   */
+  OpenRouterTtsBackend(
+      OkHttpClient httpClient,
+      VoicedDialogueConfig config,
+      Gson gson,
+      String endpoint,
+      RetryTuning tuning) {
     // Derive a long-lived keepalive client from the injected one (Hub rule: never new an
     // OkHttpClient). newBuilder() shares the dispatcher cheaply; we give it our own warm connection
     // pool so back-to-back lines skip the TCP/TLS handshake, and our own connect/read/call timeouts
@@ -151,11 +185,13 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
             .protocols(Collections.singletonList(Protocol.HTTP_1_1))
             .connectionPool(
                 new ConnectionPool(MAX_IDLE_CONNECTIONS, KEEP_ALIVE.toMinutes(), TimeUnit.MINUTES))
-            .connectTimeout(CONNECT_TIMEOUT)
-            .readTimeout(READ_TIMEOUT)
-            .callTimeout(CALL_TIMEOUT)
+            .connectTimeout(tuning.connectTimeout)
+            .readTimeout(tuning.readTimeout)
+            .callTimeout(tuning.callTimeout)
             .retryOnConnectionFailure(true)
             .build();
+    this.networkRetryBaseMillis = tuning.retryBackoffBaseMillis;
+    this.networkRetryJitterMillis = tuning.retryJitterMillis;
     this.config = config;
     this.gson = gson;
     this.endpoint = endpoint;
@@ -343,8 +379,13 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
     // A 200 with a zero-byte body is a transient server-side glitch (the generation id is present
     // but no audio came back), so one immediate retry recovers the line; the byte[]-backed request
-    // body is reusable across calls. Any other failure is not retried here. Every attempt is timed
-    // and numbered individually so retry effectiveness is measurable from the logs (#162, #196).
+    // body is reusable across calls. A read/call timeout (or other transient IOException) is also
+    // retried, but spaced by a backoff since the cause is slowness rather than a fast glitch
+    // (#196).
+    // A connect-phase failure (host unreachable) and any non-2xx fail the line without a retry.
+    // Every attempt is timed and numbered individually so retry effectiveness is measurable from
+    // the
+    // logs (#162, #196).
     int inputLen = input.length();
     for (int attempt = 1; attempt <= MAX_SPEECH_ATTEMPTS; attempt++) {
       long attemptStart = System.nanoTime();
@@ -441,14 +482,42 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
             CloudSynthTrace.success(
                 attempt, MAX_SPEECH_ATTEMPTS, elapsedMs, inputLen, bytes.length, generationId));
         return pcm;
+      } catch (ConnectException e) {
+        // The host is unreachable (connection refused / no route), almost certainly an offline
+        // client. Retrying only delays the failure, so this line fails fast (#196).
+        warnOnce("OpenRouter TTS request could not reach the network; this line was not voiced.");
+        log.warn(
+            CloudSynthTrace.failure(
+                "connect",
+                attempt,
+                MAX_SPEECH_ATTEMPTS,
+                elapsedMs(attemptStart),
+                inputLen,
+                0,
+                "",
+                "",
+                0,
+                e.getMessage()));
+        return null;
       } catch (IOException e) {
+        // A read/call timeout (InterruptedIOException / SocketTimeoutException) or a transient
+        // blip:
+        // a slow generation deserves a backed-off retry rather than being dropped on the first
+        // failure (#196). The sleep runs on the dedicated synthesis thread, never the game thread.
+        long elapsedMs = elapsedMs(attemptStart);
+        if (attempt < MAX_SPEECH_ATTEMPTS) {
+          log.debug(CloudSynthTrace.retry("network", attempt, MAX_SPEECH_ATTEMPTS, elapsedMs));
+          if (backoffBeforeNetworkRetry(attempt)) {
+            continue;
+          }
+        }
         warnOnce("OpenRouter TTS request could not reach the network; this line was not voiced.");
         log.warn(
             CloudSynthTrace.failure(
                 "network",
                 attempt,
                 MAX_SPEECH_ATTEMPTS,
-                elapsedMs(attemptStart),
+                elapsedMs,
                 inputLen,
                 0,
                 "",
@@ -479,6 +548,28 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   /** Elapsed wall-clock since {@code startNanos}, in whole milliseconds, for a latency trace. */
   private static long elapsedMs(long startNanos) {
     return (System.nanoTime() - startNanos) / 1_000_000L;
+  }
+
+  /**
+   * Spaces a retry after a transient network failure: an exponential base ({@code base * 2^(attempt
+   * - 1)}) plus a small random jitter, so a brief blip or a slow generation gets a real second
+   * chance without a tight retry storm and concurrent lines do not retry in lockstep. Runs on the
+   * dedicated synthesis thread, never the game thread. Returns {@code false} if interrupted, in
+   * which case the caller abandons the line rather than retrying.
+   */
+  private boolean backoffBeforeNetworkRetry(int attempt) {
+    long base = networkRetryBaseMillis << (attempt - 1);
+    long jitter =
+        networkRetryJitterMillis <= 0
+            ? 0
+            : ThreadLocalRandom.current().nextLong(networkRetryJitterMillis + 1);
+    try {
+      Thread.sleep(base + jitter);
+      return true;
+    } catch (InterruptedException ie) {
+      Thread.currentThread().interrupt();
+      return false;
+    }
   }
 
   @Override
@@ -601,5 +692,40 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   private static boolean isNonBlank(String value) {
     return value != null && !value.trim().isEmpty();
+  }
+
+  /**
+   * Timeout and retry-backoff budget. {@link #defaults()} carries the production values; tests
+   * construct one with millisecond budgets so the network-timeout retry path can be exercised
+   * without multi-second waits.
+   */
+  static final class RetryTuning {
+    final Duration connectTimeout;
+    final Duration readTimeout;
+    final Duration callTimeout;
+    final long retryBackoffBaseMillis;
+    final long retryJitterMillis;
+
+    RetryTuning(
+        Duration connectTimeout,
+        Duration readTimeout,
+        Duration callTimeout,
+        long retryBackoffBaseMillis,
+        long retryJitterMillis) {
+      this.connectTimeout = connectTimeout;
+      this.readTimeout = readTimeout;
+      this.callTimeout = callTimeout;
+      this.retryBackoffBaseMillis = retryBackoffBaseMillis;
+      this.retryJitterMillis = retryJitterMillis;
+    }
+
+    static RetryTuning defaults() {
+      return new RetryTuning(
+          CONNECT_TIMEOUT,
+          READ_TIMEOUT,
+          CALL_TIMEOUT,
+          NETWORK_RETRY_BASE_MILLIS,
+          NETWORK_RETRY_JITTER_MILLIS);
+    }
   }
 }

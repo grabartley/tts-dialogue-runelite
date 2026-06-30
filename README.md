@@ -109,7 +109,7 @@ Profanity filtering is always on, for everyone, with no toggle and no opt-out. E
 
 Synthesis and playback run off the game thread, so the client stays responsive and skipping a line cancels its audio instantly. Repeated lines are served from a cache keyed on backend, model, voice, emotion, and text: an in-memory layer for the session, plus a size-bounded on-disk cache under `~/.runelite/voiced-dialogue/cache/` that survives restarts. The disk cache is capped by **Cache Size Limit**, evicts oldest-first, and keeps Cloud from being re-billed for audio you have already generated.
 
-Cloud adds a few cost and latency guards: each line is capped at **Max Characters Per Line** and truncated at a sentence or word boundary, calls carry a 10-second timeout, a response that lands after you have skipped ahead is dropped, and two identical lines in flight share a single call. Requests reuse a keepalive connection pool and a byte-stable per-speaker profile block so Gemini's implicit prompt cache hits on repeats. Speculative prefetch (**Prefetch Dialogue**) warms the cache for the options you can see, so the line you pick next plays instantly.
+Cloud adds a few cost and latency guards: each line is capped at **Max Characters Per Line** and truncated at a sentence or word boundary, calls carry a 30-second timeout and retry once on a slow or dropped response, a response that lands after you have skipped ahead is dropped, and two identical lines in flight share a single call. Requests reuse a keepalive connection pool and a byte-stable per-speaker profile block so Gemini's implicit prompt cache hits on repeats. Speculative prefetch (**Prefetch Dialogue**) warms the cache for the options you can see, so the line you pick next plays instantly.
 
 </details>
 

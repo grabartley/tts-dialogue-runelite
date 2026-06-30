@@ -52,9 +52,10 @@ Because the cloud backend is billed per character, several guards keep cost boun
   cases.
 - **In-flight de-duplication.** If two tasks reach the synth step for the same cache key at once, only
   the first issues a cloud call; the second waits on and reuses its result (`synthesizeDeduped`).
-- **Timeout and stale-drop.** Cloud calls carry a 10-second `callTimeout` so a hung request cannot pin
-  the single synthesis thread, and the pipeline's epoch check drops any response that arrives after the
-  dialogue has advanced, so stale audio never plays late.
+- **Timeout and stale-drop.** Cloud calls carry a 30-second `callTimeout` (sized above the 15-second
+  `readTimeout` so the read budget is actually reachable) so a hung request cannot pin the single
+  synthesis thread, and the pipeline's epoch check drops any response that arrives after the dialogue
+  has advanced, so stale audio never plays late.
 - **Speaking pace.** The shared **Speaking Pace** setting (General section) is sent as the OpenRouter
   `speed` parameter only when it is not 100%, so the default request body is unchanged; the active
   model may ignore it. The Local backend reads the same setting and always sends it.
@@ -65,8 +66,10 @@ Because the cloud backend is billed per character, several guards keep cost boun
   connection where a concurrent streamed body can return truncated as an empty 200, so each
   concurrent call instead gets its own pooled connection. The same client backs the translation hop.
 - **Empty-200 retry.** A 200 with a zero-byte body is a transient server glitch (the generation id
-  is present but no audio came back), so the line is retried once before falling back; any other
-  failure is not retried.
+  is present but no audio came back), so the line is retried once before falling back.
+- **Timeout retry.** A read/call timeout (a slow generation or a transient network blip) is retried
+  once after a short exponential backoff with jitter, rather than dropping the line on the first
+  failure. A connect-phase failure (host unreachable) and any non-2xx fail the line without a retry.
 - **Fastest-provider routing.** Every request carries a `provider` block with `sort: "throughput"`
   (the `:nitro` equivalent), so OpenRouter routes to the lowest-latency provider for the model.
 - **Prompt-cache stabilisation.** The per-speaker character-profile block leads each request and is

@@ -14,6 +14,7 @@ import com.grahambartley.VoicedDialogueConfig;
 import com.grahambartley.tts.Pcm;
 import com.grahambartley.voice.VoiceManager.NPCGender;
 import com.grahambartley.voice.VoiceManager.NPCRace;
+import java.time.Duration;
 import java.util.EnumSet;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -21,6 +22,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import okhttp3.mockwebserver.SocketPolicy;
 import okio.Buffer;
 import org.junit.After;
 import org.junit.Before;
@@ -99,13 +101,32 @@ public class OpenRouterTtsBackendTest {
 
   @After
   public void tearDown() throws Exception {
-    server.shutdown();
+    // The connect-failure test shuts the server down itself; a second shutdown would throw.
+    try {
+      server.shutdown();
+    } catch (Exception ignored) {
+      // already shut down
+    }
   }
+
+  /**
+   * Millisecond timeout + backoff so the network-timeout retry path runs without multi-second
+   * waits.
+   */
+  private static final OpenRouterTtsBackend.RetryTuning FAST_RETRY =
+      new OpenRouterTtsBackend.RetryTuning(
+          Duration.ofMillis(500), Duration.ofMillis(200), Duration.ofSeconds(1), 10, 0);
 
   private OpenRouterTtsBackend backend(TestConfig config) {
     // Point the backend at the mock server while keeping the real header/body/decode/error logic.
     return new OpenRouterTtsBackend(
         client, config, gson, server.url("/api/v1/audio/speech").toString());
+  }
+
+  private OpenRouterTtsBackend backendWith(
+      TestConfig config, OpenRouterTtsBackend.RetryTuning tuning) {
+    return new OpenRouterTtsBackend(
+        client, config, gson, server.url("/api/v1/audio/speech").toString(), tuning);
   }
 
   private static SynthesisRequest req() {
@@ -1022,5 +1043,58 @@ public class OpenRouterTtsBackendTest {
     backend.synthesize(req());
 
     assertEquals("repeated failures warn once", 1, notices[0]);
+  }
+
+  @Test
+  public void networkTimeoutIsRetriedOnceAndRecovers() throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    // First attempt: the server accepts the connection but never replies, so the read times out.
+    server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
+    // The backed-off retry gets a clean line.
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBody(new Buffer().write(RawPcmDecoderTest.raw(new short[] {1, 2, 3}))));
+
+    int[] notices = {0};
+    OpenRouterTtsBackend backend = backendWith(config, FAST_RETRY);
+    backend.setNotice(msg -> notices[0]++);
+
+    assertNotNull(
+        "a timed-out line is recovered by the backed-off retry", backend.synthesize(req()));
+    assertEquals("the line was attempted twice", 2, server.getRequestCount());
+    assertEquals("a recovered line surfaces no failure notice", 0, notices[0]);
+  }
+
+  @Test
+  public void repeatedNetworkTimeoutFailsGracefullyAfterOneRetry() {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
+    server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
+
+    int[] notices = {0};
+    OpenRouterTtsBackend backend = backendWith(config, FAST_RETRY);
+    backend.setNotice(msg -> notices[0]++);
+
+    assertNull("two timeouts in a row fail the line gracefully", backend.synthesize(req()));
+    assertEquals("it retries exactly once, never storms", 2, server.getRequestCount());
+    assertEquals("the persistent timeout surfaces one notice", 1, notices[0]);
+  }
+
+  @Test
+  public void unreachableHostFailsFastAndGracefully() throws Exception {
+    TestConfig config = new TestConfig();
+    config.key = "sk-or-abc";
+    OpenRouterTtsBackend backend = backendWith(config, FAST_RETRY);
+    // Shut the server down so the connection is refused outright (an offline-style failure).
+    server.shutdown();
+
+    int[] notices = {0};
+    backend.setNotice(msg -> notices[0]++);
+
+    assertNull("an unreachable host fails the line gracefully", backend.synthesize(req()));
+    assertEquals("the failure surfaces one notice", 1, notices[0]);
   }
 }
