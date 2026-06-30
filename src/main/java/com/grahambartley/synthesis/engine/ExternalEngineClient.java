@@ -141,18 +141,37 @@ public final class ExternalEngineClient {
     try {
       start();
     } catch (IOException e) {
-      log.warn("Could not start external engine: {}", e.getMessage());
+      log.warn("[TTS local] engine start failed: {}", e.getMessage());
       return null;
     }
+    long start = System.nanoTime();
     try {
       writeRequest(request);
-      return readResponse();
+      Pcm pcm = readResponse();
+      // Time the engine round-trip so local "slow responses" can be quantified the same way the
+      // cloud synth trace does; null means the engine reported an error line (already logged).
+      log.debug(
+          "[TTS local] engine ok={} elapsedMs={} samples={} sampleRate={} inputLen={}",
+          pcm != null,
+          elapsedMs(start),
+          pcm == null ? 0 : pcm.getSamples().length,
+          pcm == null ? 0 : pcm.getSampleRate(),
+          request.text().length());
+      return pcm;
     } catch (IOException e) {
-      log.warn("External engine request failed ({}); tearing down for restart", e.getMessage());
+      log.warn(
+          "[TTS local] engine request failed elapsedMs={} ({}); tearing down for restart",
+          elapsedMs(start),
+          e.getMessage());
       drainStderr();
       stopQuietly();
       return null;
     }
+  }
+
+  /** Elapsed wall-clock since {@code startNanos}, in whole milliseconds, for a latency trace. */
+  private static long elapsedMs(long startNanos) {
+    return (System.nanoTime() - startNanos) / 1_000_000L;
   }
 
   /** Encodes the request as the protocol JSON line and writes it to the engine's stdin. */

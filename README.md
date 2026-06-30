@@ -158,7 +158,7 @@ Settings mirror the in-game panel: **General** (shared), **Cloud Voice (OpenRout
 |---------|---------|--------------|
 | **Cache Size Limit (MiB)** | `1024` | Maximum size of the on-disk audio cache. When a new clip would exceed it, the oldest are deleted first. Set to `0` for no limit. Only applies when Save Audio To Disk is on. |
 | **Max Characters Per Line** | `0` | Caps how many characters of a line are sent to Cloud, truncating at a sentence or word boundary. `0` sends the whole line; set a positive value to bound worst-case per-line cost. |
-| **Debug Logging** | `Off` | Logs detailed NPC race/gender resolution and the chosen voice per NPC. |
+| **Debug Logging** | `Off` | Logs the full resolved decision per line (one `[TTS line]` record with backend, emotion, race, gender, speaker, profile, and accent), plus per-operation latency, cache hits/misses by tier, and timed/numbered synth attempts. |
 
 </details>
 

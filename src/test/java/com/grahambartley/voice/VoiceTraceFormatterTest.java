@@ -33,6 +33,43 @@ public class VoiceTraceFormatterTest {
   }
 
   @Test
+  public void buildResolvedLineGivesTheWholeDecisionInOneRecord() {
+    String line =
+        VoiceTraceFormatter.buildResolvedLine(
+            "cloud-openrouter",
+            false,
+            "Hans",
+            "HAPPY",
+            NPCRace.HUMAN,
+            NPCGender.MALE,
+            26,
+            "Hans",
+            "British");
+    assertTrue(line, line.startsWith("[TTS line]"));
+    assertTrue(line, line.contains("backend=cloud-openrouter"));
+    assertTrue(line, line.contains("kind=npc"));
+    assertTrue(line, line.contains("name='Hans'"));
+    assertTrue(line, line.contains("emotion=HAPPY"));
+    assertTrue(line, line.contains("race=HUMAN"));
+    assertTrue(line, line.contains("gender=MALE"));
+    assertTrue(line, line.contains("speaker=bm_george(26)"));
+    assertTrue(line, line.contains("profile='Hans'"));
+    assertTrue(line, line.contains("accent='British'"));
+  }
+
+  @Test
+  public void buildResolvedLineCollapsesAbsentSpeakerAndProfileToDash() {
+    String line =
+        VoiceTraceFormatter.buildResolvedLine(
+            "local-kokoro", true, null, "NEUTRAL", NPCRace.HUMAN, NPCGender.FEMALE, -1, null, null);
+    assertTrue(line, line.contains("kind=player"));
+    assertTrue(line, line.contains("name=-"));
+    assertTrue(line, line.contains("speaker=-"));
+    assertTrue(line, line.contains("profile=-"));
+    assertTrue(line, line.contains("accent=-"));
+  }
+
+  @Test
   public void buildPlayerTraceNamesTheSpeaker() {
     String trace = VoiceTraceFormatter.buildPlayerTrace(NPCGender.FEMALE);
     assertTrue(trace, trace.contains("player ->"));

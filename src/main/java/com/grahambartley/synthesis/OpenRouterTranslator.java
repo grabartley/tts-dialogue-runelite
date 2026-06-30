@@ -91,26 +91,52 @@ final class OpenRouterTranslator {
                     JSON_MEDIA_TYPE, gson.toJson(payload).getBytes(StandardCharsets.UTF_8)))
             .build();
 
+    long start = System.nanoTime();
     try (Response response = httpClient.newCall(httpRequest).execute()) {
       ResponseBody body = response.body();
       String raw = body == null ? "" : body.string();
+      long elapsedMs = elapsedMs(start);
       if (!response.isSuccessful()) {
-        log.warn("[TTS cloud] translation failed: HTTP {} {}", response.code(), response.message());
+        log.warn(
+            "[TTS cloud] translate fail reason=non-2xx http={} elapsedMs={} inLen={} detail={}",
+            response.code(),
+            elapsedMs,
+            text.length(),
+            response.message());
         return null;
       }
       String translated = extractContent(raw);
       if (translated == null || translated.isEmpty()) {
-        log.warn("[TTS cloud] translation returned no usable content");
+        log.warn(
+            "[TTS cloud] translate fail reason=no-content http={} elapsedMs={} inLen={}",
+            response.code(),
+            elapsedMs,
+            text.length());
         return null;
       }
       if (config.debugMode()) {
-        log.info("[TTS cloud] translated to {} -> \"{}\"", language, translated);
+        log.info(
+            "[TTS cloud] translate ok lang={} elapsedMs={} inLen={} outLen={} -> \"{}\"",
+            language,
+            elapsedMs,
+            text.length(),
+            translated.length(),
+            translated);
       }
       return translated;
     } catch (IOException | RuntimeException e) {
-      log.debug("[TTS cloud] translation error: {}", e.getMessage());
+      log.warn(
+          "[TTS cloud] translate fail reason=error elapsedMs={} inLen={} detail={}",
+          elapsedMs(start),
+          text.length(),
+          e.getMessage());
       return null;
     }
+  }
+
+  /** Elapsed wall-clock since {@code startNanos}, in whole milliseconds, for a latency trace. */
+  private static long elapsedMs(long startNanos) {
+    return (System.nanoTime() - startNanos) / 1_000_000L;
   }
 
   /**

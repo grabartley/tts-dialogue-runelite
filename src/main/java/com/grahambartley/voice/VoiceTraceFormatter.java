@@ -9,7 +9,7 @@ import com.grahambartley.voice.VoiceManager.NPCRace;
  * path (world hit/id, table hit/miss, detected race/gender + source) and the chosen British speaker
  * id/name are verifiable without a live client or logger.
  */
-final class VoiceTraceFormatter {
+public final class VoiceTraceFormatter {
 
   private VoiceTraceFormatter() {}
 
@@ -29,6 +29,37 @@ final class VoiceTraceFormatter {
         source,
         KokoroVoice.nameFor(chosenSpeakerId),
         chosenSpeakerId);
+  }
+
+  /**
+   * One consolidated record of the whole resolved decision for a voiced line, so a single grep over
+   * {@code [TTS line]} gives the backend, emotion, and the full voice metadata (race, gender,
+   * speaker, profile, accent) actually used for synthesis. The detected npc id and ethnicity stay
+   * on the adjacent {@code [TTS profile]}/{@code [TTS voice]} traces, which this complements rather
+   * than replaces. A null profile (profiles off) renders {@code -}.
+   */
+  public static String buildResolvedLine(
+      String backendId,
+      boolean player,
+      String npcName,
+      String emotion,
+      NPCRace race,
+      NPCGender gender,
+      int speakerId,
+      String profileName,
+      String accent) {
+    return String.format(
+        "[TTS line] backend=%s kind=%s name=%s emotion=%s race=%s gender=%s speaker=%s profile=%s"
+            + " accent=%s",
+        backendId,
+        player ? "player" : "npc",
+        player ? "-" : "'" + npcName + "'",
+        emotion,
+        race,
+        gender,
+        speakerId < 0 ? "-" : KokoroVoice.nameFor(speakerId) + "(" + speakerId + ")",
+        profileName == null ? "-" : "'" + profileName + "'",
+        accent == null ? "-" : "'" + accent + "'");
   }
 
   static String buildPlayerTrace(NPCGender gender) {

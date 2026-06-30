@@ -6,6 +6,7 @@ import com.grahambartley.tts.DialogueAudioService;
 import com.grahambartley.voice.EmotionResolver;
 import com.grahambartley.voice.ProfileResolver;
 import com.grahambartley.voice.VoiceManager;
+import com.grahambartley.voice.VoiceTraceFormatter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -61,7 +62,8 @@ public final class SynthesisDispatcher {
             emotion,
             profileResolver.resolve(speaker, npcName),
             /* skipTranslation= */ false,
-            player));
+            player),
+        npcName);
   }
 
   /**
@@ -78,16 +80,37 @@ public final class SynthesisDispatcher {
             Emotion.NEUTRAL,
             profileResolver.resolve(VoiceManager.SPEAKER_PLAYER, null),
             /* skipTranslation= */ true,
-            /* player= */ true));
+            /* player= */ true),
+        null);
   }
 
   /**
    * Hands a built request to the off-thread synth pipeline, guarded by the availability check every
-   * speak path needs: no-op when the active backend is unavailable.
+   * speak path needs: no-op when the active backend is unavailable. On dispatch (debug mode) it
+   * emits one consolidated {@code [TTS line]} record of the whole resolved decision, so a single
+   * grep gives the backend, emotion, and the full voice metadata used for synthesis.
    */
-  private void dispatch(SynthesisRequest request) {
-    if (!backendProvider.active().isAvailable()) {
+  private void dispatch(SynthesisRequest request, String npcName) {
+    SynthesisBackend backend = backendProvider.active();
+    if (!backend.isAvailable()) {
       return;
+    }
+    if (config.debugMode()) {
+      // The effective emotion is what the backend will actually voice after the downgrade rule, so
+      // the record reflects the real decision (e.g. Local always renders NEUTRAL).
+      Emotion effective = BackendProvider.downgradeFor(backend, request).emotion();
+      CharacterProfile profile = request.profile();
+      log.info(
+          VoiceTraceFormatter.buildResolvedLine(
+              backend.id(),
+              request.player(),
+              npcName,
+              effective.name(),
+              request.voice().race(),
+              request.voice().gender(),
+              request.voice().kokoroSpeakerId(),
+              profile == null ? null : profile.name(),
+              profile == null ? null : profile.accent()));
     }
     audioService.speak(request, caveEchoPolicy.shouldEcho());
   }

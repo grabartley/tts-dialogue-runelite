@@ -343,8 +343,11 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
     // A 200 with a zero-byte body is a transient server-side glitch (the generation id is present
     // but no audio came back), so one immediate retry recovers the line; the byte[]-backed request
-    // body is reusable across calls. Any other failure is not retried here.
+    // body is reusable across calls. Any other failure is not retried here. Every attempt is timed
+    // and numbered individually so retry effectiveness is measurable from the logs (#162, #196).
+    int inputLen = input.length();
     for (int attempt = 1; attempt <= MAX_SPEECH_ATTEMPTS; attempt++) {
+      long attemptStart = System.nanoTime();
       try (Response response = httpClient.newCall(httpRequest).execute()) {
         ResponseBody body = response.body();
         // Read the bytes once; on any failure they are the diagnostic payload (an OpenRouter/Gemini
@@ -354,6 +357,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
         byte[] bytes = body == null ? new byte[0] : body.bytes();
         String contentType = headerOrEmpty(response, "Content-Type");
         String generationId = headerOrEmpty(response, "X-Generation-Id");
+        long elapsedMs = elapsedMs(attemptStart);
 
         if (!response.isSuccessful()) {
           if (response.code() == 429) {
@@ -364,16 +368,32 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
                   + response.code()
                   + "); check your API key. This line was not voiced.");
           logFailure(
-              "non-2xx", response.code(), response.message(), contentType, generationId, bytes);
+              "non-2xx",
+              attempt,
+              elapsedMs,
+              inputLen,
+              response.code(),
+              response.message(),
+              contentType,
+              generationId,
+              bytes);
           return null;
         }
         // A clean call clears any rate-limit back-off so prefetch can resume.
         backoff.recordSuccess();
         if (bytes.length == 0) {
           logFailure(
-              "empty-body", response.code(), response.message(), contentType, generationId, bytes);
+              "empty-body",
+              attempt,
+              elapsedMs,
+              inputLen,
+              response.code(),
+              response.message(),
+              contentType,
+              generationId,
+              bytes);
           if (attempt < MAX_SPEECH_ATTEMPTS) {
-            log.debug("[TTS cloud] empty 200 body; retrying once");
+            log.debug(CloudSynthTrace.retry("empty-body", attempt, MAX_SPEECH_ATTEMPTS, elapsedMs));
             continue;
           }
           warnOnce("OpenRouter TTS returned an empty response; this line was not voiced.");
@@ -384,7 +404,15 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
           warnOnce(
               "OpenRouter TTS returned audio that could not be decoded; this line was not voiced.");
           logFailure(
-              "undecodable", response.code(), response.message(), contentType, generationId, bytes);
+              "undecodable",
+              attempt,
+              elapsedMs,
+              inputLen,
+              response.code(),
+              response.message(),
+              contentType,
+              generationId,
+              bytes);
           return null;
         }
         // The response is transport-complete (OkHttp throws on a truncated chunked stream, handled
@@ -393,26 +421,64 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
         // clip is never cached or voiced. One retry recovers the common transient case.
         if (PcmCompleteness.isTruncated(pcm)) {
           if (attempt < MAX_SPEECH_ATTEMPTS) {
-            log.debug("[TTS cloud] audio ended mid-line (no trailing silence); retrying once");
+            log.debug(CloudSynthTrace.retry("truncated", attempt, MAX_SPEECH_ATTEMPTS, elapsedMs));
             continue;
           }
           warnOnce("OpenRouter TTS returned a truncated line; this line was not voiced.");
           logFailure(
-              "truncated", response.code(), response.message(), contentType, generationId, bytes);
+              "truncated",
+              attempt,
+              elapsedMs,
+              inputLen,
+              response.code(),
+              response.message(),
+              contentType,
+              generationId,
+              bytes);
           return null;
         }
+        log.debug(
+            CloudSynthTrace.success(
+                attempt, MAX_SPEECH_ATTEMPTS, elapsedMs, inputLen, bytes.length, generationId));
         return pcm;
       } catch (IOException e) {
         warnOnce("OpenRouter TTS request could not reach the network; this line was not voiced.");
-        log.debug("OpenRouter TTS network error: {}", e.getMessage());
+        log.warn(
+            CloudSynthTrace.failure(
+                "network",
+                attempt,
+                MAX_SPEECH_ATTEMPTS,
+                elapsedMs(attemptStart),
+                inputLen,
+                0,
+                "",
+                "",
+                0,
+                e.getMessage()));
         return null;
       } catch (RuntimeException e) {
         warnOnce("OpenRouter TTS request failed unexpectedly; this line was not voiced.");
-        log.debug("OpenRouter TTS unexpected error: {}", e.getMessage());
+        log.warn(
+            CloudSynthTrace.failure(
+                "unexpected",
+                attempt,
+                MAX_SPEECH_ATTEMPTS,
+                elapsedMs(attemptStart),
+                inputLen,
+                0,
+                "",
+                "",
+                0,
+                e.getMessage()));
         return null;
       }
     }
     return null;
+  }
+
+  /** Elapsed wall-clock since {@code startNanos}, in whole milliseconds, for a latency trace. */
+  private static long elapsedMs(long startNanos) {
+    return (System.nanoTime() - startNanos) / 1_000_000L;
   }
 
   @Override
@@ -478,27 +544,35 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   }
 
   /**
-   * Logs why a cloud line was rejected: HTTP status, content type, generation id, and byte count
-   * (at warn so it surfaces without debug), plus a short UTF-8 snippet of the body (at info, only
-   * in debug mode) since a Gemini/OpenRouter error is typically a JSON/text body, sometimes
-   * returned even with HTTP 200. This is what tells rate-limiting/quota/content errors apart from
-   * genuinely bad audio.
+   * Logs why a cloud line was rejected in the standardized {@link CloudSynthTrace} shape: reason,
+   * attempt, elapsed ms, input length, HTTP status, content type, generation id, and byte count (at
+   * warn so it surfaces without debug), plus a short UTF-8 snippet of the body (at info, only in
+   * debug mode) since a Gemini/OpenRouter error is typically a JSON/text body, sometimes returned
+   * even with HTTP 200. This is what tells rate-limiting/quota/content errors apart from genuinely
+   * bad audio, and lets a slow failure be quantified rather than guessed at.
    */
   private void logFailure(
       String kind,
+      int attempt,
+      long elapsedMs,
+      int inputLen,
       int code,
       String message,
       String contentType,
       String generationId,
       byte[] bytes) {
     log.warn(
-        "[TTS cloud] {} response: HTTP {} {} contentType={} genId={} bytes={}",
-        kind,
-        code,
-        message,
-        contentType.isEmpty() ? "-" : contentType,
-        generationId.isEmpty() ? "-" : generationId,
-        bytes.length);
+        CloudSynthTrace.failure(
+            kind,
+            attempt,
+            MAX_SPEECH_ATTEMPTS,
+            elapsedMs,
+            inputLen,
+            code,
+            contentType,
+            generationId,
+            bytes.length,
+            message));
     if (config.debugMode() && bytes.length > 0) {
       log.info("[TTS cloud] {} body snippet: {}", kind, bodySnippet(bytes));
     }

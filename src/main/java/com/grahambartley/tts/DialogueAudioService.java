@@ -203,10 +203,10 @@ public final class DialogueAudioService {
             return;
           }
           log.debug(
-              "Prefetching \"{}\" ({}/{})",
-              abbreviate(key.text()),
+              "[TTS synth] prefetch ({}/{}) \"{}\"",
               key.backendId(),
-              key.voiceKey());
+              key.voiceKey(),
+              abbreviate(key.text()));
           synthesizeDeduped(backend, effective, key);
         });
   }
@@ -298,15 +298,21 @@ public final class DialogueAudioService {
     output.stream(toPlay.getSamples(), toPlay.getSampleRate(), volume.getAsInt());
   }
 
-  /** Memory then disk lookup; a disk hit is promoted into memory. {@code null} when both miss. */
+  /**
+   * Memory then disk lookup; a disk hit is promoted into memory. {@code null} when both miss. Every
+   * hit notes its tier (memory/disk) and the lookup cost, so a slow disk serve is visible; a miss
+   * is left to the synth trace that follows, keeping speculative prefetch misses out of the log.
+   */
   private Pcm lookup(CacheKey key) {
+    long start = System.nanoTime();
     Pcm pcm = cache.get(key);
     if (pcm != null) {
       log.debug(
-          "Serving \"{}\" ({}/{}) from memory cache",
-          abbreviate(key.text()),
+          "[TTS cache] hit tier=memory lookupMs={} ({}/{}) \"{}\"",
+          elapsedMs(start),
           key.backendId(),
-          key.voiceKey());
+          key.voiceKey(),
+          abbreviate(key.text()));
       return pcm;
     }
     // Memory miss: try the persistent on-disk cache (this runs on the pipeline thread, never the
@@ -316,10 +322,11 @@ public final class DialogueAudioService {
       if (pcm != null) {
         cache.put(key, pcm);
         log.debug(
-            "Serving \"{}\" ({}/{}) from disk cache",
-            abbreviate(key.text()),
+            "[TTS cache] hit tier=disk lookupMs={} ({}/{}) \"{}\"",
+            elapsedMs(start),
             key.backendId(),
-            key.voiceKey());
+            key.voiceKey(),
+            abbreviate(key.text()));
       }
     }
     return pcm;
@@ -336,15 +343,27 @@ public final class DialogueAudioService {
     CompletableFuture<Pcm> running = inFlight.putIfAbsent(key, own);
     if (running != null) {
       log.debug(
-          "Reusing in-flight synthesis for \"{}\" ({}/{})",
-          abbreviate(key.text()),
+          "[TTS synth] dedup reuse ({}/{}) \"{}\"",
           key.backendId(),
-          key.voiceKey());
+          key.voiceKey(),
+          abbreviate(key.text()));
       return await(running);
     }
     Pcm pcm = null;
     try {
+      long start = System.nanoTime();
       pcm = backends.synthesizeWith(backend, request);
+      // Both cache tiers missed, so this is the real (billable, for cloud) synth: time it so "slow
+      // responses" can be quantified, and note the outcome so a silent line is distinguishable from
+      // a slow one.
+      log.debug(
+          "[TTS synth] backend={} ok={} synthMs={} ({}/{}) \"{}\"",
+          backend.id(),
+          pcm != null,
+          elapsedMs(start),
+          key.backendId(),
+          key.voiceKey(),
+          abbreviate(key.text()));
       if (pcm != null) {
         cache.put(key, pcm);
         if (diskCache != null) {
@@ -407,7 +426,7 @@ public final class DialogueAudioService {
         // Drop the oldest queued line under backpressure (newer dialogue supersedes it), but log it
         // so QA can tell whether the queue is actually saturating in practice.
         (r, exec) -> {
-          log.debug("Dialogue audio queue saturated; dropping oldest queued line");
+          log.debug("[TTS synth] queue saturated; dropping oldest queued line");
           new ThreadPoolExecutor.DiscardOldestPolicy().rejectedExecution(r, exec);
         });
   }
@@ -449,5 +468,10 @@ public final class DialogueAudioService {
     return text.length() <= LOG_TEXT_PREVIEW_LENGTH
         ? text
         : text.substring(0, LOG_TEXT_PREVIEW_LENGTH) + "...";
+  }
+
+  /** Elapsed wall-clock since {@code startNanos}, in whole milliseconds, for a latency trace. */
+  private static long elapsedMs(long startNanos) {
+    return (System.nanoTime() - startNanos) / 1_000_000L;
   }
 }
