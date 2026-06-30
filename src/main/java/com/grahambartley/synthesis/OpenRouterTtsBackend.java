@@ -12,8 +12,6 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
@@ -54,17 +52,6 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   /** Stable backend id, matched by {@link BackendProvider} when {@code CLOUD} is selected. */
   public static final String ID = "cloud-openrouter";
 
-  /** OpenRouter {@code pcm} output is headerless 16-bit LE mono at this rate. */
-  static final int SAMPLE_RATE = 24_000;
-
-  static final String RESPONSE_FORMAT = "pcm";
-
-  /**
-   * The fixed OpenRouter speech model: the only one meeting both the voice-variety and emotion
-   * bars.
-   */
-  static final String MODEL = "google/gemini-3.1-flash-tts-preview";
-
   private static final String PRODUCTION_ENDPOINT = "https://openrouter.ai/api/v1/audio/speech";
   private static final String USER_AGENT = "tts-dialogue-runelite";
   private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json");
@@ -92,11 +79,6 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   /** One speech call plus a single retry, only ever for a transient empty 200 body. */
   private static final int MAX_SPEECH_ATTEMPTS = 2;
 
-  /** Base 429 back-off; doubled per consecutive limit hit and capped so prefetch never storms. */
-  private static final long BACKOFF_BASE_MILLIS = 1_000;
-
-  private static final long BACKOFF_MAX_MILLIS = 30_000;
-
   /** Speaking pace as a percentage of normal: the default (skipped on the wire) and clamp range. */
   private static final int DEFAULT_SPEED_PERCENT = 100;
 
@@ -118,7 +100,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
   private final TTSDialogueConfig config;
   private final Gson gson;
   private final String endpoint;
-  private final GeminiVoiceMap voiceMap = new GeminiVoiceMap();
+  private final TtsModelStrategy model = new GeminiTtsModel();
   private final OpenRouterTranslator translator;
 
   /**
@@ -128,11 +110,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
    */
   private final Map<String, Integer> prefixHashes = new ConcurrentHashMap<>();
 
-  /** Epoch-millis until which the backend is rate-limit backing off; 0 means not throttled. */
-  private final AtomicLong backoffUntil = new AtomicLong();
-
-  /** Consecutive 429s, so the back-off window grows geometrically and resets on a clean call. */
-  private final AtomicInteger consecutive429 = new AtomicInteger();
+  private final RateLimitBackoff backoff = new RateLimitBackoff();
 
   /** One-time user notice hook for cloud failures; defaults to a no-op. */
   private Consumer<String> notice = msg -> {};
@@ -202,49 +180,28 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   @Override
   public EnumSet<Emotion> supportedEmotions() {
-    return EnumSet.copyOf(GeminiEmotionStyle.SUPPORTED);
+    return model.supportedEmotions();
   }
 
   @Override
   public String cacheVariant(SynthesisRequest request) {
-    // Fold in everything outside (voice, emotion, original text) that changes the rendered audio,
-    // so
-    // a cache hit always returns the bytes the current settings would synthesize:
-    //  - model: fixed today, but explicit so a future model switch can never replay another model's
-    //    audio,
-    //  - voice: the resolved Gemini voice,
-    //  - speed: only when non-default (a short line is unaffected, so it stays a stable key),
-    //  - cap: only when this specific line is long enough to actually be truncated, so changing the
-    //    cap re-keys only the lines it would change rather than re-billing every short line.
-    StringBuilder variant =
-        new StringBuilder(MODEL).append('|').append(voiceMap.voiceFor(request.voice()));
-    int speed = speedPercent();
-    if (speed != DEFAULT_SPEED_PERCENT) {
-      variant.append("|s").append(speed);
-    }
-    int cap = config.cloudMaxChars();
-    String text = request.text();
-    if (cap > 0 && text != null && text.length() > cap) {
-      variant.append("|c").append(cap);
-    }
-    // A character profile is prepended to the input as an AUDIO PROFILE block, so it changes the
-    // rendered audio. Fold its content digest in (only when present) so two profiles never collide
-    // and a re-tuned profile re-keys; a line with no profile keeps the pre-profile variant, so
-    // existing cache entries stay valid.
-    CharacterProfile profile = request.profile();
-    if (profile != null) {
-      variant.append("|p").append(profile.cacheKey());
-    }
     // A non-English target (or a global quirk) re-keys the line: the audio is the transformed
-    // speech, not the source words, so the same source text must not collide across languages or
-    // quirks. Plain English with no quirk adds nothing, so pre-translation cache entries stay
-    // valid. A skip-translation request (public chat) is voiced verbatim, so it keeps the plain
-    // pre-translation key and never collides with a translated dialogue line of the same text.
+    // speech, not the source words. A skip-translation request (public chat) is voiced verbatim, so
+    // it keeps the plain pre-translation key and never collides with a translated line of the same
+    // text. Plain English with no quirk folds in no language fragment, so pre-translation cache
+    // entries stay valid.
     String language = effectiveSpokenLanguage(request);
-    if (needsTranslation(language) && !request.skipTranslation()) {
-      variant.append("|l").append(language.toLowerCase());
-    }
-    return variant.toString();
+    String languageFragment =
+        needsTranslation(language) && !request.skipTranslation() ? language.toLowerCase() : null;
+    return CloudCacheKeyBuilder.build(
+        model.modelId(),
+        model.voiceFor(request.voice()),
+        speedPercent(),
+        DEFAULT_SPEED_PERCENT,
+        request.text(),
+        config.cloudMaxChars(),
+        request.profile(),
+        languageFragment);
   }
 
   /** A target language other than English (case-insensitive, blank treated as English). */
@@ -287,7 +244,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
       return null;
     }
     String key = config.openRouterApiKey().trim();
-    String voice = voiceMap.voiceFor(request.voice());
+    String voice = model.voiceFor(request.voice());
     String cappedText = capLength(request.text(), config.cloudMaxChars());
     // Optional first hop: a non-English target language (or a global quirk) routes the (already
     // capped) line through the translation model before it is voiced, so the spoken transcript is
@@ -307,7 +264,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
       }
       spokenText = translated;
     }
-    String styledInput = GeminiEmotionStyle.apply(spokenText, request.emotion());
+    String styledInput = model.styleInput(spokenText, request.emotion());
     // The profile block sets the tone (accent/style/pace) and the emotion tag colours the moment;
     // they compose, so the block leads and the emotion-tagged transcript follows the divider. A
     // null
@@ -343,10 +300,10 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
     }
 
     JsonObject payload = new JsonObject();
-    payload.addProperty("model", MODEL);
+    payload.addProperty("model", model.modelId());
     payload.addProperty("input", input);
     payload.addProperty("voice", voice);
-    payload.addProperty("response_format", RESPONSE_FORMAT);
+    payload.addProperty("response_format", model.responseFormat());
     int speed = speedPercent();
     if (speed != DEFAULT_SPEED_PERCENT) {
       // The model may ignore speed; sending it only when non-default keeps the default request body
@@ -392,7 +349,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
         if (!response.isSuccessful()) {
           if (response.code() == 429) {
-            enterBackoff();
+            backoff.recordRateLimited();
           }
           warnOnce(
               "OpenRouter TTS request failed (HTTP "
@@ -403,7 +360,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
           return null;
         }
         // A clean call clears any rate-limit back-off so prefetch can resume.
-        clearBackoff();
+        backoff.recordSuccess();
         if (bytes.length == 0) {
           logFailure(
               "empty-body", response.code(), response.message(), contentType, generationId, bytes);
@@ -414,7 +371,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
           warnOnce("OpenRouter TTS returned an empty response; this line was not voiced.");
           return null;
         }
-        Pcm pcm = RawPcmDecoder.decode(bytes, SAMPLE_RATE);
+        Pcm pcm = model.decodeResponse(bytes);
         if (pcm == null) {
           warnOnce(
               "OpenRouter TTS returned audio that could not be decoded; this line was not voiced.");
@@ -438,33 +395,7 @@ public final class OpenRouterTtsBackend implements SynthesisBackend {
 
   @Override
   public boolean isThrottled() {
-    return System.currentTimeMillis() < backoffUntil.get();
-  }
-
-  /** Opens (or widens) the rate-limit back-off window after a 429, geometrically per repeat hit. */
-  private void enterBackoff() {
-    long window = backoffWindowMillis(consecutive429.incrementAndGet());
-    backoffUntil.set(System.currentTimeMillis() + window);
-    log.debug("[TTS cloud] rate limited (429); backing off prefetch for {}ms", window);
-  }
-
-  /** Clears the back-off after any clean call so prefetch resumes immediately. */
-  private void clearBackoff() {
-    if (backoffUntil.get() != 0) {
-      consecutive429.set(0);
-      backoffUntil.set(0);
-    }
-  }
-
-  /**
-   * The back-off window for the n-th consecutive 429: {@code base * 2^(n-1)}, capped, so repeated
-   * limits widen the pause geometrically instead of retry-storming, and a single 429 pauses only
-   * briefly.
-   */
-  static long backoffWindowMillis(int consecutive) {
-    int shift = Math.min(Math.max(consecutive, 1) - 1, 16);
-    long window = BACKOFF_BASE_MILLIS << shift;
-    return Math.min(window, BACKOFF_MAX_MILLIS);
+    return backoff.isThrottled();
   }
 
   /**

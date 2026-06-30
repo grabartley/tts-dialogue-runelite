@@ -808,18 +808,6 @@ public class OpenRouterTtsBackendTest {
   }
 
   @Test
-  public void backoffWindowGrowsGeometricallyAndCaps() {
-    assertEquals(
-        "first 429 backs off the base window", 1_000, OpenRouterTtsBackend.backoffWindowMillis(1));
-    assertEquals("second doubles", 2_000, OpenRouterTtsBackend.backoffWindowMillis(2));
-    assertEquals("third doubles again", 4_000, OpenRouterTtsBackend.backoffWindowMillis(3));
-    assertEquals(
-        "the window is capped so it never grows without bound",
-        30_000,
-        OpenRouterTtsBackend.backoffWindowMillis(50));
-  }
-
-  @Test
   public void rateLimitThrottlesThenClearsOnACleanCall() {
     TestConfig config = new TestConfig();
     config.key = "sk-or-abc";
