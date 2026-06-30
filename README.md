@@ -13,13 +13,12 @@ Every quest, every shopkeeper, every cheeky goblin: **now they actually talk.** 
 
 Walk up, talk, and listen. That is the whole setup.
 
-> Powered by [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) via [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx).
-
 ## What you get
 
-- **A voice for everyone.** NPCs and the player each get a distinct voice picked by race and gender, so a goblin never sounds like a king.
+- **A voice for everyone.** NPCs and the player each get a distinct voice, so a goblin never sounds like a king.
+- **Thousands of NPCs, already voiced.** The plugin knows exactly who is speaking and picks the right voice from a bundled table of **over 13,000 NPCs**, matched by race and gender, with no lookups or lag mid-conversation. Bump into someone added in a future update? **Auto-learn** quietly looks them up on the wiki once and remembers them.
+- **Accents and personalities with real craft.** **12 races and 13 regional origins** each map to their own accent: Scottish dwarves, South London trolls, Irish leprechauns, Dracula-esque vampyres, Norse Fremennik raiders, the gothic dread of Morytania, and more. On top of that, **over 2,600 named characters** get a hand-written personality with its own style and speaking pace, so the icons of Gielinor sound like themselves.
 - **Real emotion.** The plugin reads each speaker's chat-head expression and delivers the line happy, sad, angry, scared, or neutral, so a furious dwarf actually sounds furious.
-- **Accents with a sense of place.** Dwarves go Scottish, trolls go South London, leprechauns Irish, vampyres Dracula-esque, wizards wise and weathered. Far-flung folk carry the accent of where they are truly from, from Fremennik raiders to desert traders to the gothic dread of Morytania.
 - **You star in it too.** Set your own hero's accent, persona, and pace and play the dashing knight, the gruff mercenary, or the chaos goblin of your dreams.
 - **Speak any language, any vibe.** Pipe dialogue through another language, or drop a delivery style over it: be a roadman in Gen Z slang among posh nobles, or run the whole realm as a pirate crew.
 - **Atmosphere on tap.** Lines spoken underground pick up a cave echo, so dungeons and sewers feel enclosed.
@@ -179,7 +178,7 @@ Run the `com.grahambartley.TTSDialoguePluginTest` class with VM options `-ea --a
 
 ## Thanks
 
-Big thanks to [hexgrad](https://huggingface.co/hexgrad/Kokoro-82M) for Kokoro, the [k2-fsa](https://github.com/k2-fsa/sherpa-onnx) team for sherpa-onnx, and the RuneLite devs for making plugin development genuinely fun.
+Voiced Dialogue stands on the shoulders of others: [hexgrad](https://huggingface.co/hexgrad/Kokoro-82M) for the Kokoro voice model, the [k2-fsa](https://github.com/k2-fsa/sherpa-onnx) team for sherpa-onnx, [OpenRouter](https://openrouter.ai) for routing the cloud voice, and the RuneLite devs for making plugin development genuinely fun.
 
 ## Contribute
 
