@@ -24,6 +24,9 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Test;
 
 /**
@@ -125,6 +128,112 @@ public class ExternalEngineClientTest {
           }
         };
     return new ExternalEngineClient(Paths.get("/fake/kokoro-engine"), GSON, factory, pace);
+  }
+
+  /**
+   * A health probe must never block behind an in-flight synthesize(). synthesize() holds this
+   * client's monitor for the whole synth; the game thread calls isHealthy() (via isAvailable()) on
+   * every dialogue dispatch and prefetch, so a synchronized health check would freeze the game
+   * thread for the synth's duration. Here a synth is parked mid-response (holding the monitor) and
+   * isHealthy() must still return promptly.
+   */
+  @Test(timeout = 10_000)
+  public void isHealthyDoesNotBlockBehindAnInFlightSynthesize() throws Exception {
+    CountDownLatch readBlocked = new CountDownLatch(1);
+    CountDownLatch releaseRead = new CountDownLatch(1);
+    AtomicBoolean announced = new AtomicBoolean();
+
+    // stdout that blocks every read (so synthesize() parks in readResponse holding the monitor)
+    // until released, then reports EOF so the synth unwinds cleanly.
+    InputStream blockingStdout =
+        new InputStream() {
+          private int blockThenEof() throws IOException {
+            if (announced.compareAndSet(false, true)) {
+              readBlocked.countDown();
+            }
+            try {
+              releaseRead.await();
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+              throw new IOException(e);
+            }
+            return -1;
+          }
+
+          @Override
+          public int read() throws IOException {
+            return blockThenEof();
+          }
+
+          @Override
+          public int read(byte[] b, int off, int len) throws IOException {
+            return blockThenEof();
+          }
+        };
+
+    Process blockingProcess =
+        new Process() {
+          private final ByteArrayOutputStream stdin = new ByteArrayOutputStream();
+
+          @Override
+          public OutputStream getOutputStream() {
+            return stdin;
+          }
+
+          @Override
+          public InputStream getInputStream() {
+            return blockingStdout;
+          }
+
+          @Override
+          public InputStream getErrorStream() {
+            return new ByteArrayInputStream(new byte[0]);
+          }
+
+          @Override
+          public int waitFor() {
+            return 0;
+          }
+
+          @Override
+          public int exitValue() {
+            return 0;
+          }
+
+          @Override
+          public void destroy() {}
+
+          @Override
+          public boolean isAlive() {
+            return true;
+          }
+        };
+
+    ExternalEngineClient client =
+        new ExternalEngineClient(
+            Paths.get("/fake/kokoro-engine"), GSON, cmd -> blockingProcess, () -> 100);
+
+    Thread synth = new Thread(() -> client.synthesize(request()), "test-synth");
+    synth.setDaemon(true);
+    synth.start();
+
+    assertTrue(
+        "synthesize() should reach the blocking response read (holding the monitor)",
+        readBlocked.await(5, TimeUnit.SECONDS));
+
+    AtomicBoolean healthy = new AtomicBoolean();
+    Thread probe = new Thread(() -> healthy.set(client.isHealthy()), "test-probe");
+    probe.setDaemon(true);
+    probe.start();
+    probe.join(2000);
+
+    assertFalse(
+        "isHealthy() blocked behind an in-flight synthesize() (health check is not lock-free)",
+        probe.isAlive());
+    assertTrue("engine process is alive, isHealthy() should report true", healthy.get());
+
+    releaseRead.countDown();
+    synth.join(2000);
   }
 
   @Test

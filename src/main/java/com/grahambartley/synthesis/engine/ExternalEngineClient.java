@@ -56,7 +56,9 @@ public final class ExternalEngineClient {
    */
   private final IntSupplier speakingPacePercent;
 
-  private Process process;
+  // volatile so isAlive()/isHealthy() can read it lock-free: a health probe from the game thread
+  // must never contend with synthesize(), which holds this client's monitor for the whole synth.
+  private volatile Process process;
   private OutputStream toEngine;
   private DataInputStream fromEngine;
   private BufferedReader fromEngineErr;
@@ -119,16 +121,23 @@ public final class ExternalEngineClient {
     log.debug("External engine started: {}", launcher);
   }
 
-  /** Whether the child process is currently running. */
-  public synchronized boolean isAlive() {
-    return process != null && process.isAlive();
+  /**
+   * Whether the child process is currently running. Lock-free (reads the {@code volatile process}
+   * snapshot) so a health probe never blocks behind an in-flight {@link #synthesize}, which holds
+   * this client's monitor for the entire synth. The game thread calls this (via {@code
+   * isAvailable()}) on every line dispatch and prefetch, so it must not wait on the synth lock.
+   */
+  public boolean isAlive() {
+    Process p = process;
+    return p != null && p.isAlive();
   }
 
   /**
    * Lightweight health check: the process is alive (it was started and has not exited). Heavy
-   * synthesis health is proven by the first {@link #synthesize} call.
+   * synthesis health is proven by the first {@link #synthesize} call. Lock-free, same as {@link
+   * #isAlive()}.
    */
-  public synchronized boolean isHealthy() {
+  public boolean isHealthy() {
     return isAlive();
   }
 
