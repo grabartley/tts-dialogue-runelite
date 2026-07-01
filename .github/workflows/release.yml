@@ -1,19 +1,13 @@
-name: CI/CD
+name: Release
 
-# Pull requests are the build/test gate: compile the plugin and the external engine, run the full
-# test suite (plugin tests + engine --stdio framing/manifest conformance), and build the standalone
-# shadow jar as a downloadable artifact.
-#
 # workflow_dispatch is the single deploy: it reads the source-pinned version (gradle.properties),
 # runs the gate, builds the thin + shadow jars AND the cross-platform Kokoro engine bundles, then
 # publishes ONE GitHub release under one v<version> tag carrying both jars, the engine bundles, and
 # the engine-manifest.json asset. The Hub builds its own jar from this source at the tagged commit,
 # so it carries the same version and resolves the engine published under the same tag. There is no
-# separate engine-only or jar-only release, and no manifest commit-back.
+# separate engine-only or jar-only release, and no manifest commit-back. The PR build/test gate
+# lives in ci.yml.
 on:
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       release_type:
@@ -28,62 +22,14 @@ on:
 
 permissions:
   contents: write
-  checks: write
-  pull-requests: write
 
 env:
   SHERPA_ONNX_VERSION: v1.13.3
   MODEL_NAME: kokoro-multi-lang-v1_0
 
 jobs:
-  # ---------- PR gate: tests + downloadable shadow jar ----------
-  build:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: "17"
-          distribution: temurin
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Check formatting (Spotless)
-        run: ./gradlew spotlessCheck
-
-      - name: Build and run tests
-        run: ./gradlew build
-
-      - name: Publish unit test report
-        uses: mikepenz/action-junit-report@v4
-        if: success() || failure()
-        with:
-          report_paths: "**/build/test-results/test/TEST-*.xml"
-          detailed_summary: true
-          include_passed: true
-
-      - name: Build shadow JAR
-        run: ./gradlew shadowJar
-
-      - name: Upload shadow JAR
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: voiced-dialogue-${{ github.sha }}
-          path: build/libs/*-all.jar
-
   # ---------- Deploy: read source version, gate, build thin + shadow jars ----------
   plugin:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -149,7 +95,6 @@ jobs:
   # native libs are native to that platform. Versioned from the plugin job so every artifact in the
   # release shares one v<version> tag.
   engine:
-    if: github.event_name == 'workflow_dispatch'
     needs: plugin
     name: Build engine ${{ matrix.platform }}
     strategy:
@@ -375,7 +320,6 @@ jobs:
 
   # ---------- Deploy: one tagged release with jar + engine bundles + manifest ----------
   publish:
-    if: github.event_name == 'workflow_dispatch'
     name: Publish release + manifest
     needs: [plugin, engine]
     runs-on: ubuntu-latest
