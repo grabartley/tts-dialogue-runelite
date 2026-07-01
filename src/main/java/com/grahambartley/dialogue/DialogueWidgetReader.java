@@ -1,8 +1,8 @@
 package com.grahambartley.dialogue;
 
 import net.runelite.api.Client;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 
 /**
  * Reads the dialogue chat-head animation id and the speaking NPC's name from the client. Only
@@ -42,7 +42,7 @@ public final class DialogueWidgetReader {
 
   /** Extracts the NPC name from the dialogue name widget, or the current interacting NPC. */
   String currentNpcName() {
-    Widget npcNameWidget = client.getWidget(WidgetInfo.DIALOG_NPC_NAME);
+    Widget npcNameWidget = client.getWidget(ComponentID.DIALOG_NPC_NAME);
     if (npcNameWidget != null && !npcNameWidget.isHidden()) {
       String npcName = npcNameWidget.getText();
       if (npcName != null && !npcName.isEmpty()) {

@@ -5,8 +5,8 @@ import com.grahambartley.tts.DialogueAudioService;
 import com.grahambartley.voice.VoiceManager;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 
 /**
  * Scans the dialogue widgets each game tick and drives the speak/prefetch/interrupt flow: speaks a
@@ -46,7 +46,7 @@ public final class DialogueWatcher {
   }
 
   public void tick() {
-    Widget npcDialogue = client.getWidget(WidgetInfo.DIALOG_NPC_TEXT);
+    Widget npcDialogue = client.getWidget(ComponentID.DIALOG_NPC_TEXT);
     if (npcDialogue != null && !npcDialogue.isHidden()) {
       String text = npcDialogue.getText();
       if (text != null && !text.isEmpty() && !text.equals(lastSpoken)) {
@@ -58,7 +58,7 @@ public final class DialogueWatcher {
       }
     }
 
-    Widget playerDialogue = client.getWidget(WidgetInfo.DIALOG_PLAYER_TEXT);
+    Widget playerDialogue = client.getWidget(ComponentID.DIALOG_PLAYER_TEXT);
     if (playerDialogue != null && !playerDialogue.isHidden()) {
       String text = playerDialogue.getText();
       if (text != null && !text.isEmpty() && !text.equals(lastSpoken)) {
@@ -70,7 +70,7 @@ public final class DialogueWatcher {
       }
     }
 
-    Widget options = client.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS);
+    Widget options = client.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
     boolean optionsVisible = options != null && !options.isHidden();
     if (optionsVisible) {
       prefetchCoordinator.prefetchOptions(options);

@@ -15,8 +15,8 @@ import com.grahambartley.voice.VoiceManager;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import net.runelite.api.Client;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,7 +77,7 @@ public class DialogueWatcherTest {
     Widget npc = mock(Widget.class);
     when(npc.isHidden()).thenReturn(false);
     when(npc.getText()).thenReturn("Greetings!");
-    when(client.getWidget(WidgetInfo.DIALOG_NPC_TEXT)).thenReturn(npc);
+    when(client.getWidget(ComponentID.DIALOG_NPC_TEXT)).thenReturn(npc);
 
     watcher.tick();
     watcher.tick();
@@ -92,7 +92,7 @@ public class DialogueWatcherTest {
     when(npc.isHidden()).thenReturn(false);
     when(npc.getText()).thenReturn("Greetings!");
     // Open on the first tick, gone on the second.
-    when(client.getWidget(WidgetInfo.DIALOG_NPC_TEXT)).thenReturn(npc, (Widget) null);
+    when(client.getWidget(ComponentID.DIALOG_NPC_TEXT)).thenReturn(npc, (Widget) null);
 
     watcher.tick();
     watcher.tick();
