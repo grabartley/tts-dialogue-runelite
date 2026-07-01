@@ -275,6 +275,22 @@ public class EngineInstallerTest {
   }
 
   @Test
+  public void ownVersionResolvesTheCommittedPluginVersionResource() {
+    // The committed src/main/resources/plugin-version.txt is the single source EngineInstaller
+    // reads
+    // to resolve its engine release. build=standard ships it verbatim (no Gradle-generated
+    // resource), so a real (non-overridden) read must return a concrete, non-SNAPSHOT version or
+    // the
+    // local backend would be permanently unavailable for every Hub user.
+    EngineInstaller installer =
+        new EngineInstaller(new OkHttpClient(), gson, tmp.getRoot().toPath());
+    String version = installer.ownVersion();
+    assertNotNull("committed plugin-version.txt must resolve on the classpath", version);
+    assertTrue("version must not be empty", !version.isEmpty());
+    assertTrue("version must not be a dev/SNAPSHOT build", !version.endsWith("-SNAPSHOT"));
+  }
+
+  @Test
   public void readManifestSkipsTheNetworkForSnapshotBuilds() {
     // A dev/SNAPSHOT build has no matching release, so no fetch is attempted (server would 404).
     EngineInstaller installer =

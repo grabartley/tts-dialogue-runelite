@@ -20,10 +20,10 @@ import com.grahambartley.synthesis.ProfanityFilter;
 import com.grahambartley.synthesis.SynthesisDispatcher;
 import com.grahambartley.synthesis.engine.EngineInstaller;
 import com.grahambartley.synthesis.engine.ExternalEngineClient;
-import com.grahambartley.tts.AudioPlayer;
 import com.grahambartley.tts.CaveEchoPolicy;
 import com.grahambartley.tts.DialogueAudioService;
 import com.grahambartley.tts.DiskAudioCache;
+import com.grahambartley.tts.StreamingAudioPlayer;
 import com.grahambartley.voice.EmotionResolver;
 import com.grahambartley.voice.ProfileResolver;
 import com.grahambartley.voice.VoiceManager;
@@ -143,7 +143,7 @@ public class VoicedDialoguePlugin extends Plugin {
     audioService =
         new DialogueAudioService(
             backendProvider,
-            new AudioPlayer(),
+            new StreamingAudioPlayer(),
             diskCache,
             CACHE_SIZE,
             QUEUE_CAPACITY,

@@ -18,7 +18,7 @@ import javax.sound.sampled.SourceDataLine;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public class AudioPlayerTest {
+public class StreamingAudioPlayerTest {
 
   /** Makes a mock line whose write() reports it accepted everything it was handed. */
   private static SourceDataLine lineThatAcceptsEverything() {
@@ -30,7 +30,7 @@ public class AudioPlayerTest {
   @Test
   public void streamsAllPcmThenDrainsAndClosesLine() throws Exception {
     SourceDataLine line = lineThatAcceptsEverything();
-    AudioPlayer player = new AudioPlayer(format -> line);
+    StreamingAudioPlayer player = new StreamingAudioPlayer(format -> line);
 
     // 3 mono samples -> 6 bytes of 16-bit PCM, a single chunk.
     player.stream(new float[] {0f, 0f, 0f}, 24_000, 100);
@@ -50,7 +50,7 @@ public class AudioPlayerTest {
   @Test
   public void stopMidStreamHaltsFurtherWritesAndSkipsDrain() {
     SourceDataLine line = mock(SourceDataLine.class);
-    AudioPlayer player = new AudioPlayer(format -> line);
+    StreamingAudioPlayer player = new StreamingAudioPlayer(format -> line);
     // Interrupt as soon as the first chunk is written: the loop should bail before the next one.
     when(line.write(any(byte[].class), anyInt(), anyInt()))
         .thenAnswer(
@@ -68,8 +68,8 @@ public class AudioPlayerTest {
 
   @Test
   public void emptySamplesNeverTouchTheAudioLine() {
-    AudioPlayer.LineFactory factory = mock(AudioPlayer.LineFactory.class);
-    AudioPlayer player = new AudioPlayer(factory);
+    StreamingAudioPlayer.LineFactory factory = mock(StreamingAudioPlayer.LineFactory.class);
+    StreamingAudioPlayer player = new StreamingAudioPlayer(factory);
 
     player.stream(new float[0], 24_000, 100);
     player.stream(null, 24_000, 100);
@@ -85,7 +85,7 @@ public class AudioPlayerTest {
     when(gain.getMaximum()).thenReturn(6f);
     when(line.isControlSupported(FloatControl.Type.MASTER_GAIN)).thenReturn(true);
     when(line.getControl(FloatControl.Type.MASTER_GAIN)).thenReturn(gain);
-    AudioPlayer player = new AudioPlayer(format -> line);
+    StreamingAudioPlayer player = new StreamingAudioPlayer(format -> line);
 
     player.stream(new float[] {0f}, 24_000, 50);
 
@@ -102,7 +102,7 @@ public class AudioPlayerTest {
     when(gain.getMinimum()).thenReturn(-80f);
     when(line.isControlSupported(FloatControl.Type.MASTER_GAIN)).thenReturn(true);
     when(line.getControl(FloatControl.Type.MASTER_GAIN)).thenReturn(gain);
-    AudioPlayer player = new AudioPlayer(format -> line);
+    StreamingAudioPlayer player = new StreamingAudioPlayer(format -> line);
 
     player.stream(new float[] {0f}, 24_000, 0);
 
@@ -113,7 +113,7 @@ public class AudioPlayerTest {
   public void unsupportedGainControlDoesNotBreakPlayback() {
     SourceDataLine line = lineThatAcceptsEverything();
     when(line.isControlSupported(any(FloatControl.Type.class))).thenReturn(false);
-    AudioPlayer player = new AudioPlayer(format -> line);
+    StreamingAudioPlayer player = new StreamingAudioPlayer(format -> line);
 
     player.stream(new float[] {0f}, 24_000, 100);
 

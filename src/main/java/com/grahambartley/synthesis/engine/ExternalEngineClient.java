@@ -29,9 +29,9 @@ import lombok.extern.slf4j.Slf4j;
  *
  * and reads back one JSON header line {@code {"sampleRate":N,"samples":M,"format":"f32le"}}
  * followed by exactly {@code M*4} little-endian float32 bytes, decoding them into a {@link Pcm}
- * that carries the engine-reported sample rate so {@link com.grahambartley.tts.AudioPlayer#stream}
- * never pitch-shifts. An {@code {"error":...}} header line is surfaced as a failed request without
- * killing the process.
+ * that carries the engine-reported sample rate so {@link
+ * com.grahambartley.tts.StreamingAudioPlayer#stream} never pitch-shifts. An {@code {"error":...}}
+ * header line is surfaced as a failed request without killing the process.
  *
  * <p>Every stateful entry point ({@link #start}, {@link #synthesize}, {@link #stop}, health checks)
  * is {@code synchronized} on this client, so the write-request/read-response round-trip is atomic

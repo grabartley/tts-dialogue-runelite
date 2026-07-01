@@ -51,38 +51,43 @@ dependencies {
 
 group = 'com.grahambartley'
 
-// version is source-pinned in gradle.properties: it is the single source of truth the Hub build,
-// the deploy tag, and the engine release all share. Bump it in the commit you tag for a release.
+// The committed src/main/resources/plugin-version.txt is the single source of truth for the
+// version. build.gradle reads it here; EngineInstaller reads the same bundled resource at runtime to
+// resolve its engine release (v<version>); and the Hub's build=standard ships it verbatim from
+// src/main/resources. This avoids a Gradle-generated resource, which build=standard would not run.
+version = file('src/main/resources/plugin-version.txt').text.trim()
+
 tasks.register('printVersion') {
 	doLast {
 		println version
 	}
 }
 
+// Fail the build if runelite-plugin.properties (read by the Hub, and unable to share a source with
+// build.gradle) drifts from plugin-version.txt. Keeps the two hand-edited version strings honest.
+tasks.register('checkVersionConsistency') {
+	def pluginProps = file('runelite-plugin.properties')
+	def expected = version.toString()
+	inputs.file(pluginProps)
+	inputs.property('version', expected)
+	doLast {
+		def props = new Properties()
+		pluginProps.withInputStream { props.load(it) }
+		def declared = props.getProperty('version')?.trim()
+		if (declared != expected) {
+			throw new GradleException(
+					"runelite-plugin.properties version='${declared}' does not match "
+							+ "plugin-version.txt='${expected}'. Set both to the same value.")
+		}
+	}
+}
+
+tasks.named('check') { dependsOn 'checkVersionConsistency' }
+
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.release.set(17)
 }
-
-// Stamp the build version into a bundled resource so EngineInstaller resolves the engine release
-// (v<version>) matching the running jar. The Hub builds this jar from source, so it carries the
-// gradle.properties version and resolves the engine published under the same tag.
-def versionResourceDir = layout.buildDirectory.dir('generated/plugin-version')
-
-tasks.register('generateVersionResource') {
-	def outDir = versionResourceDir
-	def stampedVersion = version.toString()
-	inputs.property('version', stampedVersion)
-	outputs.dir(outDir)
-	doLast {
-		def file = outDir.get().file('plugin-version.txt').asFile
-		file.parentFile.mkdirs()
-		file.text = stampedVersion
-	}
-}
-
-sourceSets.main.resources.srcDir(versionResourceDir)
-tasks.named('processResources') { dependsOn 'generateVersionResource' }
 
 tasks.register('shadowJar', Jar) {
 	dependsOn configurations.testRuntimeClasspath

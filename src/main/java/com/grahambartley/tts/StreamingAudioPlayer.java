@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  * the streaming loop bails as soon as a newer generation is observed.
  */
 @Slf4j
-public class AudioPlayer implements AudioOutput {
+public class StreamingAudioPlayer implements AudioOutput {
 
   /**
    * Supplies an unopened {@link SourceDataLine} for a format; a seam so tests can mock the line.
@@ -31,11 +31,11 @@ public class AudioPlayer implements AudioOutput {
   private final AtomicLong generation = new AtomicLong();
   private volatile SourceDataLine line;
 
-  public AudioPlayer() {
+  public StreamingAudioPlayer() {
     this(AudioSystem::getSourceDataLine);
   }
 
-  AudioPlayer(LineFactory lineFactory) {
+  StreamingAudioPlayer(LineFactory lineFactory) {
     this.lineFactory = lineFactory;
   }
 

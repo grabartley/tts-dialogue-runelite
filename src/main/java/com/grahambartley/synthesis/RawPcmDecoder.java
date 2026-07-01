@@ -10,7 +10,7 @@ import com.grahambartley.tts.Pcm;
  * samples at a sample rate the caller already knows (24 kHz for the OpenRouter speech endpoint,
  * matching the rest of the pipeline). The decoder therefore takes the rate as an argument rather
  * than reading it from a header, and converts each 16-bit sample to a {@code float} in [-1, 1] so
- * {@code AudioPlayer} plays it at native pitch with no resampling.
+ * {@code StreamingAudioPlayer} plays it at native pitch with no resampling.
  */
 final class RawPcmDecoder {
 

@@ -56,7 +56,9 @@ import okhttp3.ResponseBody;
 @Slf4j
 public class EngineInstaller {
 
-  /** Resource holding this build's plugin version, stamped into the jar by Gradle at build time. */
+  /**
+   * Committed resource holding this build's plugin version; shipped verbatim, including by the Hub.
+   */
   static final String VERSION_RESOURCE = "/plugin-version.txt";
 
   /** Repository whose GitHub Releases host the per-version engine bundles + manifest asset. */
@@ -266,7 +268,7 @@ public class EngineInstaller {
   }
 
   /**
-   * This build's plugin version, stamped into the jar by Gradle ({@code /plugin-version.txt}), or
+   * This build's plugin version, read from the committed resource {@code /plugin-version.txt}, or
    * {@code null} if absent. Overridable in tests.
    */
   protected String ownVersion() {

@@ -32,22 +32,23 @@ repo; copy it into the fork and fill in the commit.
 
 - The repository is public.
 - A `LICENSE` exists at the repo root (this repo ships MIT).
-- A `v<version>` GitHub Release matching the `version` in `gradle.properties` is published, with
+- A `v<version>` GitHub Release matching the version in `src/main/resources/plugin-version.txt` is published, with
   the engine bundles and the `engine-manifest.json` asset attached (the `Release` deploy does this).
   The Hub-built jar carries that same version and fetches the manifest from the matching release at
   runtime, so until that release is cut the local backend cannot install. Do not submit before the
   deploy has published the matching release.
 - `runelite-plugin.properties` is non-placeholder (no `Example` / `Nobody` /
   `An example greeter plugin`, which the packager rejects), and declares `build=standard`.
-  Its `version` matches `gradle.properties`.
+  Its `version` matches `src/main/resources/plugin-version.txt` (the build fails otherwise).
 - The plugin jar builds clean: no native libraries, no model, well under the 10 MiB
   source/jar limit. `./gradlew jar` produces a ~362 KiB jar (mostly the bundled
   `npc-voices.json` data table).
 
 ## Step 1: Cut the matching release
 
-The `Release` deploy creates the tag and the release the descriptor points at. Bump `version` in
-`gradle.properties` to the release version, merge it, then dispatch `Release` (Actions tab -> "Run
+The `Release` deploy creates the tag and the release the descriptor points at. Bump the version in
+`src/main/resources/plugin-version.txt` **and** `runelite-plugin.properties` (they must match or the
+build fails) to the release version, merge it, then dispatch `Release` (Actions tab -> "Run
 workflow") with the `release_type`. It tags `v<version>` and publishes the release with both jars,
 the engine bundles, and the `engine-manifest.json` asset. Then copy that tag's commit sha for the
 descriptor:

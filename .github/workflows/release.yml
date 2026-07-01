@@ -1,6 +1,7 @@
 name: Release
 
-# workflow_dispatch is the single deploy: it reads the source-pinned version (gradle.properties),
+# workflow_dispatch is the single deploy: it reads the source-pinned version (the committed
+# src/main/resources/plugin-version.txt, via `./gradlew printVersion`),
 # runs the gate, builds the thin + shadow jars AND the cross-platform Kokoro engine bundles, then
 # publishes ONE GitHub release under one v<version> tag carrying both jars, the engine bundles, and
 # the engine-manifest.json asset. The Hub builds its own jar from this source at the tagged commit,
@@ -71,11 +72,11 @@ jobs:
         run: |
           VERSION=$(./gradlew -q printVersion | tail -1 | tr -d '[:space:]')
           if [ -z "$VERSION" ]; then
-            echo "::error::Could not read the project version from gradle.properties"
+            echo "::error::Could not read the project version from src/main/resources/plugin-version.txt"
             exit 1
           fi
           if [[ "$VERSION" == *-SNAPSHOT ]]; then
-            echo "::error::Refusing to release a SNAPSHOT version ($VERSION). Set a release version in gradle.properties on the commit you are releasing."
+            echo "::error::Refusing to release a SNAPSHOT version ($VERSION). Set a release version in src/main/resources/plugin-version.txt on the commit you are releasing."
             exit 1
           fi
           echo "Releasing version: ${VERSION}"
