@@ -1,6 +1,8 @@
 package com.grahambartley.synthesis;
 
 import com.grahambartley.voice.VoiceManager;
+import lombok.Value;
+import lombok.experimental.Accessors;
 
 /**
  * Backend-neutral description of <em>who</em> is speaking: the player, or an NPC of a given race
@@ -19,11 +21,17 @@ import com.grahambartley.voice.VoiceManager;
  * ({@code -1}) means "no explicit choice" so the engine falls back to its race/gender matrix
  * exactly as before.
  */
-public record VoiceSpec(
-    boolean player, VoiceManager.NPCRace race, VoiceManager.NPCGender gender, int kokoroSpeakerId) {
+@Value
+@Accessors(fluent = true)
+public class VoiceSpec {
 
   /** No explicit Kokoro speaker id: the engine falls back to its race/gender matrix. */
   public static final int UNSPECIFIED_SPEAKER_ID = -1;
+
+  boolean player;
+  VoiceManager.NPCRace race;
+  VoiceManager.NPCGender gender;
+  int kokoroSpeakerId;
 
   /** A player voice of the given gender. Race is not meaningful for the player. */
   public static VoiceSpec player(VoiceManager.NPCGender gender) {
