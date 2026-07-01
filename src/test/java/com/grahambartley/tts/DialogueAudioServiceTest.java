@@ -295,7 +295,7 @@ public class DialogueAudioServiceTest {
 
   @Test
   public void unsupportedEmotionDowngradesToNeutralAndSharesCacheEntry() {
-    // Kokoro-style backend: NEUTRAL only. An ANGRY line downgrades and collides with the NEUTRAL
+    // A NEUTRAL-only backend. An ANGRY line downgrades and collides with the NEUTRAL
     // one, proving the downgrade happens before the cache key is built.
     FakeBackend backend = new FakeBackend(EnumSet.of(Emotion.NEUTRAL));
     FakeOutput output = new FakeOutput();

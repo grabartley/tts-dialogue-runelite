@@ -52,7 +52,7 @@ import okhttp3.ResponseBody;
 @Slf4j
 public final class OpenRouterTtsBackend implements SynthesisBackend {
 
-  /** Stable backend id, matched by {@link BackendProvider} when {@code CLOUD} is selected. */
+  /** Stable backend id, folded into the synthesis cache key. */
   public static final String ID = "cloud-openrouter";
 
   private static final String PRODUCTION_ENDPOINT = "https://openrouter.ai/api/v1/audio/speech";

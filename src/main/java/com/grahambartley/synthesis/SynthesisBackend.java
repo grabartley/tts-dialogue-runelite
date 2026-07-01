@@ -15,7 +15,7 @@ public interface SynthesisBackend {
   /** Stable identifier, e.g. {@code "cloud-openrouter"}. */
   String id();
 
-  /** Whether this backend can actually run right now (engine installed, key set, GPU present). */
+  /** Whether this backend can actually run right now (e.g. an API key is set). */
   boolean isAvailable();
 
   /** The emotions this backend can voice. Requests outside this set are downgraded to neutral. */
@@ -48,7 +48,10 @@ public interface SynthesisBackend {
     return false;
   }
 
-  /** Optional one-off warm-up (e.g. model load) run on the pipeline thread before first use. */
+  /**
+   * Optional one-off warm-up (e.g. a connection handshake) run on the pipeline thread before first
+   * use.
+   */
   default void warmUp() {}
 
   /** Optional resource release when the backend is torn down. */

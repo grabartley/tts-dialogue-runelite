@@ -55,7 +55,7 @@ The mapping is derived from the live OSRS cache and lives in [`src/main/resource
 <details>
 <summary><b>Character profiles and accents</b></summary>
 
-On Cloud, every speaker gets a **character profile** that steers an accent, a persona, and a pace. This is a **British** medieval fantasy world: commoners speak plain common British, while royalty, knights, and high society get posh Received Pronunciation, with lore-driven exceptions (leprechauns Irish, vampyres Dracula-esque, trolls South London, dwarves Scottish, goblins mischievous and high).
+Every speaker gets a **character profile** that steers an accent, a persona, and a pace. This is a **British** medieval fantasy world: commoners speak plain common British, while royalty, knights, and high society get posh Received Pronunciation, with lore-driven exceptions (leprechauns Irish, vampyres Dracula-esque, trolls South London, dwarves Scottish, goblins mischievous and high).
 
 Accents also follow where a character is **from**, taking the real-world cultures the lands are based on: the Kharidian Desert Middle Eastern, Karamja West African, the Fremennik lands Norse, Morytania gothic Eastern European, Varlamore Mediterranean, while the central kingdoms use distinct English regional accents. It is an origin signal, not where the NPC is standing, so a Misthalin guard visiting Karamja still sounds like home.
 
@@ -123,11 +123,11 @@ Settings mirror the in-game panel: **General**, **Cloud Voice (OpenRouter)**, an
 | Setting | Default | What it does |
 |---------|---------|--------------|
 | **OpenRouter API Key** | empty | Your OpenRouter API key, required for the Cloud voice. Create a free key at openrouter.ai and paste it here; stored locally, never bundled with the plugin. |
-| **Your Accent** | British (Cambridge) | Accent for your character's Cloud voice. Used with Character Voices on and Cloud active. |
-| **Your Persona** | friendly and plucky | Persona and delivery style for your character's Cloud voice. |
-| **Your Pace** | Normal | Speaking pace for your character's Cloud voice. |
+| **Your Accent** | British (Cambridge) | Accent for your character's voice. Used with Character Voices on. |
+| **Your Persona** | friendly and plucky | Persona and delivery style for your character's voice. |
+| **Your Pace** | Normal | Speaking pace for your character's voice. |
 | **Character Voices** | `On` | Gives each speaker a distinct voice (accent, style, pace) from the bundled table instead of one shared voice. Emotion still layers on top. Off gives the plainest, cheapest delivery. |
-| **Emotional Delivery** | `On` | Carries the emotion detected from the speaker's chat-head animation through to the Cloud voice. Off voices every line as Neutral. |
+| **Emotional Delivery** | `On` | Carries the emotion detected from the speaker's chat-head animation through to the voice. Off voices every line as Neutral. |
 | **Spoken Language** | `English` | Language dialogue is spoken in, from a dropdown of supported languages. `English` voices the original line; anything else translates each line first (preserving names, places, and item terms), then voices it. |
 | **Player Speaking Style** | `None` | Optional delivery register layered onto your own lines (Gen Z slang, pirate speak, formal, and so on). Set independently of the NPC style. |
 | **NPC Speaking Style** | `None` | Optional delivery register layered onto NPC lines, from the same set. Language-agnostic, so it composes with any Spoken Language. |
@@ -143,7 +143,7 @@ Settings mirror the in-game panel: **General**, **Cloud Voice (OpenRouter)**, an
 |---------|---------|--------------|
 | **Cache Size Limit (MiB)** | `1024` | Maximum size of the on-disk audio cache. When a new clip would exceed it, the oldest are deleted first. Set to `0` for no limit. Only applies when Save Audio To Disk is on. |
 | **Max Characters Per Line** | `0` | Caps how many characters of a line are sent to Cloud, truncating at a sentence or word boundary. `0` sends the whole line; set a positive value to bound worst-case per-line cost. |
-| **Debug Logging** | `Off` | Logs the full resolved decision per line (one `[TTS line]` record with backend, emotion, race, gender, seed, profile, and accent), plus per-operation latency, cache hits/misses by tier, and timed/numbered synth attempts. |
+| **Debug Logging** | `Off` | Logs the full resolved decision per line (one `[TTS line]` record with backend, kind, name, emotion, race, gender, seed, profile, and accent), plus per-operation latency, cache hits/misses by tier, and timed/numbered synth attempts. |
 
 </details>
 

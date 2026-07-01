@@ -11,16 +11,16 @@ Find the root cause from the runtime logs, then fix at the source via the
 ## Get logs
 
 Launch with the `run-game-client` skill (it runs with `--debug` and logs to
-`/tmp/tts-client.log`), turn **Debug Mode** on in the plugin config, use the
-**Cloud** backend with a key (accents only render on cloud), and reproduce the
-line. Then read the two trace lines the plugin emits per line:
+`/tmp/tts-client.log`), turn **Debug Mode** on in the plugin config, set an
+OpenRouter API key so dialogue is voiced, and reproduce the line. Then read the
+trace lines the plugin emits per line:
 
 ```
-[TTS voice]   npc='X' world=HIT(id=<activeId>) race=R gender=G source=table-hit -> voice=... speaker=...
+[TTS voice]   npc='X' world=HIT(id=<activeId>) race=R gender=G source=table-hit -> seed=<n>
 [TTS profile] npc='X' id=<id> race=R ethnicity=E -> '<profile name>' (source=..., accent='...')
 ```
 
-- `[TTS voice]` = the **timbre** (race/gender pick a Gemini voice). `[TTS cloud] ...` lines show the actual request/response.
+- `[TTS voice]` = the **timbre** pick: race/gender select a Gemini voice sub-pool, and `seed` spreads same-race/gender NPCs across it. `[TTS cloud] ...` lines show the actual request/response.
 - `[TTS profile]` = the **delivery** (accent/style/pace). `source=` lists every layer that combined, e.g. `race:Human+ethnicity:karamja+keyword:vampyre+id:123`. For single-valued fields the **last** layer that sets them wins.
 
 ## Common root causes

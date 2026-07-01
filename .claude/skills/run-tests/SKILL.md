@@ -20,9 +20,9 @@ Run unit tests and manual tests for the Voiced Dialogue RuneLite plugin.
 ./gradlew clean build
 
 # Manual testing in the RuneLite dev client
-# (run via the VoicedDialoguePluginTest entry point; --developer-mode is required for login, --debug is optional)
+# (run via the VoicedDialoguePluginRunner entry point, the shadow jar's Main-Class; --developer-mode is required for login, --debug is optional)
 ./gradlew shadowJar
-java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/voicedDialogue-1.0-SNAPSHOT-all.jar --developer-mode --debug
+java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/voicedDialogue-*-all.jar --developer-mode --debug
 ```
 
 The plugin voices dialogue through OpenRouter (cloud), so manual audio testing needs an OpenRouter API key set in the plugin config. There is no engine download or bundled model: the client stays silent until a key is supplied.

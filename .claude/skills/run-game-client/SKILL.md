@@ -13,7 +13,7 @@ Ensure Java 17 is active (`jenv local 17` or `sdk use java 17-amzn`), build the 
 
 ```bash
 ./gradlew shadowJar
-java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/voicedDialogue-1.0-SNAPSHOT-all.jar --developer-mode --debug 2>&1 | tee /tmp/tts-client.log
+java -ea --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED -jar build/libs/voicedDialogue-*-all.jar --developer-mode --debug 2>&1 | tee /tmp/tts-client.log
 ```
 
 `VoicedDialoguePluginRunner.main` forwards these program arguments to `RuneLite.main`. `--developer-mode` belongs only with this launcher and is required for login to work; omit it and login fails. `--debug` is optional and turns on RuneLite debug-level logging, which pairs well with the plugin's Debug Mode config toggle.

@@ -114,7 +114,7 @@ epoch-based stale-drop for little perceived gain.
 
 The primary cost lever remains the persistent disk cache, on by default, which keeps any already-heard
 line from being billed again across sessions. Its footprint is bounded by the **Cache Size Limit**
-(default 256 MiB) and evicted oldest-first (FIFO) so it never grows past the configured limit; a read
+(default 1024 MiB) and evicted oldest-first (FIFO) so it never grows past the configured limit; a read
 never rescues an old entry, and the just-written clip always survives. Setting the limit to `0` opts
 out of eviction entirely, so the cache keeps every clip for users who would rather spend disk than
 ever re-bill a line.

@@ -4,7 +4,7 @@ import com.grahambartley.VoicedDialogueConfig;
 import java.util.Set;
 
 /**
- * Pure decision for the runtime backend-switch warm-up trigger (#75): whether a {@link
+ * Pure decision for the runtime warm-up trigger (#75): whether a {@link
  * net.runelite.client.events.ConfigChanged} should re-run the active backend's off-thread warm-up.
  * Factored out of the plugin so it is testable without RuneLite injection.
  */

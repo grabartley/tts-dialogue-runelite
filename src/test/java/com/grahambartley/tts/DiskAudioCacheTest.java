@@ -33,16 +33,16 @@ public class DiskAudioCacheTest {
   @Test
   public void missWhenNothingStored() {
     DiskAudioCache cache = new DiskAudioCache(cacheDir());
-    assertNull(cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Hello"));
+    assertNull(cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Hello"));
   }
 
   @Test
   public void roundTripsPcmAndPreservesSampleRate() {
     DiskAudioCache cache = new DiskAudioCache(cacheDir());
     Pcm stored = pcm(48_000, 0.5f, -0.25f, 1.0f, -1.0f, 0.0f);
-    cache.put("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Hello", stored);
+    cache.put("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Hello", stored);
 
-    Pcm read = cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Hello");
+    Pcm read = cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Hello");
     assertNotNull(read);
     assertEquals("sample rate must survive disk round-trip", 48_000, read.getSampleRate());
     assertArrayEquals(stored.getSamples(), read.getSamples(), 0.0f);
@@ -52,12 +52,12 @@ public class DiskAudioCacheTest {
   public void survivesAcrossFreshCacheInstance() {
     Pcm stored = pcm(24_000, 0.1f, -0.1f);
     new DiskAudioCache(cacheDir())
-        .put("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Persist me", stored);
+        .put("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Persist me", stored);
 
     // A brand new instance over the same directory simulates a new session.
     Pcm read =
         new DiskAudioCache(cacheDir())
-            .get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Persist me");
+            .get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Persist me");
     assertNotNull("a fresh session should still find the line on disk", read);
     assertArrayEquals(stored.getSamples(), read.getSamples(), 0.0f);
   }
@@ -76,25 +76,28 @@ public class DiskAudioCacheTest {
 
   @Test
   public void differentBackendDoesNotCollide() {
+    // The backend id is part of the cache key, so two ids never serve each other's audio for an
+    // otherwise-identical (voice, emotion, text) line.
     DiskAudioCache cache = new DiskAudioCache(cacheDir());
-    cache.put("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings", pcm(24_000, 0.2f));
     cache.put(
-        "cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings", pcm(24_000, 0.8f));
+        "cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings", pcm(24_000, 0.2f));
+    cache.put("other-backend", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings", pcm(24_000, 0.8f));
 
     assertArrayEquals(
         new float[] {0.2f},
-        cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings").getSamples(),
+        cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings").getSamples(),
         0.0f);
     assertArrayEquals(
         new float[] {0.8f},
-        cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings").getSamples(),
+        cache.get("other-backend", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Greetings").getSamples(),
         0.0f);
   }
 
   @Test
   public void corruptFileIsTreatedAsMissAndDeleted() throws IOException {
     DiskAudioCache cache = new DiskAudioCache(cacheDir());
-    cache.put("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Boom", pcm(24_000, 0.3f, 0.4f));
+    cache.put(
+        "cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Boom", pcm(24_000, 0.3f, 0.4f));
 
     // Overwrite the single stored entry with garbage to simulate corruption / partial write.
     Path entry = onlyEntry(cacheDir());
@@ -102,25 +105,30 @@ public class DiskAudioCacheTest {
 
     assertNull(
         "a corrupt file must read as a miss, not crash",
-        cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Boom"));
+        cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Boom"));
     assertTrue("the corrupt file should be deleted on miss", Files.notExists(entry));
 
     // And a fresh synth can rewrite it cleanly.
-    cache.put("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Boom", pcm(24_000, 0.3f, 0.4f));
-    assertNotNull(cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Boom"));
+    cache.put(
+        "cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Boom", pcm(24_000, 0.3f, 0.4f));
+    assertNotNull(cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Boom"));
   }
 
   @Test
   public void truncatedFileIsTreatedAsMiss() throws IOException {
     DiskAudioCache cache = new DiskAudioCache(cacheDir());
     cache.put(
-        "local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Cut", pcm(24_000, 0.3f, 0.4f, 0.5f));
+        "cloud-openrouter",
+        "npc:HUMAN:MALE",
+        Emotion.NEUTRAL,
+        "Cut",
+        pcm(24_000, 0.3f, 0.4f, 0.5f));
 
     Path entry = onlyEntry(cacheDir());
     byte[] full = Files.readAllBytes(entry);
     Files.write(entry, java.util.Arrays.copyOf(full, full.length - 4)); // drop one sample's bytes
 
-    assertNull(cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Cut"));
+    assertNull(cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "Cut"));
   }
 
   @Test
@@ -135,7 +143,8 @@ public class DiskAudioCacheTest {
     for (int i = 0; i < 12; i++) {
       String text = "line-" + i;
       texts.add(text);
-      cache.put("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, text, new Pcm(samples, 24_000));
+      cache.put(
+          "cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, text, new Pcm(samples, 24_000));
       Thread.sleep(5); // ensure distinct, increasing write times for deterministic FIFO ordering
     }
 
@@ -143,10 +152,10 @@ public class DiskAudioCacheTest {
     // The very first lines should have been evicted; the most recent should remain.
     assertNull(
         "oldest line should be evicted",
-        cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-0"));
+        cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-0"));
     assertNotNull(
         "newest line should remain",
-        cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-11"));
+        cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-11"));
   }
 
   @Test
@@ -158,15 +167,19 @@ public class DiskAudioCacheTest {
     float[] samples = new float[26];
     for (int i = 0; i < 12; i++) {
       cache.put(
-          "local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-" + i, new Pcm(samples, 24_000));
+          "cloud-openrouter",
+          "npc:HUMAN:MALE",
+          Emotion.NEUTRAL,
+          "line-" + i,
+          new Pcm(samples, 24_000));
     }
 
     assertNotNull(
         "the oldest line survives under an unlimited cache",
-        cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-0"));
+        cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-0"));
     assertNotNull(
         "the newest line survives too",
-        cache.get("local-kokoro", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-11"));
+        cache.get("cloud-openrouter", "npc:HUMAN:MALE", Emotion.NEUTRAL, "line-11"));
   }
 
   @Test
@@ -177,23 +190,23 @@ public class DiskAudioCacheTest {
     DiskAudioCache cache = new DiskAudioCache(cacheDir(), cap);
     float[] samples = new float[26];
 
-    cache.put("local-kokoro", "v", Emotion.NEUTRAL, "first", new Pcm(samples, 24_000));
+    cache.put("cloud-openrouter", "v", Emotion.NEUTRAL, "first", new Pcm(samples, 24_000));
     Thread.sleep(5);
     assertNotNull(
         "the oldest entry is present before the cache fills",
-        cache.get("local-kokoro", "v", Emotion.NEUTRAL, "first"));
+        cache.get("cloud-openrouter", "v", Emotion.NEUTRAL, "first"));
 
     for (int i = 0; i < 5; i++) {
-      cache.put("local-kokoro", "v", Emotion.NEUTRAL, "fill-" + i, new Pcm(samples, 24_000));
+      cache.put("cloud-openrouter", "v", Emotion.NEUTRAL, "fill-" + i, new Pcm(samples, 24_000));
       Thread.sleep(5);
     }
 
     assertTrue("total cache size must stay under the cap", dirSize(cacheDir()) <= cap);
     assertNull(
         "the oldest entry is evicted FIFO even though it was read",
-        cache.get("local-kokoro", "v", Emotion.NEUTRAL, "first"));
+        cache.get("cloud-openrouter", "v", Emotion.NEUTRAL, "first"));
     assertNotNull(
-        "the newest entry survives", cache.get("local-kokoro", "v", Emotion.NEUTRAL, "fill-4"));
+        "the newest entry survives", cache.get("cloud-openrouter", "v", Emotion.NEUTRAL, "fill-4"));
   }
 
   @Test

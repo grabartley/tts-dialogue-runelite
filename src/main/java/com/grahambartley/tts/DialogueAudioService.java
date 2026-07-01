@@ -181,8 +181,8 @@ public final class DialogueAudioService {
     }
     long mine = epoch.incrementAndGet();
     output.stop();
-    // Resolve the active backend now so the cache key reflects the backend that will actually run,
-    // even if the user switches backend before this line reaches the pipeline thread.
+    // Resolve the active backend now so the cache key reflects the backend that will actually run
+    // this line on the pipeline thread.
     SynthesisBackend backend = backends.active();
     SynthesisRequest effective = BackendProvider.downgradeFor(backend, request);
     CacheKey key = keyFor(backend, effective);

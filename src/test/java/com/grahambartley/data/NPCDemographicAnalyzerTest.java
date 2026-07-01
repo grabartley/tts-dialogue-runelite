@@ -52,7 +52,7 @@ public class NPCDemographicAnalyzerTest {
   public void dialogueNpcsResolveToCorrectGenderAndRace() {
     // High-traffic peaceful dialogue NPCs (the acceptance-criteria sample) must
     // now be present with the correct gender so male and female townsfolk get
-    // distinct voices on the Kokoro backend, instead of collapsing to the
+    // distinct voices, instead of collapsing to the
     // human-male default. Ids are real cache ids verified against the osrs data.
     assertAttributes(3105, "Human", "Male"); // Hans
     assertAttributes(306, "Human", "Male"); // Lumbridge Guide
