@@ -9,15 +9,16 @@ plugin build.
 
 The Hub does not host the plugin jar. It hosts a one-file *commit descriptor* per plugin
 (`plugins/voiced-dialogue`) containing only a `repository=` and a `commit=`. The Hub
-packager clones this repo at that exact commit, builds the jar from `src/main`, reads
-`runelite-plugin.properties` for the display metadata (`displayName`, `author`,
-`description`, `tags`), and reads the descriptor for the listing `warning=`/`authors=`.
+packager clones this repo at that exact commit, builds the jar from `src/main` per the
+`build=standard` build type, reads `runelite-plugin.properties` for the display metadata
+(`displayName`, `author`, `support`, `description`, `tags`, `version`), and reads the
+descriptor for the listing `warning=`/`authors=`.
 
 The split matters:
 
 | Field | Lives in | Why |
 |-------|----------|-----|
-| `displayName`, `author`, `description`, `tags` | `runelite-plugin.properties` (this repo) | Read from the repo at the tagged commit. |
+| `displayName`, `author`, `support`, `description`, `tags`, `version`, `build` | `runelite-plugin.properties` (this repo) | Read from the repo at the tagged commit. `build=standard` is required and tells the packager to build `src/main` with its own Gradle setup. |
 | `repository`, `commit` | `plugins/voiced-dialogue` descriptor (plugin-hub fork) | The only required descriptor fields. |
 | `warning`, `authors`, `jarSizeLimitMiB` | `plugins/voiced-dialogue` descriptor (plugin-hub fork) | The packager reads these from the descriptor, not from the properties file. A `warning=` in `runelite-plugin.properties` is an unused prop and never reaches the user; it must go in the descriptor. |
 
@@ -37,7 +38,8 @@ repo; copy it into the fork and fill in the commit.
   runtime, so until that release is cut the local backend cannot install. Do not submit before the
   deploy has published the matching release.
 - `runelite-plugin.properties` is non-placeholder (no `Example` / `Nobody` /
-  `An example greeter plugin`, which the packager rejects).
+  `An example greeter plugin`, which the packager rejects), and declares `build=standard`.
+  Its `version` matches `gradle.properties`.
 - The plugin jar builds clean: no native libraries, no model, well under the 10 MiB
   source/jar limit. `./gradlew jar` produces a ~362 KiB jar (mostly the bundled
   `npc-voices.json` data table).

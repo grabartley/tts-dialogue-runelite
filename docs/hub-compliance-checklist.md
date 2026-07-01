@@ -102,8 +102,11 @@ From `runelite-plugin.properties`:
 
 - **displayName:** Voiced Dialogue
 - **author:** Graham Bartley
+- **support:** https://github.com/grabartley/runelite-voiced-dialogue
 - **description:** Voices NPC and player dialogue using local or cloud text-to-speech.
-- **tags:** tts, voice, dialogue, audio, immersion, accessibility
+- **tags:** tts, voice, dialogue, audio, immersion, accessibility, npc, speech, talk, text-to-speech
+- **version:** 0.1.0
+- **build:** standard
 
 Descriptor `warning=` (off-machine-data disclosure, from
 [`plugin-hub-manifest/voiced-dialogue`](plugin-hub-manifest/voiced-dialogue)): "With the
