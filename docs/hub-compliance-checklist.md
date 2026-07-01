@@ -96,6 +96,14 @@ OS) is **not** bundled: `EngineInstaller` fetches the `engine-manifest.json` for
 build's version from the matching GitHub Release, downloads the per-OS engine bundle, and
 verifies it against the SHA-256 in that manifest before extracting.
 
+### Main sources compile under the Hub's Java 11 standard build
+
+**Verified.** `build=standard` discards our `build.gradle` and compiles `src/main` at
+`options.release=11`. Our own `compileJava` pins the same release level so a Java 12+ syntax or
+API in main sources fails locally before it reaches the Hub. `src/main` carries no records,
+pattern-matching `instanceof`, or other Java 12+ constructs; tests and the `engine-kokoro`
+subproject stay on release 17 and are never built by the Hub.
+
 ## Hub listing text (for the descriptor / properties)
 
 From `runelite-plugin.properties`:

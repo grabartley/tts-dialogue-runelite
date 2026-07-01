@@ -164,7 +164,7 @@ Settings mirror the in-game panel: **General** (shared), **Cloud Voice (OpenRout
 
 ## For developers
 
-**Requirements:** Java 17 and Gradle (wrapper included).
+**Requirements:** Java 17 and Gradle (wrapper included). The plugin's `src/main` sources compile at release 11 for Plugin Hub compatibility, so keep them free of Java 12+ syntax and APIs; tests and the engine subproject use Java 17.
 
 ```bash
 git clone https://github.com/grabartley/runelite-voiced-dialogue.git

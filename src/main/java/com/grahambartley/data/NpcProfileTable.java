@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -53,15 +55,33 @@ public final class NpcProfileTable {
           "Steady and conversational.");
 
   /** The resolved profile plus the layer that won, for debug logging. */
-  public record Resolution(CharacterProfile profile, String source) {}
+  @Value
+  @Accessors(fluent = true)
+  public static class Resolution {
+    CharacterProfile profile;
+    String source;
+  }
 
   /**
    * A sparse profile layer: any field may be {@code null}, meaning "inherit from the layer below".
    */
-  private record Layer(String name, String accent, String style, String pace) {}
+  @Value
+  @Accessors(fluent = true)
+  private static class Layer {
+    String name;
+    String accent;
+    String style;
+    String pace;
+  }
 
   /** An ordered keyword rule: the layer applies when any keyword word-matches the display name. */
-  private record CategoryRule(String id, List<String> keywords, Layer layer) {}
+  @Value
+  @Accessors(fluent = true)
+  private static class CategoryRule {
+    String id;
+    List<String> keywords;
+    Layer layer;
+  }
 
   /**
    * Neutralizes the three free-text player direction fields (injection break-out + profanity)

@@ -1,5 +1,11 @@
 package com.grahambartley.synthesis;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
 /**
  * One line to synthesize: the text, the resolved {@link VoiceSpec}, the desired {@link Emotion},
  * and an optional {@link CharacterProfile} steering delivery.
@@ -26,13 +32,19 @@ package com.grahambartley.synthesis;
  * false} for NPC lines. The legacy constructors default it {@code false}, so an unmarked request
  * voices as an NPC line as before.
  */
-public record SynthesisRequest(
-    String text,
-    VoiceSpec voice,
-    Emotion emotion,
-    CharacterProfile profile,
-    boolean skipTranslation,
-    boolean player) {
+@Getter
+@Accessors(fluent = true)
+@EqualsAndHashCode
+@ToString
+@AllArgsConstructor
+public final class SynthesisRequest {
+
+  private final String text;
+  private final VoiceSpec voice;
+  private final Emotion emotion;
+  private final CharacterProfile profile;
+  private final boolean skipTranslation;
+  private final boolean player;
 
   /** A request with no character profile (backward-compatible 3-arg form). */
   public SynthesisRequest(String text, VoiceSpec voice, Emotion emotion) {

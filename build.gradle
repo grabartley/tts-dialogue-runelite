@@ -89,6 +89,14 @@ tasks.withType(JavaCompile).configureEach {
 	options.release.set(17)
 }
 
+// The Plugin Hub's build=standard compiles the plugin's main sources at Java 11 (its injected
+// build.gradle hard-sets options.release=11 and discards ours). Pin our own main compile to 11 too
+// so CI catches any Java 12+ syntax or API here rather than only when the Hub build fails. Tests and
+// the engine subproject keep 17: the Hub never builds them.
+tasks.named('compileJava') {
+	options.release.set(11)
+}
+
 tasks.register('shadowJar', Jar) {
 	dependsOn configurations.testRuntimeClasspath
 	manifest {

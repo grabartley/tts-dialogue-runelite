@@ -34,11 +34,13 @@ In-process Kokoro TTS is on by default, so manual audio testing needs no voice s
 | Unit Tests (JUnit 4) | `src/test/java/` | `./gradlew test` |
 | Manual Tests | RuneLite dev client | `./gradlew shadowJar` then run the shadow jar |
 
-## Java 17 Required
+## Java toolchain and language level
 
-The plugin targets Java 17 (`options.release.set(17)` in `build.gradle`). Ensure a Java 17 toolchain is active:
+Build with a Java 17 toolchain (tests and the `engine-kokoro` subproject compile at release 17). Ensure it is active:
 - **jenv**: `jenv local 17`
 - **SDKMAN**: `sdk use java 17-amzn`
+
+The plugin's **main sources compile at release 11** (`compileJava` sets `options.release=11`), because the Plugin Hub's `build=standard` compiles them at Java 11 with its own injected `build.gradle`. Do not use Java 12+ syntax or APIs in `src/main` (no records, no pattern-matching `instanceof`, no `Stream.toList()`, etc.); `./gradlew compileJava` fails locally if you do, mirroring the Hub. Tests may use Java 17 freely.
 
 ## Writing Tests
 

@@ -20,6 +20,7 @@ description: Build or implement a feature for the Voiced Dialogue RuneLite plugi
 11. Stop at QA testing, human performs final verification and moves to Done.
 12. Every code change must also update any docs it invalidates. Audit `README.md`, in-repo docs, and the linked issue body before committing; ship doc edits in the same PR as the code change.
 13. If QA finds issues after handoff, re-enter the build flow for the same issue: move it back to `In progress` and continue on the existing branch and PR. Do not open a new issue for the same scope.
+14. Plugin `src/main` sources must stay Java 11 compatible: the Plugin Hub's `build=standard` compiles them at release 11 with its own `build.gradle`. Do not add records, pattern-matching `instanceof`, `Stream.toList()`, or other Java 12+ syntax/APIs to `src/main`. `compileJava` pins `options.release=11` so `./gradlew build` fails locally on a violation; keep it that way. Tests and the `engine-kokoro` subproject may use Java 17.
 
 ## Workflow
 

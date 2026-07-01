@@ -43,6 +43,11 @@ repo; copy it into the fork and fill in the commit.
 - The plugin jar builds clean: no native libraries, no model, well under the 10 MiB
   source/jar limit. `./gradlew jar` produces a ~362 KiB jar (mostly the bundled
   `npc-voices.json` data table).
+- The plugin `src/main` sources compile under **Java 11**. `build=standard` replaces our
+  `build.gradle` with the Hub's, which hard-sets `options.release=11`, so any Java 12+ syntax
+  or API in main sources (records, pattern-matching `instanceof`, `Stream.toList()`, ...) fails
+  the Hub build. Our own `compileJava` pins `options.release=11` to catch this locally; keep it
+  that way. Tests and the `engine-kokoro` subproject are unaffected (the Hub never builds them).
 
 ## Step 1: Cut the matching release
 

@@ -1,5 +1,10 @@
 package com.grahambartley.synthesis;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
 /**
  * A resolved character voice profile: the director's-notes a cloud TTS backend prepends to a line
  * to steer delivery. Carries the speaker's display label plus the three steering fields the Gemini
@@ -15,7 +20,16 @@ package com.grahambartley.synthesis;
  * #cacheKey()} is a stable digest of the four fields so two NPCs that share a profile share cached
  * audio for the same line, while editing any field re-keys only the lines it changes.
  */
-public record CharacterProfile(String name, String accent, String style, String pace) {
+@Getter
+@Accessors(fluent = true)
+@EqualsAndHashCode
+@ToString
+public final class CharacterProfile {
+
+  private final String name;
+  private final String accent;
+  private final String style;
+  private final String pace;
 
   /** Divider Google's AUDIO PROFILE convention uses to separate direction from the spoken line. */
   static final String TRANSCRIPT_DIVIDER = "#### TRANSCRIPT";
@@ -36,11 +50,11 @@ public record CharacterProfile(String name, String accent, String style, String 
    * speaker speaks repeatedly; a stray trailing space leaking in from the bundled table or a config
    * field would otherwise re-key the prefix and miss the cache every line.
    */
-  public CharacterProfile {
-    name = stripTrailingOrNull(name);
-    accent = stripTrailingOrNull(accent);
-    style = stripTrailingOrNull(style);
-    pace = stripTrailingOrNull(pace);
+  public CharacterProfile(String name, String accent, String style, String pace) {
+    this.name = stripTrailingOrNull(name);
+    this.accent = stripTrailingOrNull(accent);
+    this.style = stripTrailingOrNull(style);
+    this.pace = stripTrailingOrNull(pace);
   }
 
   private static String stripTrailingOrNull(String field) {

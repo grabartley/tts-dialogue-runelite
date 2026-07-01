@@ -17,6 +17,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.IntSupplier;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -46,7 +48,14 @@ public final class DialogueAudioService {
    * downgraded) emotion, and the text are all part of the identity, so the same words spoken with a
    * different backend, voice, or emotion are distinct cache entries.
    */
-  record CacheKey(String backendId, String voiceKey, Emotion emotion, String text) {}
+  @Value
+  @Accessors(fluent = true)
+  static class CacheKey {
+    String backendId;
+    String voiceKey;
+    Emotion emotion;
+    String text;
+  }
 
   /**
    * Worker threads for the live synthesis pool. Two, sharing one queue, so a line stuck retrying a
@@ -266,7 +275,8 @@ public final class DialogueAudioService {
   }
 
   private static void shutdown(Executor exec) {
-    if (exec instanceof ExecutorService es) {
+    if (exec instanceof ExecutorService) {
+      ExecutorService es = (ExecutorService) exec;
       es.shutdownNow();
       try {
         // Give an in-flight synth/warm-up a brief window to unwind so a plugin reload does not
