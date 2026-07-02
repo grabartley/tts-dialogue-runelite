@@ -29,7 +29,15 @@ Walk up, talk, and listen. That is the whole setup.
 
 Install from the **RuneLite Plugin Hub**: open RuneLite, click the wrench (Configuration) icon, open the **Plugin Hub**, search for **Voiced Dialogue**, and install.
 
-Voiced Dialogue voices dialogue through the cloud, so it needs a free [OpenRouter](https://openrouter.ai) API key. Create one, paste it into the **OpenRouter API Key** field in the plugin's **General** settings, and you are away. Until a key is set, lines stay silent and a one-time notice points you to the key.
+Voiced Dialogue voices dialogue through the cloud, so it needs a free [OpenRouter](https://openrouter.ai) API key. There is no subscription: you load a few euro of credit once and only pay for the audio you actually generate. Setup takes about two minutes:
+
+1. **Create an account.** Go to [openrouter.ai](https://openrouter.ai), click **Sign Up**, and pick **Sign in with Google** (GitHub or email work too).
+2. **Add credits.** Open your [Credits page](https://openrouter.ai/settings/credits) and top up. **€5 is plenty to start.**
+3. **Create an API key.** Open your [API Keys page](https://openrouter.ai/settings/keys), create a new key (name it anything, like `RuneLite`), and copy it.
+4. **Paste the key into the plugin.** In RuneLite, open the Voiced Dialogue settings and paste it into the **OpenRouter API Key** field under **General**.
+5. **Talk to someone.** Walk up to any NPC and start a conversation. If they answer out loud, you are done.
+
+Until a key is set, lines stay silent and a one-time notice points you to the key.
 
 ## How it sounds
 
